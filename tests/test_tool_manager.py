@@ -416,6 +416,27 @@ def test_build_command_with_empty_and_none_placeholders(tool_manager, mocker):
     expected_command = ["test-empty", "-p-", "192.168.1.100", "None"]
     assert built_commands[0] == expected_command
 
+def test_delete_command_shortcut(tool_manager):
+    """Testet das Löschen eines Befehls über die 'tool delete <name> <cmd>' Abkürzung."""
+    tool_name = "nmap"
+    cmd_name = "shortcut-scan"
+
+    # 1. Tool erstellen und Befehl hinzufügen
+    tool_manager.create(tool_name)
+    tool_manager.add_command(tool_name, cmd_name)
+
+    # Sicherstellen, dass der Befehl vor dem Löschen vorhanden ist
+    tool_data_before = tool_manager.load(tool_name)
+    assert any(c.get("name") == cmd_name for c in tool_data_before.get("commands", []))
+
+    # 2. Simuliere den Aufruf von `tool delete nmap shortcut-scan`
+    delete_args = type('Args', (), {'name': tool_name, 'delete_args': [cmd_name]})()
+    tool_manager._cmd_delete(delete_args, cli=None)
+
+    # 3. Überprüfe, ob der Befehl entfernt wurde
+    tool_data_after = tool_manager.load(tool_name)
+    assert not any(c.get("name") == cmd_name for c in tool_data_after.get("commands", []))
+
 def test_build_command_with_invalid_path(tool_manager, mock_session_with_target, tmp_path, mocker):
     """
     Testet, ob build_command fehlschlägt, wenn der Pfad des Tools ungültig ist

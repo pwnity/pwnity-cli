@@ -87,6 +87,33 @@ def test_populate_tool_parser(parser_factory, empty_parsers):
     assert "old_index" in actions
     assert "new_index" in actions
 
+def test_tool_parser_custom_help_examples(parser_factory, empty_parsers):
+    """
+    Tests that the custom help examples for 'tool update' and 'tool delete'
+    are correctly set in the parser factory.
+    """
+    parsers = {"tool": empty_parsers["tool"]}
+    parser_factory.populate_all_parsers(parsers)
+    tool_parser = parsers["tool"]
+
+    # 1. Check 'tool update' examples
+    update_parser = get_subparser(tool_parser, "update")
+    assert update_parser is not None
+    update_examples = {example[0] for example in update_parser.examples} # Use a set for easy checking
+    assert "tool update nmap sudo true" in update_examples
+    assert "tool update nmap command stealth-scan" in update_examples
+    assert "tool update nmap stealth-scan param '-p-'" in update_examples
+
+    # 2. Check 'tool delete' examples
+    delete_parser = get_subparser(tool_parser, "delete")
+    assert delete_parser is not None
+    delete_examples = {example[0] for example in delete_parser.examples}
+    assert "tool delete nmap path" in delete_examples
+    assert "tool delete nmap stealth-scan" in delete_examples # Shortcut
+    assert "tool delete nmap command stealth-scan" in delete_examples # Explicit
+    assert "tool delete nmap stealth-scan param 2" in delete_examples
+
+
 def test_populate_jobs_parser(parser_factory, empty_parsers):
     """
     Tests that the jobs parser is correctly populated.

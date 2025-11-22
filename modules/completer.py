@@ -30,6 +30,64 @@ class Completer:
 
         return []
 
+    def _filter_completions(self, text, suggestions):
+        """
+        A robust filter that handles both lists of strings and lists of CompletionItem objects.
+        """
+        filtered = []
+        for s in suggestions:
+            # --- FINAL, ROBUST FIX for cmd2 version incompatibility ---
+            # The CompletionItem API changed across cmd2 versions.
+            # Older versions use '.text', newer versions use '.completion'.
+            # This code now robustly handles both cases.
+            if isinstance(s, CompletionItem):
+                # Check for the attribute's existence to support both old and new cmd2.
+                completion_text = getattr(s, 'completion', getattr(s, 'text', ''))
+            else:
+                completion_text = s # It's just a string
+
+            if completion_text.startswith(text):
+                filtered.append(s)
+        return filtered
+
+    def _generate_paths_recursively(self, data, current_path="", suggestions=None):
+        """
+        Recursively traverses a dictionary or list to generate all possible dot-notation paths
+        for autocompletion.
+        """
+        if suggestions is None:
+            suggestions = set()
+
+        if isinstance(data, dict):
+            for key, value in data.items():
+                new_path = f"{current_path}.{key}" if current_path else key
+                suggestions.add(new_path)
+                self._generate_paths_recursively(value, new_path, suggestions)
+        # We don't recurse into lists for 'update' completion, as path-based updates on list elements are not supported.
+        return suggestions
+
+    def _get_value_from_path(self, data, path):
+        """
+        Retrieves a value from a nested dictionary using a dot-notation path.
+        """
+        try:
+            keys = path.split('.')
+            current = data
+            for key in keys:
+                if isinstance(current, dict):
+                    current = current[key]
+                else:
+                    return None # Path is invalid
+            return current
+        except (KeyError, TypeError):
+            return None
+
+    def _create_completion_items_from_paths(self, data, paths):
+        """Creates CompletionItem objects with values as descriptions."""
+        for path in sorted(list(paths)):
+            value = self._get_value_from_path(data, path)
+            yield CompletionItem(path, description=f"({value})") if value is not None and not isinstance(value, (dict, list)) else path
+
     def complete_tool(self, text, line, begidx, endidx):
         """Autocompletion for the 'tool' command."""
         try:
@@ -58,11 +116,32 @@ class Completer:
             # --- FIX: Dynamically add all top-level keys from the tool's data to the suggestions ---
             # The previous implementation had a hardcoded list.
             base_suggestions = ['path', 'sudo', 'name', 'command']
-            dynamic_suggestions = list(tool_data.keys())
+            # --- NEW: Use recursive helper to get all nested paths ---
+            dynamic_suggestions = self._generate_paths_recursively(tool_data)
             command_names = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
             # Combine all, use a set to remove duplicates, then convert back to a sorted list.
-            all_suggestions = sorted(list(set(base_suggestions + dynamic_suggestions + command_names)))
-            return [s for s in all_suggestions if s.startswith(text)]
+            all_suggestions = set(base_suggestions + command_names) | dynamic_suggestions
+            # --- FIX: Exclude 'commands' (plural) as it cannot be directly modified. ---
+            # The user should use 'command' (singular) to interact with specific commands.
+            filtered_suggestions = [s for s in all_suggestions if s != 'commands']
+            return self._filter_completions(text, sorted(filtered_suggestions))
+
+        # --- NEW: Context-sensitive completion for 'tool delete <name> ...' ---
+        if num_tokens == 3 and tokens[1] == 'delete':
+            tool_name = tokens[2]
+            tool_data = self.cli.tool_mgr.load(tool_name)
+            if not tool_data:
+                return []
+
+            # Suggestions should include top-level fields and command names.
+            base_suggestions = ['path', 'sudo', 'name', 'command']
+            dynamic_suggestions = self._generate_paths_recursively(tool_data)
+            command_names = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
+            
+            all_suggestions = set(base_suggestions + command_names) | dynamic_suggestions
+            # --- FIX: Exclude 'commands' (plural) for the same reason as in 'update'. ---
+            filtered_suggestions = [s for s in all_suggestions if s != 'commands']
+            return self._filter_completions(text, sorted(filtered_suggestions))
 
         # 4. Context-sensitive completion for 'tool update <name> <command> ...'
         if num_tokens == 4 and tokens[1] == 'update':
@@ -77,7 +156,58 @@ class Completer:
             if is_command:
                 # Suggest actions for a command: add a parameter or update a command-level field
                 suggestions = ['param', 'execute_per_param']
-                return [s for s in suggestions if s.startswith(text)]
+                return self._filter_completions(text, suggestions)
+
+        # --- NEW: Context-sensitive completion for 'tool delete <name> <command> ...' ---
+        if num_tokens == 4 and tokens[1] == 'delete':
+            tool_name = tokens[2]
+            command_name = tokens[3]
+            tool_data = self.cli.tool_mgr.load(tool_name)
+            if not tool_data:
+                return []
+
+            # Check if the third token is a valid command for the tool
+            is_command = any(cmd.get('name') == command_name for cmd in tool_data.get("commands", []))
+            if is_command:
+                # Suggest 'param' to delete a parameter from the command
+                return self._filter_completions(text, ['param'])
+
+        # 5. --- NEW: Suggest parameter indices for 'tool update <name> <cmd> param <TAB>' ---
+        if num_tokens == 5 and tokens[1] == 'update' and tokens[4] == 'param':
+            tool_name = tokens[2]
+            command_name = tokens[3]
+            tool_data = self.cli.tool_mgr.load(tool_name)
+            if not tool_data:
+                return []
+
+            command = next((c for c in tool_data.get("commands", []) if c.get("name") == command_name), None)
+            if not command or not command.get("params"):
+                return []
+
+            # Create CompletionItem suggestions for each parameter index.
+            # The completion value is the index (1-based), and the description is the parameter's value.
+            # --- FIX: Directly format the string for display, as CompletionItem description is not always shown. ---
+            # This ensures the value is visible in the completion suggestions.
+            suggestions = [f"{i} ({(param_value[:75] + '...') if len(param_value) > 75 else param_value})"
+                           for i, param_value in enumerate(command.get("params", []), 1)]
+            return self._filter_completions(text, suggestions)
+
+        # 6. --- NEW: Suggest parameter indices for 'tool delete <name> <cmd> param <TAB>' ---
+        if num_tokens == 5 and tokens[1] == 'delete' and tokens[4] == 'param':
+            tool_name = tokens[2]
+            command_name = tokens[3]
+            tool_data = self.cli.tool_mgr.load(tool_name)
+            if not tool_data:
+                return []
+
+            command = next((c for c in tool_data.get("commands", []) if c.get("name") == command_name), None)
+            if not command or not command.get("params"):
+                return []
+
+            # --- FIX: Use direct string formatting for consistency with 'update' completion. ---
+            suggestions = [f"{i} ({(param_value[:75] + '...') if len(param_value) > 75 else param_value})"
+                           for i, param_value in enumerate(command.get("params", []), 1)]
+            return self._filter_completions(text, suggestions)
 
         return []
 
@@ -105,8 +235,13 @@ class Completer:
             target_data = self.cli.target_mgr.load(target_name)
             if not target_data:
                 return []
-            suggestions = ['url'] + list(target_data.keys())
-            return sorted([s for s in set(suggestions) if s.startswith(text)])
+            # --- FIX: Dynamically add all top-level keys from the target's data ---
+            # The previous implementation had a hardcoded list.
+            base_suggestions = ['url'] # Keep 'url' as a default suggestion
+            # --- NEW: Use recursive helper to get all nested paths ---
+            dynamic_suggestions = self._generate_paths_recursively(target_data)
+            all_suggestions = list(self._create_completion_items_from_paths(target_data, dynamic_suggestions)) + base_suggestions
+            return self._filter_completions(text, all_suggestions)
 
         return []
 

@@ -300,8 +300,9 @@ class ParserFactory:
         delete_parser.add_argument("delete_args", nargs=argparse.REMAINDER, help="What to delete (e.g., 'path' or '<cmd> param <param_value>').")
         delete_parser.examples = [
             ("tool delete nmap path", "Deletes the custom path, falling back to system PATH."),
+            ("tool delete nmap stealth-scan", "Deletes the 'stealth-scan' command (shortcut)."),
+            ("tool delete nmap command stealth-scan", "Deletes the 'stealth-scan' command (explicit)."),
             ("tool delete nmap stealth-scan param 2", "Deletes the 2nd parameter of the 'stealth-scan' command."),
-            ("tool delete nmap stealth-scan", "Deletes the entire 'stealth-scan' command.")
         ]
 
         reorder_parser = subparsers.add_parser("reorder",

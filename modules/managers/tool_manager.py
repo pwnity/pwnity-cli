@@ -79,6 +79,14 @@ class ToolManager(JSONManager):
                 self.delete_command(tool_name, potential_cmd_name)
                 return
 
+        # --- Syntax: `... <cmd_name>` (where cmd_name is a single arg) ---
+        # This handles the case from the help example: `tool delete nmap stealth-scan`
+        if len(delete_args) == 1:
+            potential_cmd_name = delete_args[0]
+            if any(c.get("name") == potential_cmd_name for c in tool.get("commands", [])):
+                self.delete_command(tool_name, potential_cmd_name)
+                return
+
         # --- Syntax 3 (Fallback): `... <field>` ---
         if len(delete_args) == 1:
             field_to_delete = delete_args[0]
@@ -299,6 +307,26 @@ class ToolManager(JSONManager):
             if field == 'commands':
                 log.error("The 'commands' list cannot be updated directly.")
                 log.prompt("Use 'tool update <name> command <cmd_name>' to edit a command.")
+                return
+
+            # --- NEW: Handle nested updates using dot notation ---
+            if '.' in field:
+                data = self.load(tool_name)
+                if not data: return
+
+                keys = field.split('.')
+                current_level = data
+                # Traverse/create path until the last key
+                for key in keys[:-1]:
+                    if key not in current_level or not isinstance(current_level[key], dict):
+                        current_level[key] = {} # Create a dict if it doesn't exist or isn't a dict
+                    current_level = current_level[key]
+                
+                # Set the value at the final key
+                final_key = keys[-1]
+                current_level[final_key] = value
+                self._save_data(tool_name, data) # Use _save_data to write the whole modified object
+                log.success(f"Tool '{tool_name}' nested field '{field}' updated -> {value}")
                 return
 
             self.update(tool_name, field, value)
