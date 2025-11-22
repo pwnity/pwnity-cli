@@ -187,7 +187,10 @@ class ParserFactory:
                                                 description=f"Displays all stored information for a specific {entity_name_singular} in a formatted table.",
                                                 formatter_class=self.formatter, add_help=False)
             self._add_custom_help(show_parser, "show")
-            show_parser.add_argument("name", help=f"The name of the {entity_name_singular} to show.", choices_provider=choices_provider)
+            # Make 'name' optional. If omitted, the loaded entity will be shown.
+            show_parser.add_argument("name", nargs='?', default=None,
+                                     help=f"Name of the {entity_name_singular} to show. If omitted, shows the loaded {entity_name_singular}.",
+                                     choices_provider=choices_provider)
             show_parser.add_argument("field", nargs="?", default=None, help="Optional: Display only the value of this specific field.")
         if "unload" not in exclude:
             unload_parser = subparsers.add_parser("unload",

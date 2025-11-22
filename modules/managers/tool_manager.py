@@ -462,6 +462,22 @@ class ToolManager(JSONManager):
         log.info(f"Param '{param}' added to {tool_name} {command_name}.")
         return cmd
 
+    def _cmd_show(self, args, cli):
+        """Handles 'tool show [name]'."""
+        tool_name = args.name
+        if not tool_name:
+            # If no name is provided, use the one from the session
+            tool_name = cli.session.tool
+            if not tool_name:
+                log.error("No tool specified and no tool loaded in the session.")
+                log.prompt("Use 'tool show <name>' or load one with 'tool load <name>'.")
+                return
+
+        tool_data = self.load(tool_name)
+        if not tool_data:
+            return # load() already logs an error
+        self._format_and_show_entity(tool_data, cli.console)
+
     def build_command(self, tool_name, session=None, command_to_run=None, extra_params=None):
         """
         Builds commands for a tool.

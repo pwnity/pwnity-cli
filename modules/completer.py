@@ -347,10 +347,15 @@ class Completer:
         # Get all available placeholders from the utility manager
         placeholders = self.cli.utility_mgr.get_all_placeholders(self.cli.session)
         
-        # Get all available functions
-        functions = [f"{name}(" for name in pwn_functions.FUNCTION_REGISTRY.keys()]
+        # Get all available functions and append '()'
+        functions = [f"{name}()" for name in pwn_functions.FUNCTION_REGISTRY.keys()]
 
+        # Combine placeholders and functions for suggestions
         suggestions = placeholders + functions
+
+        # Tell cmd2 not to add a space after completing a function.
+        # This is the compatible way for older cmd2 versions.
+        self.cli.allow_appended_space = False
 
         # The text to complete might already have a '$'
         if text.startswith('$'):

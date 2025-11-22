@@ -26,6 +26,22 @@ class WordlistManager(JSONManager):
             log.success(f"{entity_type} '{args.name}' added.")
             log.prompt(f"Set the path now with: wordlist update {args.name} path /path/to/wordlist.txt")
 
+    def _cmd_show(self, args, cli):
+        """Handles 'wordlist show [name]'."""
+        wordlist_name = args.name
+        if not wordlist_name:
+            # If no name is provided, use the one from the session
+            wordlist_name = cli.session.wordlist
+            if not wordlist_name:
+                log.error("No wordlist specified and no wordlist loaded in the session.")
+                log.prompt("Use 'wordlist show <name>' or load one with 'wordlist load <name>'.")
+                return
+
+        wordlist_data = self.load(wordlist_name)
+        if not wordlist_data:
+            return # load() already logs an error
+        self._format_and_show_entity(wordlist_data, cli.console)
+
     def _cmd_export(self, args, cli):
         """Generates the pwnity commands to reconstruct a wordlist."""
         name = args.name

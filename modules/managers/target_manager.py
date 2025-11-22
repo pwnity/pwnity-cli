@@ -31,6 +31,22 @@ class TargetManager(JSONManager):
         super()._cmd_add(args, cli)
         log.prompt(f"Tip: Define the target's URL now with 'target update {args.name} url <your-url-here>'")
 
+    def _cmd_show(self, args, cli):
+        """Handles 'target show [name]'."""
+        target_name = args.name
+        if not target_name:
+            # If no name is provided, use the one from the session
+            target_name = cli.session.target
+            if not target_name:
+                log.error("No target specified and no target loaded in the session.")
+                log.prompt("Use 'target show <name>' or load one with 'target load <name>'.")
+                return
+
+        target_data = self.load(target_name)
+        if not target_data:
+            return # load() already logs an error
+        self._format_and_show_entity(target_data, cli.console)
+
     def _is_local_target(self, target):
         """Checks if the target is a local/private address."""
         hostname = target.get('hostname')
