@@ -66,5 +66,5 @@
   },
   "username": "admin",
   "password": "foooooo",
-  "auth_b64": "$target.username:$target.password"
+  "auth_b64": "b64encode($target.username:$target.password)"
 }

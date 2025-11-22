@@ -82,36 +82,20 @@ def resolve_placeholders(text: str, session=None, tool_name: str = None, command
         return text
 
     current_text = text
-    # Loop to resolve nested functions, e.g., b64encode(urlencode($target.name))
-    # We continue as long as we are successfully replacing function patterns.
+    # --- FINAL FIX for deeply nested placeholders ---
+    # This loop ensures that the entire string is repeatedly processed until no more
+    # placeholders (neither functions nor simple $entity.key) can be resolved.
+    # This correctly handles cases like $tool.input -> $target.auth_b64 -> b64encode($target.username:$target.password) -> final_string
     while True:
-        match = FUNC_PATTERN.search(current_text)
-        if not match:
-            break # No more function calls found
-
-        func_name, arg_str = match.groups()
-        
-        if func_name in FUNCTION_REGISTRY:
-            # First, resolve any simple placeholders *inside* the argument string
-            resolved_arg = _resolve_simple_placeholders(arg_str, session, tool_name, command_name)
-            
-            # Call the registered function with the resolved argument
-            try:
-                result = FUNCTION_REGISTRY[func_name](resolved_arg)
-                # Replace the entire function call with its result
-                current_text = current_text[:match.start()] + str(result) + current_text[match.end():]
-            except Exception as e:
-                log.error(f"Error executing placeholder function '{func_name}': {e}")
-                # Stop processing to avoid further errors with this string
-                break
-        else:
-            # If the function name is not in our registry, we stop to avoid infinite loops
-            # on strings that look like functions but aren't, e.g., "some_command(foo)"
+        # First, resolve all simple placeholders ($entity.key)
+        resolved_simple = _resolve_simple_placeholders(current_text, session, tool_name, command_name)
+        # Then, resolve any function calls that might have been exposed
+        resolved_functions = _resolve_functions(resolved_simple, session, tool_name, command_name)
+        if resolved_functions == current_text:
+            # If the text is stable (no more changes), we are done.
             break
-
-    # After all functions are resolved, resolve any remaining top-level simple placeholders
-    final_text = _resolve_simple_placeholders(current_text, session, tool_name, command_name)
-    return final_text
+        current_text = resolved_functions
+    return current_text
 
 def register_manager(key, manager):
     """Registers a manager with a given prefix for placeholder resolution."""
@@ -121,7 +105,43 @@ def _resolve_simple_placeholders(text: str, session=None, tool_name: str = None,
     """Resolves only the simple $entity.key placeholders."""
     if not isinstance(text, str) or not session:
         return text
-    return SIMPLE_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_match(m, session, tool_name, command_name), text)
+
+    # --- FIX for nested placeholders ---
+    # Loop to resolve nested simple placeholders, e.g., $target.auth_b64 which contains "$target.username:$target.password".
+    # The previous implementation would only perform one pass.
+    current_text = text
+    while True:
+        resolved_text = SIMPLE_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_match(m, session, tool_name, command_name), current_text)
+        if resolved_text == current_text: # No more placeholders were found and replaced
+            return resolved_text
+        current_text = resolved_text
+
+def _resolve_functions(text: str, session=None, tool_name: str = None, command_name: str = None) -> str:
+    """Resolves only the function-based placeholders, e.g., func(...)"""
+    current_text = text
+    # Loop to resolve nested functions, e.g., b64encode(urlencode(...))
+    while True:
+        match = FUNC_PATTERN.search(current_text)
+        if not match:
+            break # No more function calls found
+
+        func_name, arg_str = match.groups()
+
+        if func_name in FUNCTION_REGISTRY:
+            # The argument string is already resolved from the main loop, so we can call the function directly.
+            try:
+                result = FUNCTION_REGISTRY[func_name](arg_str)
+                # Replace the entire function call with its result
+                current_text = current_text[:match.start()] + str(result) + current_text[match.end():]
+            except Exception as e:
+                log.error(f"Error executing placeholder function '{func_name}': {e}")
+                break # Stop processing to avoid further errors
+        else:
+            # If the name is not a registered function, stop to avoid infinite loops
+            # on strings that look like functions but aren't (e.g., "some_command(foo)").
+            break
+    return current_text
+
 
 def _resolve_match(match, session, tool_name: str = None, command_name: str = None) -> str:
     """Callback function for re.sub to resolve a single placeholder match."""

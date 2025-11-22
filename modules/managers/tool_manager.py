@@ -517,11 +517,10 @@ class ToolManager(JSONManager):
                     built_commands.append(single_cmd)
             else:
                 # "single_line" - the original behavior.
-                # 1. Resolve placeholders in the raw parameter strings
-                resolved_param_strings = [
-                    resolve_placeholders(p, session=session)
-                    for p in cmd.get("params", [])
-                ]
+                # 1. Resolve placeholders in the raw parameter strings.
+                # The resolve_placeholders function now handles nested/recursive resolution internally.
+                resolved_param_strings = [resolve_placeholders(p, session=session, tool_name=tool_name, command_name=cmd.get("name")) for p in cmd.get("params", [])]
+
                 # 2. Split each resolved string into individual arguments.
                 final_params = []
                 for s in resolved_param_strings:

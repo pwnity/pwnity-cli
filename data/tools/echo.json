@@ -24,6 +24,6 @@
       ]
     }
   ],
-  "input": "foo",
+  "input": "$target.auth_b64",
   "test": "test"
 }

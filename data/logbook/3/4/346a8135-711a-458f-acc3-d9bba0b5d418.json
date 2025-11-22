@@ -1,0 +1,18 @@
+{
+  "id": "346a8135-711a-458f-acc3-d9bba0b5d418",
+  "timestamp": "2025-11-22 14:52:47",
+  "command": "sudo /usr/bin/echo -n '$tool.b64_auth'",
+  "context": {
+    "session": "local_ping",
+    "target": "fritzbox",
+    "tool": "echo",
+    "wordlist": "rockyou"
+  },
+  "execution": {
+    "duration_seconds": 0.01,
+    "return_code": 0
+  },
+  "output": "$tool.b64_auth",
+  "source_job_id": null,
+  "additional_info": {}
+}

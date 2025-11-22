@@ -1,0 +1,7 @@
+{
+  "name": "test",
+  "target": "fritzbox",
+  "tool": "echo",
+  "wordlist": "rockyou",
+  "report": null
+}
