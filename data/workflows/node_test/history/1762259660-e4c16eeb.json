@@ -1,0 +1,9 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1762259660.8867283,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [],
+  "run_id": "1762259660-e4c16eeb",
+  "workflow_name": "node_test"
+}

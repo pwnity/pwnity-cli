@@ -1,0 +1,115 @@
+{
+  "name": "1",
+  "id": 1,
+  "timestamp": "2025-09-04 16:50:40",
+  "command": "/usr/bin/curl -I -s -A Vermillion https://www.moonandhoney.de",
+  "context": {
+    "session": "default",
+    "target": null,
+    "tool": null,
+    "wordlist": null
+  },
+  "execution": {
+    "duration_seconds": 1.24,
+    "return_code": 0
+  },
+  "output": "HTTP/1.1 301 Moved Permanently\r\nDate: Thu, 04 Sep 2025 14:50:39 GMT\r\nServer: Apache/2.4.52 (Debian)\r\nStrict-Transport-Security: max-age=63072000; includeSubDomains\r\nX-Powered-By: PHP/7.4.27\r\nX-Redirect-By: WordPress\r\nLocation: https://moonandhoney.de/\r\nContent-Type: text/html; charset=UTF-8\r\nX-Frame-Options: SAMEORIGIN\r\nReferrer-Policy: same-origin\r\n\r\n",
+  "findings": {
+    "recon_domain_generic": [
+      "moonandhoney.de"
+    ],
+    "recon_url_https": [
+      "https://moonandhoney.de/"
+    ],
+    "recon_phone_e164": [
+      "63072000"
+    ],
+    "recon_header_content_type": [
+      "Content-Type: text/html; charset=UTF-8\r"
+    ],
+    "recon_header_location": [
+      "Location: https://moonandhoney.de/\r"
+    ],
+    "recon_header_server": [
+      "Server: Apache/2.4.52 (Debian)\r"
+    ],
+    "recon_social_twitter_handle": [
+      "04",
+      "1",
+      "14",
+      "2",
+      "2025",
+      "27",
+      "301",
+      "39",
+      "4",
+      "50",
+      "52",
+      "63072000",
+      "7",
+      "8",
+      "Apache",
+      "By",
+      "Content",
+      "Date",
+      "Debian",
+      "Frame",
+      "GMT",
+      "HTTP",
+      "Location",
+      "Moved",
+      "Options",
+      "PHP",
+      "Permanently",
+      "Policy",
+      "Powered",
+      "Redirect",
+      "Referrer",
+      "SAMEORIGIN",
+      "Security",
+      "Sep",
+      "Server",
+      "Strict",
+      "Thu",
+      "Transport",
+      "Type",
+      "UTF",
+      "WordPress",
+      "X",
+      "age",
+      "charset",
+      "de",
+      "html",
+      "https",
+      "includeSubDomai",
+      "max",
+      "moonandhoney",
+      "ns",
+      "origin",
+      "same",
+      "text"
+    ],
+    "recon_banner_apache": [
+      "Apache/2.4.52"
+    ],
+    "recon_ipv4_integer": [
+      "63072000"
+    ],
+    "recon_domain_tld_de": [
+      "moonandhoney.de"
+    ],
+    "recon_kv_pair": [
+      "charset=UTF-8",
+      "max-age=63072000"
+    ],
+    "recon_http_status_301": [
+      "HTTP/1.1 301"
+    ],
+    "recon_tech_indicator_01": [
+      "X-Powered-By: PHP"
+    ],
+    "recon_tech_indicator_05": [
+      "Server: Apache"
+    ]
+  }
+}

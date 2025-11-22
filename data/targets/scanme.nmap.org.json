@@ -1,0 +1,56 @@
+{
+  "name": "scanme.nmap.org",
+  "protocol": "https",
+  "hostname": "scanme.nmap.org",
+  "ip": "45.33.32.156",
+  "domain": "nmap.org",
+  "domain_name": "nmap",
+  "tld": "org",
+  "subdomains": [
+    "scanme"
+  ],
+  "port": "443",
+  "base_url": "https://scanme.nmap.org",
+  "uri": "/",
+  "url": "https://scanme.nmap.org",
+  "ptr_record": "scanme.nmap.org",
+  "whois_info": {
+    "domain_name": "nmap.org",
+    "registrar": "DYNADOT LLC",
+    "registrar_url": "http://www.dynadot.com",
+    "whois_server": "whois.dynadot.com",
+    "updated_date": [
+      "2023-08-31T05:05:15",
+      "2023-08-26T05:16:38"
+    ],
+    "creation_date": "1999-01-18T05:00:00",
+    "expiration_date": "2029-01-18T05:00:00",
+    "name_servers": [
+      "ns1.linode.com",
+      "ns2.linode.com",
+      "ns3.linode.com",
+      "ns4.linode.com",
+      "ns5.linode.com"
+    ],
+    "status": "clientTransferProhibited https://icann.org/epp#clientTransferProhibited",
+    "emails": "abuse@dynadot.com",
+    "dnssec": "unsigned",
+    "name": "REDACTED FOR PRIVACY",
+    "org": "Super Privacy Service LTD c/o Dynadot",
+    "address": "PO Box 701",
+    "city": "San Mateo",
+    "state": "California",
+    "registrant_postal_code": "94401",
+    "country": "US"
+  },
+  "geo_intel": {
+    "ip": "45.33.32.156",
+    "lat": 37.5625,
+    "lon": -122.0004,
+    "city": "Fremont",
+    "country": "United States",
+    "isp": "Akamai Technologies, Inc.",
+    "org": "Linode",
+    "as": "AS63949 Akamai Connected Cloud"
+  }
+}

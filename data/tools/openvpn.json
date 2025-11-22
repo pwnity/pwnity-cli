@@ -1,0 +1,15 @@
+{
+  "name": "openvpn",
+  "path": "/usr/sbin/openvpn",
+  "sudo": true,
+  "commands": [
+    {
+      "name": "tryhackme",
+      "params": [
+        "--config",
+        "$tool.ovpn_file_path"
+      ]
+    }
+  ],
+  "ovpn_file_path": "/home/kali/v3rm1ll1on.ovpn"
+}

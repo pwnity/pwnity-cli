@@ -1,0 +1,16 @@
+{
+  "id": "b66f3836-8938-4675-9625-f7081d2c8a4f",
+  "timestamp": "2025-11-03 21:12:59",
+  "command": "/home/kali/fake_test.sh 5",
+  "context": {},
+  "execution": {
+    "duration_seconds": 65.09,
+    "return_code": 0
+  },
+  "output": "Username (default: guest): (no username \u2014 using: guest)\nPassword: \n\n(no password \u2014 using fallback)\nLogin FAILED (invalid password)\n[guest] working (1/5)...\n[guest] working (2/5)...\n[guest] working (3/5)...\n[guest] working (4/5)...\n[guest] working (5/5)...\nSession ended.\n",
+  "source_job_id": "fbe034a4-6a0a-4d32-8ada-78d85d9fd083",
+  "additional_info": {
+    "node_id": 15,
+    "node_title": "faketest.sh"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1762263139.2183838,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [],
+  "run_id": "1762263139-0cab7654",
+  "workflow_name": "my_workflow"
+}

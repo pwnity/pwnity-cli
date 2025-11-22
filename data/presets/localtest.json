@@ -1,0 +1,7 @@
+{
+  "name": "localtest",
+  "target": "localhost",
+  "tool": "faketest.sh",
+  "wordlist": null,
+  "report": null
+}

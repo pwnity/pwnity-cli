@@ -1,0 +1,15 @@
+{
+  "name": "faketest.sh",
+  "path": "/home/kali/fake_test.sh",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "fake",
+      "params": [
+        "$tool.input"
+      ],
+      "execute_per_param": false
+    }
+  ],
+  "input": "30"
+}

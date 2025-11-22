@@ -1,0 +1,26 @@
+{
+  "path": "/usr/bin/sqlmap",
+  "sudo": false,
+  "name": "sqlmap",
+  "commands": [
+    {
+      "name": "quick_test",
+      "params": [
+        "-u '$target.url' --batch --level=1 --risk=1"
+      ]
+    },
+    {
+      "name": "list_dbs",
+      "params": [
+        "-u '$target.url' --dbs --batch"
+      ]
+    },
+    {
+      "name": "dump_db",
+      "params": [
+        "-u '$target.url' --batch -D DB_NAME"
+      ],
+      "execute_per_param": false
+    }
+  ]
+}

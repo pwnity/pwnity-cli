@@ -1,0 +1,46 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1762174678.8901513,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "21b66825-7372-4738-b9bb-29abf5b1c564",
+      "command_str": "/home/kali/fake_test.sh 5",
+      "session_name": "workflow",
+      "tool_name": "faketest.sh",
+      "tool_command_name": "fake",
+      "status": "finished",
+      "start_time": 1762174662.371533,
+      "end_time": 1762174678.7991202,
+      "duration": 16.427587270736694,
+      "return_code": 0,
+      "logbook_id": "9cc1b710-64d0-4094-916b-0ae84d3cfd6c",
+      "additional_info": {
+        "node_id": 15,
+        "node_title": "faketest.sh"
+      },
+      "output": "Username (default: guest): test\r\nPassword: \r\nasd\r\nLogin FAILED (invalid password)\r\n[test] working (1/5)...\r\n[test] working (2/5)...\r\n[test] working (3/5)...\r\n[test] working (4/5)...\r\n[test] working (5/5)...\r\nSession ended.\r\n"
+    },
+    {
+      "id": "0fca85a9-40b6-44b5-a977-e3a21078f354",
+      "command_str": "/usr/bin/echo -n 'THIS IS A TEST'",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1762174662.4715242,
+      "end_time": 1762174662.5724297,
+      "duration": 0.1009054183959961,
+      "return_code": 0,
+      "logbook_id": "e91929d7-cd9e-41ed-b1ea-8027bad60741",
+      "additional_info": {
+        "node_id": 36,
+        "node_title": "echo"
+      },
+      "output": "THIS IS A TEST"
+    }
+  ],
+  "run_id": "1762174678-db911d68",
+  "workflow_name": "test5"
+}

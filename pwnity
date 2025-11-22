@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+import sys
+import os
+import subprocess
+
+# --- Add the project root to the Python path ---
+# This ensures that all modules can be imported correctly, regardless of
+# how the script is executed.
+project_root = os.path.abspath(os.path.dirname(__file__))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+# Set the working directory to the project root.
+# This ensures that all relative paths in config.json (like 'data/targets') resolve correctly.
+os.chdir(project_root)
+
+# Import the logger from services, as it's used for messages.
+from modules.services import log
+
+def start_web_ui():
+    """Checks for the web UI plugin and starts it if found."""
+    web_ui_path = os.path.join(project_root, 'plugins', 'web_ui', 'pwnity_ui.py')
+
+    if os.path.exists(web_ui_path):
+        log.info("Starting pwnity Web UI...")
+        try:
+            # We execute the web UI app as a separate process.
+            # This keeps the web server isolated from the CLI logic.
+            # We pass all arguments except '--web-ui' to the web app.
+            args_for_web_ui = [arg for arg in sys.argv[1:] if arg != '--web-ui']
+            # The web UI app itself will handle its own Flask server startup.
+            process = subprocess.Popen([sys.executable, web_ui_path] + args_for_web_ui, cwd=project_root)
+            process.wait()
+        except KeyboardInterrupt:
+            log.info("Web UI stopped by user.")
+            if process.poll() is None: # If still running
+                process.terminate()
+        except Exception as e:
+            log.error(f"Failed to start the Web UI: {e}")
+    else:
+        # If the plugin is not found, display the PRO feature message.
+        log.header("PRO Feature: Web UI")
+        log.info("The Web UI is a premium feature.")
+        log.prompt("To get access, please visit: https://your-website.com/pro")
+
+def main():
+    """Main entry point for the pwnity application."""
+    # Check for the --web-ui flag before starting the CLI.
+    if '--web-ui' in sys.argv:
+        start_web_ui()
+    else:
+        # If the flag is not present, start the regular CLI.
+        from pwnity_cli import MyCLI
+        cli = MyCLI()
+        sys.exit(cli.cmdloop())
+
+if __name__ == '__main__':
+    main()

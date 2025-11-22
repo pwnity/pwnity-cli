@@ -1,0 +1,64 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1762199534.726997,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "6d2fed28-8290-42cd-ba86-02c9ff608d90",
+      "command_str": "/usr/bin/nc -l -p 1337 -v -n",
+      "session_name": "workflow",
+      "tool_name": "nc",
+      "tool_command_name": "listen_1337",
+      "status": "killed",
+      "start_time": 1762199529.5212843,
+      "end_time": 1762199534.530325,
+      "duration": 5.009040594100952,
+      "return_code": 1,
+      "logbook_id": "7ab105f7-3339-4f01-840f-2b08fb145354",
+      "additional_info": {
+        "node_id": 17,
+        "node_title": "nc"
+      },
+      "output": "listening on [any] 1337 ...\r\n\r\n"
+    },
+    {
+      "id": "0f9f66b9-a18a-4f5b-9499-a793e26e7d3e",
+      "command_str": "/home/kali/fake_test.sh 5",
+      "session_name": "workflow",
+      "tool_name": "faketest.sh",
+      "tool_command_name": "fake",
+      "status": "killed",
+      "start_time": 1762199529.6210134,
+      "end_time": 1762199534.5301602,
+      "duration": 4.909146785736084,
+      "return_code": -15,
+      "logbook_id": "6c24d426-44a9-4d22-a9b2-6ca2bbd22102",
+      "additional_info": {
+        "node_id": 15,
+        "node_title": "faketest.sh"
+      },
+      "output": "Username (default: guest): "
+    },
+    {
+      "id": "9c137a8d-486f-4e29-9aa6-bf03da5bcc53",
+      "command_str": "/usr/bin/echo -n 'THIS IS A TEST'",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1762199529.7215502,
+      "end_time": 1762199529.8238392,
+      "duration": 0.10228896141052246,
+      "return_code": 0,
+      "logbook_id": "f667c5eb-cae2-462d-8c81-2c6b70ec6fc1",
+      "additional_info": {
+        "node_id": 36,
+        "node_title": "echo"
+      },
+      "output": "THIS IS A TEST"
+    }
+  ],
+  "run_id": "1762199534-f390eba2",
+  "workflow_name": "test5"
+}

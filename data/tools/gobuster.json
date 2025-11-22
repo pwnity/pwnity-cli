@@ -1,0 +1,25 @@
+{
+  "name": "gobuster",
+  "path": "/usr/bin/gobuster",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "dir",
+      "params": [
+        "dir",
+        "-w $wordlist.path",
+        "-b $tool.negative_codes",
+        "-u $target.base_url"
+      ]
+    },
+    {
+      "name": "dns",
+      "params": [
+        "dns",
+        "-w $wordlist.path",
+        "--wildcard",
+        "-d $target.domain"
+      ]
+    }
+  ]
+}

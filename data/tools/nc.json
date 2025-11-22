@@ -1,0 +1,17 @@
+{
+  "path": "/usr/bin/nc",
+  "sudo": false,
+  "name": "nc",
+  "commands": [
+    {
+      "name": "listen_1337",
+      "params": [
+        "-l",
+        "-p $tool.port",
+        "-v",
+        "-n"
+      ]
+    }
+  ],
+  "port": "1337"
+}

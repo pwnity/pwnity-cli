@@ -1,0 +1,51 @@
+{
+  "name": "iprs.fly.dev",
+  "protocol": "https",
+  "hostname": "iprs.fly.dev",
+  "ip": "66.241.124.224",
+  "domain": "fly.dev",
+  "domain_name": "fly",
+  "tld": "dev",
+  "subdomains": [
+    "iprs"
+  ],
+  "port": "443",
+  "base_url": "https://iprs.fly.dev",
+  "uri": "/",
+  "url": "https://iprs.fly.dev",
+  "ptr_record": "ip-66-241-124-224.shared.customer.flyio.net",
+  "ssl_info": {
+    "subject": {
+      "commonName": "*.fly.dev"
+    },
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "E7"
+    },
+    "valid_from": "Aug 23 23:24:54 2025 GMT",
+    "valid_to": "Nov 21 23:24:53 2025 GMT",
+    "sans": [
+      "*.fly.dev"
+    ]
+  },
+  "http_headers": {
+    "content-type": "text/plain; charset=utf-8",
+    "content-length": "14",
+    "date": "Fri, 17 Oct 2025 13:09:38 GMT",
+    "server": "Fly/31563e821d (2025-10-15)",
+    "via": "1.1 fly.io, 1.1 fly.io",
+    "fly-request-id": "01K7S4MHRB6PP334KESCWDH1ES-fra"
+  },
+  "whois_info": {},
+  "geo_intel": {
+    "ip": "66.241.124.224",
+    "lat": 41.8781,
+    "lon": -87.6298,
+    "city": "Chicago",
+    "country": "United States",
+    "isp": "Fly.io, Inc.",
+    "org": "Fly.io, Inc.",
+    "as": "AS40509 Fly.io, Inc."
+  }
+}

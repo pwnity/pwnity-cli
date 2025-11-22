@@ -1,0 +1,7 @@
+{
+  "name": "my-best-preset",
+  "target": "moonandhoney.de",
+  "tool": "gobuster",
+  "wordlist": "dir_small",
+  "report": "my-report"
+}

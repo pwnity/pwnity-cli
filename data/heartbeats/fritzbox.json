@@ -1,0 +1,130 @@
+{
+  "target_name": "fritzbox",
+  "url": "http://192.168.178.1",
+  "min_delay_seconds": 1.0,
+  "max_delay_seconds": 3.0,
+  "timelimit_seconds": null,
+  "status": "stopped",
+  "data_points": [
+    {
+      "timestamp": "2025-11-16T22:34:38.853363",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1321,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:41554a3da4cbe760f7ce14eaf5d05e7d"
+    },
+    {
+      "timestamp": "2025-11-16T22:34:41.891146",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 999,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:93c49af4fcdeb6a4e85622a092a4264c"
+    },
+    {
+      "timestamp": "2025-11-16T22:34:44.043071",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1145,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:6e465a9c78f9565d50f0cf258bd56794"
+    },
+    {
+      "timestamp": "2025-11-16T22:34:46.362057",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1267,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:b06d0d724cee5e276973bdf2ccd31e7f"
+    },
+    {
+      "timestamp": "2025-11-16T22:34:49.740250",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1095,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:b1b986bc8741ab03af9512fb5b618137"
+    },
+    {
+      "timestamp": "2025-11-16T22:34:52.494272",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1275,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:ffb69719e5d5583a8fb7a299a0ffc8f5"
+    },
+    {
+      "timestamp": "2025-11-16T22:34:56.065072",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1014,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:4440891fd34e65d33a123fcc581cb35b"
+    },
+    {
+      "timestamp": "2025-11-16T22:34:58.799558",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1217,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:fdfe8e50d0f5111fd38c0d8abf720bca"
+    },
+    {
+      "timestamp": "2025-11-16T22:35:02.708025",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1301,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:3285df1862c098f47dcb15a49f18d219"
+    },
+    {
+      "timestamp": "2025-11-16T22:35:06.906051",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1358,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:6c2ad174e974ee29991ee0383b70485c"
+    },
+    {
+      "timestamp": "2025-11-16T22:35:10.325567",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1224,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:553fdd3bad463a48fe93876a717f1d68"
+    },
+    {
+      "timestamp": "2025-11-16T22:35:14.271299",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1109,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:7682f37b4ee6bbcf000d310956246e1e"
+    },
+    {
+      "timestamp": "2025-11-16T22:35:17.881985",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1024,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:b41b0c13a7eb71b9f40b8b4c35820fef"
+    },
+    {
+      "timestamp": "2025-11-16T22:35:20.680885",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1118,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:3ae4ca9e64e1a397ceff7208716acb8a"
+    },
+    {
+      "timestamp": "2025-11-16T22:35:23.738195",
+      "resolved_ip": "192.168.178.1",
+      "latency_ms": 1120,
+      "status_code": 200,
+      "content_length": 8172,
+      "content_hash": "md5:1b2beea2f7d856367ee0150b567075ee"
+    }
+  ]
+}

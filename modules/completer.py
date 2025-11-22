@@ -1,0 +1,254 @@
+# modules/completer.py
+import shlex
+from cmd2 import CompletionItem
+from . import functions as pwn_functions
+
+class Completer:
+    """
+    A dedicated class to handle all command completion logic for the pwnity shell.
+    This centralizes completion logic, making it easier to manage and test.
+    """
+    def __init__(self, cli_instance):
+        """
+        Initializes the Completer with a reference to the main CLI application instance,
+        which it uses to access managers and session state.
+        """
+        self.cli = cli_instance
+
+    def _basic_manager_completion(self, text, line, begidx, endidx, manager, subcommands):
+        """A generic completion helper for manager-based commands."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+
+        if len(tokens) == 1:  # Completing the subcommand
+            return [s for s in subcommands if s.startswith(text)]
+        
+        if len(tokens) == 2:  # Completing the item name
+            return [item for item in manager.list_all() if item.startswith(text)]
+
+        return []
+
+    def complete_help(self, text, line, begidx, endidx):
+        """Autocompletion for the help command, including subcommands."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+
+        if len(tokens) == 1:
+            all_commands = self.cli.get_all_commands()
+            return [c for c in all_commands if c.startswith(text)]
+        
+        elif len(tokens) == 2:
+            command_name = tokens[1]
+            parser = getattr(self.cli, f"{command_name}_parser", None)
+            if not parser: return []
+
+            subparsers_action = next((action for action in parser._actions if isinstance(action, self.cli.argparse._SubParsersAction)), None)
+            if not subparsers_action or not subparsers_action.choices: return []
+
+            subcommand_names = list(subparsers_action.choices.keys())
+            for sub_parser in subparsers_action.choices.values():
+                subcommand_names.extend(getattr(sub_parser, 'aliases', []))
+
+            return sorted([s for s in subcommand_names if s.startswith(text)])
+        return []
+
+    def complete_manual(self, text, line, begidx, endidx):
+        topics = self.cli.manual_mgr.list_topics()
+        return [t for t in topics if t.startswith(text)]
+
+    def complete_parser(self, text, line, begidx, endidx):
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError: tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        if num_tokens == 1:
+            return [s for s in ['add', 'list', 'show', 'apply', 'delete', 'destroy', 'rename', 'update', 'export'] if s.startswith(text)]
+        if num_tokens == 2:
+            if tokens[1] in ['show', 'apply', 'delete', 'destroy', 'rename', 'update', 'export']:
+                return [p for p in self.cli.parser_mgr.list_all() if p.startswith(text)]
+        if num_tokens == 3:
+            if tokens[1] == 'apply':
+                return [str(l_id) for l_id in self.cli.logbook_mgr.list_all() if str(l_id).startswith(text)]
+            if tokens[1] in ['update', 'delete']:
+                parser_data = self.cli.parser_mgr.load(tokens[2])
+                if not parser_data: return []
+                rule_names = [r.get('name') for r in parser_data.get('rules', [])]
+                suggestions = ['description', 'add-rule'] + rule_names
+                return [s for s in suggestions if s.startswith(text)]
+        if num_tokens == 4:
+            if tokens[1] == 'update' and tokens[3] != 'add-rule':
+                return [s for s in ['regex', 'exclude'] if s.startswith(text)]
+            if tokens[1] == 'delete':
+                return [s for s in ['exclude'] if s.startswith(text)]
+        if num_tokens == 5:
+            if tokens[1] == 'delete' and tokens[3] == 'exclude':
+                parser_data = self.cli.parser_mgr.load(tokens[2])
+                if not parser_data: return []
+                rule = next((r for r in parser_data.get('rules', []) if r.get('name') == tokens[3]), None)
+                if not rule: return []
+                exclude_patterns = rule.get('exclude_patterns', [])
+                suggestions = [CompletionItem(str(i), description=f"({(p[:40] + '...') if len(p) > 40 else p})") for i, p in enumerate(exclude_patterns, 1)]
+                return [s for s in suggestions if s.startswith(text)]
+        return []
+
+    def complete_logbook(self, text, line, begidx, endidx):
+        return self._basic_manager_completion(text, line, begidx, endidx, self.cli.logbook_mgr, ['list', 'show'])
+
+    def complete_report(self, text, line, begidx, endidx):
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError: tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        if num_tokens == 1:
+            return [s for s in ['add', 'load', 'unload', 'list', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render', 'view'] if s.startswith(text)]
+        if num_tokens == 2:
+            if tokens[1] in ['load', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render']:
+                return [r_name for r_name in self.cli.report_mgr.list_all() if r_name.startswith(text)]
+            if tokens[1] == 'view' and self.cli.session.report:
+                files = self.cli.report_mgr.list_files(self.cli.session.report)
+                return [f for f in files if f.startswith(text)] if files else []
+        return []
+
+    def complete_revshell(self, text, line, begidx, endidx):
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError: tokens = line[:begidx].split()
+        if len(tokens) == 1:
+            return [lang for lang in self.cli.revshell_mgr.list_languages() if lang.startswith(text)]
+        return []
+
+    def complete_heartbeat(self, text, line, begidx, endidx):
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError: tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        if num_tokens == 1:
+            return [s for s in ['start', 'stop', 'show', 'list', 'destroy'] if s.startswith(text)]
+        if num_tokens == 2 and tokens[1] in ['stop', 'show', 'destroy']:
+            return [t for t in self.cli.heartbeat_mgr.list_all() if t.startswith(text)]
+        if num_tokens > 1 and tokens[1] == 'start':
+            used_options = {tokens[i] for i in range(2, num_tokens) if (i - 2) % 2 == 0}
+            if (num_tokens - 2) % 2 == 0:
+                available_options = ['delaymin', 'delaymax', 'timelimit']
+                return [opt for opt in available_options if opt not in used_options and opt.startswith(text)]
+        return []
+
+    def complete_library(self, text, line, begidx, endidx):
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError: tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        subparsers_action = next((action for action in self.cli.library_parser._actions if isinstance(action, self.cli.argparse._SubParsersAction)), None)
+        if not subparsers_action: return []
+        subcommand_names = list(subparsers_action.choices.keys())
+        for sub_parser in subparsers_action.choices.values():
+            subcommand_names.extend(getattr(sub_parser, 'aliases', []))
+
+        if num_tokens == 1:
+            return [s for s in sorted(list(set(subcommand_names))) if s.startswith(text)]
+        if num_tokens == 2:
+            if tokens[1] in ['show', 'rename', 'update', 'delete', 'destroy', 'open', 'export', 'reverse', 'check']:
+                completions = self.cli.library_mgr.list_all()
+                if tokens[1] == 'check': completions.append('all')
+                return [t for t in completions if t.startswith(text)]
+        return []
+
+    def complete_workflow(self, text, line, begidx, endidx):
+        return self._basic_manager_completion(text, line, begidx, endidx, self.cli.workflow_mgr, ['add', 'list', 'show', 'rename', 'destroy', 'delete', 'run'])
+
+    def complete_config(self, text, line, begidx, endidx):
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError: tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        if num_tokens == 1:
+            return [s for s in ['list', 'get', 'set'] if s.startswith(text)]
+        if num_tokens == 2 and tokens[1] in ['get', 'set']:
+            all_keys = []
+            for section, settings in self.cli.config.get_all_data().items():
+                if isinstance(settings, dict):
+                    for key in settings:
+                        all_keys.append(f"{section}.{key}")
+            return [k for k in all_keys if k.startswith(text)]
+        return []
+
+    def complete_print(self, text, line, begidx, endidx):
+        """
+        Provides autocompletion for the 'print' command, suggesting placeholders
+        and functions.
+        """
+        # Get all available placeholders from the utility manager
+        placeholders = self.cli.utility_mgr.get_all_placeholders(self.cli.session)
+        
+        # Get all available functions
+        functions = [f"{name}(" for name in pwn_functions.FUNCTION_REGISTRY.keys()]
+
+        suggestions = placeholders + functions
+
+        # The text to complete might already have a '$'
+        if text.startswith('$'):
+            return [s for s in placeholders if s.startswith(text)]
+        
+        # If we are inside a function call, e.g., print b64encode($tar...)
+        # we should suggest placeholders.
+        line_before_cursor = line[:begidx]
+        if '(' in line_before_cursor:
+            # Find the start of the current argument
+            last_paren = line_before_cursor.rfind('(')
+            last_comma = line_before_cursor.rfind(',')
+            arg_start = max(last_paren, last_comma) + 1
+            
+            # Check if the argument starts with '$'
+            if line[arg_start:].strip().startswith('$'):
+                 return [s for s in placeholders if s.startswith(text)]
+
+        # Default case: suggest anything that matches
+        return [s for s in suggestions if s.startswith(text)]
+
+    def complete_identify(self, text, line, begidx, endidx):
+        """
+        Provides autocompletion for the 'identify' command.
+        Currently, it does not offer any suggestions.
+        """
+        # No specific completions for a hash string.
+        return []
+
+    def _get_pwn_completions(self, text, line, begidx, endidx):
+        if not self.cli.session or not self.cli.session.tool: return []
+        tool_data = self.cli.tool_mgr.load(self.cli.session.tool)
+        tool_commands = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
+
+        try:
+            tokens = shlex.split(line[:endidx])
+        except ValueError: tokens = line[:endidx].split()
+        args = tokens[1:]
+
+        suggestions = []
+
+        # If no arguments have been typed yet, or the first argument is not a full command,
+        # suggest tool commands.
+        if not args or (len(args) >= 1 and args[0] not in tool_commands):
+            suggestions.extend(tool_commands)
+        
+        # If a tool command has been identified as the first argument,
+        # then suggest 'now' and 'bg' (if they haven't been used yet).
+        if args and args[0] in tool_commands:
+            if 'now' not in args: suggestions.append('now')
+            if 'bg' not in args: suggestions.append('bg')
+        
+        return [s for s in suggestions if s.startswith(text)]
+
+    def complete_pwn(self, text, line, begidx, endidx):
+        return self._get_pwn_completions(text, line, begidx, endidx)
+
+    def complete_run(self, text, line, begidx, endidx):
+        return self._get_pwn_completions(text, line, begidx, endidx)

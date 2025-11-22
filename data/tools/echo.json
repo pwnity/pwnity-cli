@@ -1,0 +1,29 @@
+{
+  "name": "echo",
+  "path": "/usr/bin/echo",
+  "sudo": true,
+  "commands": [
+    {
+      "name": "output",
+      "params": [
+        "$target.base_url"
+      ]
+    },
+    {
+      "name": "say",
+      "params": [
+        "-n",
+        "$tool.input"
+      ]
+    },
+    {
+      "name": "print",
+      "params": [
+        "$report.loot.0.value",
+        "$profile.mykey"
+      ]
+    }
+  ],
+  "input": "foo",
+  "test": "test"
+}

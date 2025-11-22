@@ -1,0 +1,61 @@
+{
+  "name": "pwnity",
+  "protocol": "https",
+  "hostname": "www.pwnity.de",
+  "ip": "92.205.62.58",
+  "domain": "pwnity.de",
+  "domain_name": "pwnity",
+  "tld": "de",
+  "subdomains": [
+    "www"
+  ],
+  "port": "443",
+  "base_url": "https://www.pwnity.de",
+  "uri": "/",
+  "url": "https://www.pwnity.de",
+  "ptr_record": "58.62.205.92.host.secureserver.net",
+  "ssl_info": {
+    "subject": {
+      "commonName": "pwnity.de"
+    },
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "R13"
+    },
+    "valid_from": "Sep 16 23:22:22 2025 GMT",
+    "valid_to": "Dec 15 23:22:21 2025 GMT",
+    "sans": [
+      "pwnity.de",
+      "www.pwnity.de"
+    ]
+  },
+  "http_headers": {
+    "Date": "Mon, 13 Oct 2025 22:19:59 GMT",
+    "Server": "Apache/2.4.41 (Ubuntu)",
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+    "WWW-Authenticate": "Basic realm=\"Restricted Access\"",
+    "Content-Length": "462",
+    "Content-Type": "text/html; charset=iso-8859-1"
+  },
+  "whois_info": {
+    "domain_name": "pwnity.de",
+    "status": "connect",
+    "updated_date": "2023-03-27T11:44:18+02:00",
+    "name_servers": [
+      "ns.udag.de",
+      "ns.udag.net",
+      "ns.udag.org"
+    ]
+  },
+  "geo_intel": {
+    "ip": "92.205.62.58",
+    "lat": 48.5848,
+    "lon": 7.7419,
+    "city": "Strasbourg",
+    "country": "France",
+    "isp": "Host Europe GmbH",
+    "org": "Go Daddy Netherlands B.V",
+    "as": "AS21499 Host Europe GmbH"
+  }
+}

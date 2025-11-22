@@ -1,0 +1,51 @@
+{
+  "path": "/usr/bin/nmap",
+  "sudo": false,
+  "name": "nmap",
+  "commands": [
+    {
+      "name": "quick",
+      "params": [
+        "-T4",
+        "-F",
+        "$target.ip"
+      ]
+    },
+    {
+      "name": "full",
+      "params": [
+        "-p-",
+        "-T4",
+        "--min-rate=1000",
+        "-v",
+        "$target.ip"
+      ]
+    },
+    {
+      "name": "service",
+      "params": [
+        "-sV",
+        "-sC",
+        "-T4",
+        "$target.ip"
+      ]
+    },
+    {
+      "name": "udp",
+      "params": [
+        "-sU",
+        "--top-ports=100",
+        "-v",
+        "$target.ip"
+      ]
+    },
+    {
+      "name": "aggressive",
+      "params": [
+        "-A",
+        "-T4",
+        "$target.ip"
+      ]
+    }
+  ]
+}

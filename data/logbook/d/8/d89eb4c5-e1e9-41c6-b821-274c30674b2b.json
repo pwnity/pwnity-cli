@@ -1,0 +1,16 @@
+{
+  "id": "d89eb4c5-e1e9-41c6-b821-274c30674b2b",
+  "timestamp": "2025-11-04 12:13:07",
+  "command": "/usr/bin/echo -n Bar",
+  "context": {},
+  "execution": {
+    "duration_seconds": 0.1,
+    "return_code": 0
+  },
+  "output": "Bar",
+  "source_job_id": "ad8c2bd8-cf4e-477d-a7ac-33b43113e02d",
+  "additional_info": {
+    "node_id": 7,
+    "node_title": "echo"
+  }
+}

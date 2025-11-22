@@ -1,0 +1,28 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1762332715.6643672,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "0a55ecee-b0c0-45ed-91e8-e0b25ab913a0",
+      "command_str": "sudo /usr/bin/ping -c 4 127.0.0.1",
+      "session_name": "workflow",
+      "tool_name": "ping",
+      "tool_command_name": "default",
+      "status": "finished",
+      "start_time": 1762332712.363816,
+      "end_time": 1762332715.5674798,
+      "duration": 3.2036638259887695,
+      "return_code": 0,
+      "logbook_id": "bfd510cc-143c-4220-8162-ee660995d3a0",
+      "additional_info": {
+        "node_id": 20,
+        "node_title": "ping"
+      },
+      "output": "PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.\r\r\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.061 ms\r\r\n64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.028 ms\r\r\n64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.029 ms\r\r\n64 bytes from 127.0.0.1: icmp_seq=4 ttl=64 time=0.028 ms\r\r\n\r\r\n--- 127.0.0.1 ping statistics ---\r\r\n4 packets transmitted, 4 received, 0% packet loss, time 3080ms\r\r\nrtt min/avg/max/mdev = 0.028/0.036/0.061/0.014 ms\r\r\n"
+    }
+  ],
+  "run_id": "1762332715-21e61c65",
+  "workflow_name": "node_test"
+}

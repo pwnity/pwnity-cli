@@ -1,0 +1,18 @@
+{
+  "id": "c89ebcef-19cd-40ea-b4f0-5bfd6f49a665",
+  "timestamp": "2025-11-03 20:25:34",
+  "command": "/home/kali/fake_test.sh 30",
+  "context": {
+    "session": "localtest",
+    "target": "localhost",
+    "tool": "faketest.sh",
+    "wordlist": null
+  },
+  "execution": {
+    "duration_seconds": 90.12,
+    "return_code": 0
+  },
+  "output": "Username (default: guest): (no username \u2014 using: guest)\nPassword: \n\n(no password \u2014 using fallback)\nLogin FAILED (invalid password)\n[guest] working (1/30)...\n[guest] working (2/30)...\n[guest] working (3/30)...\n[guest] working (4/30)...\n[guest] working (5/30)...\n[guest] working (6/30)...\n[guest] working (7/30)...\n[guest] working (8/30)...\n[guest] working (9/30)...\n[guest] working (10/30)...\n[guest] working (11/30)...\n[guest] working (12/30)...\n[guest] working (13/30)...\n[guest] working (14/30)...\ntest\n[guest] working (15/30)...\n[guest] working (16/30)...\n[guest] working (17/30)...\n[guest] working (18/30)...\n[guest] working (19/30)...\n[guest] working (20/30)...\n[guest] working (21/30)...\n[guest] working (22/30)...\n[guest] working (23/30)...\n[guest] working (24/30)...\n[guest] working (25/30)...\n[guest] working (26/30)...\n[guest] working (27/30)...\n[guest] working (28/30)...\n[guest] working (29/30)...\n[guest] working (30/30)...\nSession ended.\n",
+  "source_job_id": "0a50a235-d5f5-4728-bc18-620b0dc38364",
+  "additional_info": {}
+}

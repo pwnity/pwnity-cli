@@ -1,0 +1,11 @@
+{
+  "final_state": "ERROR",
+  "end_time": 1762328751.6327832,
+  "failed_nodes": {
+    "20": "ping"
+  },
+  "error_message": null,
+  "jobs": [],
+  "run_id": "1762328751-97fb8019",
+  "workflow_name": "node_test"
+}

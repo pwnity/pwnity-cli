@@ -1,0 +1,34 @@
+{
+  "path": "/usr/bin/curl",
+  "sudo": false,
+  "name": "curl",
+  "commands": [
+    {
+      "name": "bannergrab",
+      "params": [
+        "-s",
+        "-D -",
+        "-o /dev/null",
+        "$target.base_url"
+      ]
+    },
+    {
+      "name": "head",
+      "params": [
+        "-I",
+        "-s",
+        "-A $profile.useragent",
+        "$target.base_url"
+      ]
+    },
+    {
+      "name": "ipv4",
+      "params": [
+        "-L",
+        "-4",
+        "-s",
+        "$target.base_url"
+      ]
+    }
+  ]
+}

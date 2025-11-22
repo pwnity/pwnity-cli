@@ -1,0 +1,21 @@
+{
+  "path": "/usr/bin/whatweb",
+  "sudo": false,
+  "name": "whatweb",
+  "commands": [
+    {
+      "name": "quick",
+      "params": [
+        "$target.base_url"
+      ]
+    },
+    {
+      "name": "aggro",
+      "params": [
+        "-v",
+        "-a 3",
+        "$target.base_url"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "final_state": "STOPPED",
+  "end_time": 1762199274.8690035,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "225b0662-a952-4b76-b6c0-689aa9ca2868",
+      "command_str": "/usr/bin/nc -l -p 1337 -v -n",
+      "session_name": "workflow",
+      "tool_name": "nc",
+      "tool_command_name": "listen_1337",
+      "status": "killing",
+      "start_time": 1762199204.8864288,
+      "end_time": null,
+      "duration": 69.98255062103271,
+      "return_code": null,
+      "logbook_id": null,
+      "additional_info": {
+        "node_id": 17,
+        "node_title": "nc"
+      },
+      "output": "listening on [any] 1337 ...\r\n"
+    },
+    {
+      "id": "cf9bc2f8-c8d2-4a33-a0fe-969d193021a3",
+      "command_str": "/home/kali/fake_test.sh 5",
+      "session_name": "workflow",
+      "tool_name": "faketest.sh",
+      "tool_command_name": "fake",
+      "status": "finished",
+      "start_time": 1762199204.9867134,
+      "end_time": 1762199270.0788102,
+      "duration": 65.09209680557251,
+      "return_code": 0,
+      "logbook_id": "63789eaf-4a1a-4811-902c-8ef71055d71b",
+      "additional_info": {
+        "node_id": 15,
+        "node_title": "faketest.sh"
+      },
+      "output": "Username (default: guest): (no username \u2014 using: guest)\r\nPassword: \r\n\r\n(no password \u2014 using fallback)\r\nLogin FAILED (invalid password)\r\n[guest] working (1/5)...\r\n[guest] working (2/5)...\r\n[guest] working (3/5)...\r\n[guest] working (4/5)...\r\n[guest] working (5/5)...\r\nSession ended.\r\n"
+    },
+    {
+      "id": "0cec5819-9add-4c32-a874-3838c1f24749",
+      "command_str": "/usr/bin/echo -n 'THIS IS A TEST'",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1762199205.0872202,
+      "end_time": 1762199205.1899261,
+      "duration": 0.1027059555053711,
+      "return_code": 0,
+      "logbook_id": "ca48b171-e613-4597-bf59-efb1f8b398a2",
+      "additional_info": {
+        "node_id": 36,
+        "node_title": "echo"
+      },
+      "output": "THIS IS A TEST"
+    }
+  ],
+  "run_id": "1762199274-4622ae7a",
+  "workflow_name": "test5"
+}

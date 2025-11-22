@@ -1,0 +1,7 @@
+{
+  "name": "local_ping",
+  "target": "mynetwork",
+  "tool": "ping",
+  "wordlist": null,
+  "report": null
+}

@@ -1,0 +1,13 @@
+{
+  "name": "whatweb",
+  "description": "Whatweb Parser",
+  "rules": [
+    {
+      "name": "ip",
+      "regex": "http://",
+      "exclude_patterns": [
+        "localhost"
+      ]
+    }
+  ]
+}

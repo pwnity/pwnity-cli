@@ -1,0 +1,28 @@
+{
+  "name": "pwnity",
+  "version": "1.0.0",
+  "description": "> A flexible and session-based wrapper for orchestrating command-line tools for pentesting and CTFs.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/v3rm1ll1on/pwnity.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/v3rm1ll1on/pwnity/issues"
+  },
+  "homepage": "https://github.com/v3rm1ll1on/pwnity#readme",
+  "devDependencies": {
+    "vite": "^7.1.12"
+  }
+}

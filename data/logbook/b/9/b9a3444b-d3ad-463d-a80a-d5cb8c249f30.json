@@ -1,0 +1,18 @@
+{
+  "id": "b9a3444b-d3ad-463d-a80a-d5cb8c249f30",
+  "timestamp": "2025-11-03 23:10:31",
+  "command": "gobuster dir -w /usr/share/wordlists/dirb/small.txt -b 404,301,308 -u 10.10.117.96",
+  "context": {
+    "session": "default",
+    "target": "Startup_THM",
+    "tool": "gobuster",
+    "wordlist": "dir_small"
+  },
+  "execution": {
+    "duration_seconds": 4.01,
+    "return_code": 0
+  },
+  "output": "===============================================================\nGobuster v3.6\nby OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)\n===============================================================\n[+] Url:                     http://10.10.117.96\n[+] Method:                  GET\n[+] Threads:                 10\n[+] Wordlist:                /usr/share/wordlists/dirb/small.txt\n[+] Negative Status codes:   404,301,308\n[+] User Agent:              gobuster/3.6\n[+] Timeout:                 10s\n===============================================================\nStarting gobuster in directory enumeration mode\n===============================================================\nProgress: 959 / 960 (99.90%)\n===============================================================\nFinished\n===============================================================\n",
+  "source_job_id": "afa651c6-b2d4-4c46-b41b-253d64e3ea73",
+  "additional_info": {}
+}

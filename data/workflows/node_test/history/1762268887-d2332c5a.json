@@ -1,0 +1,27 @@
+{
+  "final_state": "ERROR",
+  "end_time": 1762268887.1686802,
+  "failed_nodes": {
+    "20": "ping"
+  },
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "b13aa7f1-7407-4aee-a4a4-fa34b5af3ba8",
+      "command_str": "/usr/bin/sudo -S /usr/bin/ping '-c 4' 127.0.0.1",
+      "session_name": "workflow",
+      "tool_name": "ping",
+      "tool_command_name": "default",
+      "status": "running",
+      "start_time": 1762268887.0711262,
+      "end_time": null,
+      "duration": 0.09753942489624023,
+      "return_code": null,
+      "logbook_id": null,
+      "additional_info": {},
+      "output": ""
+    }
+  ],
+  "run_id": "1762268887-d2332c5a",
+  "workflow_name": "node_test"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "foo",
+  "description": "This is my Description",
+  "rules": [
+    {
+      "name": "myrule",
+      "regex": "^BAR$",
+      "exclude_patterns": [
+        "Foo",
+        "Bar",
+        "Baz",
+        "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b"
+      ]
+    },
+    {
+      "name": "test",
+      "regex": "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b",
+      "exclude_patterns": []
+    },
+    {
+      "name": "GoBusterFiles",
+      "regex": "/\\w+\\s+\\(\\w+:\\s+\\w+\\)",
+      "exclude_patterns": []
+    },
+    {
+      "name": "server_header",
+      "regex": "\\w+:\\s+\\w+/\\w+\\.\\w+\\.\\w+\\s+\\(\\w+\\)",
+      "exclude_patterns": []
+    }
+  ]
+}

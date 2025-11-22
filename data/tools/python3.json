@@ -1,0 +1,14 @@
+{
+  "path": "/usr/bin/python",
+  "sudo": false,
+  "name": "python3",
+  "commands": [
+    {
+      "name": "webserver",
+      "params": [
+        "-m http.server",
+        "8080"
+      ]
+    }
+  ]
+}

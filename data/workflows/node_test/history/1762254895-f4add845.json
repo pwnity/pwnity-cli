@@ -1,0 +1,28 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1762254895.5706043,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "63b80493-9ebd-4411-8fa7-b84323d3f9c7",
+      "command_str": "/usr/bin/echo -n Bara",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1762254895.2726154,
+      "end_time": 1762254895.3734488,
+      "duration": 0.10083341598510742,
+      "return_code": 0,
+      "logbook_id": "81e674bb-cb9f-4814-8c55-641759a5f780",
+      "additional_info": {
+        "node_id": 7,
+        "node_title": "echo"
+      },
+      "output": "Bara"
+    }
+  ],
+  "run_id": "1762254895-f4add845",
+  "workflow_name": "node_test"
+}

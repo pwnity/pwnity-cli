@@ -1,0 +1,28 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1762260141.9575834,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "f5597dbf-6c92-4f0c-a75f-19265fa8d9dc",
+      "command_str": "/usr/bin/echo -n Success",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1762260141.760384,
+      "end_time": 1762260141.86265,
+      "duration": 0.10226583480834961,
+      "return_code": 0,
+      "logbook_id": "49620ca1-8ef4-454b-af3d-410c94b58ee4",
+      "additional_info": {
+        "node_id": 7,
+        "node_title": "echo"
+      },
+      "output": "Success"
+    }
+  ],
+  "run_id": "1762260141-cd874fdb",
+  "workflow_name": "node_test"
+}

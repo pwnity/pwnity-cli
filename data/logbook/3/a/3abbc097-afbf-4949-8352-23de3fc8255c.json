@@ -1,0 +1,18 @@
+{
+  "id": "3abbc097-afbf-4949-8352-23de3fc8255c",
+  "timestamp": "2025-11-19 19:44:51",
+  "command": "sudo /usr/bin/ping -b 192.168.178.255",
+  "context": {
+    "session": "local_ping",
+    "target": "mynetwork",
+    "tool": "ping",
+    "wordlist": null
+  },
+  "execution": {
+    "duration_seconds": 125.1,
+    "return_code": 130
+  },
+  "output": "",
+  "source_job_id": null,
+  "additional_info": {}
+}

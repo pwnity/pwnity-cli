@@ -1,0 +1,46 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1762255213.8015342,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "012a302f-ad59-4a38-b4f7-396915407484",
+      "command_str": "/usr/bin/echo -n Failed",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1762255213.4026864,
+      "end_time": 1762255213.5049822,
+      "duration": 0.1022958755493164,
+      "return_code": 0,
+      "logbook_id": "11eb87be-5b5d-4b9c-8438-9ce949c4fa44",
+      "additional_info": {
+        "node_id": 13,
+        "node_title": "echo"
+      },
+      "output": "Failed"
+    },
+    {
+      "id": "4c16bf75-6bd3-42b2-9774-a4d1c4ca038b",
+      "command_str": "/usr/bin/echo -n Success",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1762255213.5031168,
+      "end_time": 1762255213.603937,
+      "duration": 0.10082006454467773,
+      "return_code": 0,
+      "logbook_id": "3b3458b8-847a-44ca-9643-388d9b772bc9",
+      "additional_info": {
+        "node_id": 7,
+        "node_title": "echo"
+      },
+      "output": "Success"
+    }
+  ],
+  "run_id": "1762255213-d923ec86",
+  "workflow_name": "node_test"
+}

@@ -1,0 +1,16 @@
+{
+  "path": "/usr/bin/hydra",
+  "sudo": false,
+  "name": "hydra",
+  "commands": [
+    {
+      "name": "http_post_form",
+      "params": [
+        "-l admin",
+        "-P $wordlist.path",
+        "$target.ip",
+        "http-post-form '$target.uri:username=^USER^&password=^PASS^:F=Invalid username or password'"
+      ]
+    }
+  ]
+}

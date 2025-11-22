@@ -1,0 +1,15 @@
+# Core CLI Framework & UI
+cmd2
+rich
+rich-argparse
+questionary
+
+# Configuration & Environment
+PyYAML
+python-dotenv
+
+# Features (Target Gathering, Proxy, etc.)
+python-whois
+dnspython
+tldextract
+PySocks

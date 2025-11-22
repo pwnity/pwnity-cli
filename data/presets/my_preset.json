@@ -1,0 +1,10 @@
+{
+  "name": "my_preset",
+  "target": "iprs.fly.dev",
+  "tool": "curl",
+  "wordlist": null,
+  "report": null,
+  "proxy_settings": {
+    "enabled": false
+  }
+}

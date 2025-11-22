@@ -1,0 +1,16 @@
+{
+  "id": "c0e26ac3-3891-4cda-83d6-3cb4262a346f",
+  "timestamp": "2025-11-03 21:08:12",
+  "command": "/usr/bin/nc -l -p 1337 -v -n",
+  "context": {},
+  "execution": {
+    "duration_seconds": 209.29,
+    "return_code": 1
+  },
+  "output": "listening on [any] 1337 ...\nconnect to [127.0.0.1] from (UNKNOWN) [127.0.0.1] 40124\ntest\ntest\n\n",
+  "source_job_id": "1040433b-fea2-4a60-9b5d-2bfe9e62062c",
+  "additional_info": {
+    "node_id": 17,
+    "node_title": "nc"
+  }
+}

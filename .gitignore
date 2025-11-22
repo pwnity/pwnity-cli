@@ -1,0 +1,167 @@
+# --- pwnity CLI .gitignore ---
+# This file specifies intentionally untracked files to ignore when using Git.
+# For more about gitignore, see: https://git-scm.com/docs/gitignore
+
+# --- Python ---
+__pycache__/
+*.py[codz]
+*.pyo
+*.pyd
+.Python/
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+wheels/
+wheelhouse/ # Specific to pwnity's wheelhouse directory
+
+# --- Virtual Environment ---
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.pixi # Pixi virtual environment
+
+# --- Environment Variables ---
+.env
+.flaskenv
+
+# --- IDEs and Editors ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+.ropeproject
+.cursorignore
+.cursorindexingignore
+
+# --- OS specific ---
+.DS_Store
+Thumbs.db
+
+# --- Testing and Coverage ---
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py.cover
+.hypothesis/
+.pytest_cache/
+cover/
+.ruff_cache/
+
+# --- Logs and temporary files ---
+*.log
+
+# --- pwnity specific user data and configuration ---
+# These directories and files are created and managed by the user during runtime.
+# They should NOT be part of the core repository.
+data/.session.json      # Current session state
+data/.pwnity_history    # CLI history file (assuming rename from .pwnity_history)
+data/temp/              # Temporary files
+data/logbook/           # Execution logs
+data/reports/           # Generated reports
+data/runs/              # Workflow run data
+data/targets/           # User-defined targets
+data/wordlists/         # User-defined wordlists
+data/presets/           # User-defined presets
+data/heartbeats/        # Heartbeat monitoring data
+etc/profile.json        # User's personal profile settings
+
+# --- Other Python-related ignores ---
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+/site # mkdocs documentation
+
+# Jupyter Notebook
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# pyenv
+# .python-version
+
+# pipenv
+#Pipfile.lock
+
+# UV
+#uv.lock
+
+# poetry
+#poetry.lock
+#poetry.toml
+
+# pdm
+#pdm.lock
+#pdm.toml
+.pdm-python
+.pdm-build/
+
+# pixi
+#pixi.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+# .idea/
+
+# Visual Studio Code
+# .vscode/
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/

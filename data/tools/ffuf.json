@@ -1,0 +1,23 @@
+{
+  "path": "/usr/bin/ffuf",
+  "sudo": false,
+  "name": "ffuf",
+  "commands": [
+    {
+      "name": "dir_scan",
+      "params": [
+        "-u $target.base_url/FUZZ",
+        "-w $wordlist.path",
+        "-c -t 100"
+      ]
+    },
+    {
+      "name": "vhost",
+      "params": [
+        "-u https://FUZZ.$target.hostname",
+        "-w $wordlist.path",
+        "-H 'Host: FUZZ.$target.hostname' -c"
+      ]
+    }
+  ]
+}

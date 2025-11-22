@@ -1,0 +1,22 @@
+{
+  "session_name": "default",
+  "target": "fritzbox",
+  "tool": null,
+  "wordlist": null,
+  "report": null,
+  "proxy_enabled": false,
+  "jobs": [],
+  "sessions": {
+    "default": {
+      "name": "default",
+      "target": "fritzbox",
+      "tool": null,
+      "wordlist": null,
+      "report": null
+    }
+  },
+  "monitoring_status": {
+    "proxy_enabled": false,
+    "heartbeat_target": "fritzbox"
+  }
+}

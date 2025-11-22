@@ -1,0 +1,46 @@
+{
+  "final_state": "FINISHED",
+  "end_time": 1761904393.3013437,
+  "failed_nodes": {},
+  "error_message": null,
+  "jobs": [
+    {
+      "id": "7eb0bd80-95b3-422d-9987-d00340fe0050",
+      "command_str": "/home/kali/fake_test.sh 5",
+      "session_name": "workflow",
+      "tool_name": "faketest.sh",
+      "tool_command_name": "fake",
+      "status": "finished",
+      "start_time": 1761904382.089388,
+      "end_time": 1761904393.2086546,
+      "duration": 11.119266748428345,
+      "return_code": 0,
+      "logbook_id": "50ce145c-fb4c-4405-a5ba-ad4cc6676314",
+      "additional_info": {
+        "node_id": 15,
+        "node_title": "faketest.sh"
+      },
+      "output": "Benutzername eingeben (Default: fakeuser) -> (Keine Eingabe \u2014 benutze Fake-Benutzer: fakeuser)\r\nAls 'fakeuser' ausf\u00fchren? (j/N, Default: j) -> Starte Task als Benutzer: fakeuser\r\n[fakeuser] Working... (1/5)\r\n[fakeuser] Working... (2/5)\r\n[fakeuser] Working... (3/5)\r\n[fakeuser] Working... (4/5)\r\n[fakeuser] Working... (5/5)\r\nDone after 5 seconds.\r\n"
+    },
+    {
+      "id": "9deaf4a4-da2a-411e-a070-72d111b51bd4",
+      "command_str": "/usr/bin/echo -n 'THIS IS A TEST'",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1761904382.188818,
+      "end_time": 1761904382.289652,
+      "duration": 0.10083413124084473,
+      "return_code": 0,
+      "logbook_id": "5630e8b9-18ee-4dfd-9fca-17c733c4cb70",
+      "additional_info": {
+        "node_id": 36,
+        "node_title": "echo"
+      },
+      "output": "THIS IS A TEST"
+    }
+  ],
+  "run_id": "1761904393-0291dd21",
+  "workflow_name": "test5"
+}

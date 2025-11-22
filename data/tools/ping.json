@@ -1,0 +1,30 @@
+{
+  "name": "ping",
+  "path": "/usr/bin/ping",
+  "sudo": true,
+  "commands": [
+    {
+      "name": "default",
+      "params": [
+        "-c $tool.counter",
+        "$target.ip"
+      ]
+    },
+    {
+      "name": "localnet",
+      "params": [
+        "-c",
+        "4",
+        "$target.router"
+      ]
+    },
+    {
+      "name": "broadcast",
+      "params": [
+        "-b",
+        "$target.broadcast"
+      ]
+    }
+  ],
+  "counter": "4"
+}

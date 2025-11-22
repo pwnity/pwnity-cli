@@ -1,0 +1,14 @@
+{
+  "name": "sleep",
+  "path": "/usr/bin/sleep",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "wait",
+      "params": [
+        "$tool.input"
+      ]
+    }
+  ],
+  "input": "10"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "GTFOBins",
+  "url": "https://gtfobins.github.io/",
+  "comment": "GTFOBins is a curated list of Unix binaries that can be used to bypass local security restrictions in misconfigured systems.",
+  "category": "Binaries",
+  "sort_order": 1,
+  "url_status_code": 200,
+  "url_last_checked": "2025-11-15T22:09:29.123897+00:00"
+}

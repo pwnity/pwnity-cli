@@ -1,0 +1,67 @@
+{
+  "final_state": "ERROR",
+  "end_time": 1762199784.5718312,
+  "failed_nodes": {
+    "17": "nc",
+    "15": "faketest.sh"
+  },
+  "error_message": "Node 'faketest.sh' timed out",
+  "jobs": [
+    {
+      "id": "6dfa8608-9cbe-4ddd-94f6-945e1e825bcd",
+      "command_str": "/usr/bin/nc -l -p 1337 -v -n",
+      "session_name": "workflow",
+      "tool_name": "nc",
+      "tool_command_name": "listen_1337",
+      "status": "killed",
+      "start_time": 1762199781.3673847,
+      "end_time": 1762199784.3753881,
+      "duration": 3.0080034732818604,
+      "return_code": 1,
+      "logbook_id": "19977d57-5686-4808-9e21-88abbf3a78a2",
+      "additional_info": {
+        "node_id": 17,
+        "node_title": "nc"
+      },
+      "output": "listening on [any] 1337 ...\r\n\r\n"
+    },
+    {
+      "id": "e47dad25-796d-4dc9-9bdd-5b71b3f3b73c",
+      "command_str": "/home/kali/fake_test.sh 5",
+      "session_name": "workflow",
+      "tool_name": "faketest.sh",
+      "tool_command_name": "fake",
+      "status": "killed",
+      "start_time": 1762199781.467661,
+      "end_time": 1762199784.375452,
+      "duration": 2.9077911376953125,
+      "return_code": -15,
+      "logbook_id": "bd5ffaf9-0c80-466e-b8f1-6951eac99cd5",
+      "additional_info": {
+        "node_id": 15,
+        "node_title": "faketest.sh"
+      },
+      "output": "Username (default: guest): "
+    },
+    {
+      "id": "626890fe-da15-4263-a9bb-441865dfccf2",
+      "command_str": "/usr/bin/echo -n 'THIS IS A TEST'",
+      "session_name": "workflow",
+      "tool_name": "echo",
+      "tool_command_name": "say",
+      "status": "finished",
+      "start_time": 1762199781.56794,
+      "end_time": 1762199781.6687813,
+      "duration": 0.10084128379821777,
+      "return_code": 0,
+      "logbook_id": "37f45205-7ce5-4353-b12e-868daaabbd3e",
+      "additional_info": {
+        "node_id": 36,
+        "node_title": "echo"
+      },
+      "output": "THIS IS A TEST"
+    }
+  ],
+  "run_id": "1762199784-ccf36e79",
+  "workflow_name": "test5"
+}
