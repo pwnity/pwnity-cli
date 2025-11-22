@@ -54,12 +54,15 @@ class Completer:
             tool_data = self.cli.tool_mgr.load(tool_name)
             if not tool_data:
                 return []
-            
-            # Suggest top-level fields and existing commands
-            suggestions = ['path', 'sudo', 'name', 'command']
+
+            # --- FIX: Dynamically add all top-level keys from the tool's data to the suggestions ---
+            # The previous implementation had a hardcoded list.
+            base_suggestions = ['path', 'sudo', 'name', 'command']
+            dynamic_suggestions = list(tool_data.keys())
             command_names = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
-            suggestions.extend(command_names)
-            return [s for s in suggestions if s.startswith(text)]
+            # Combine all, use a set to remove duplicates, then convert back to a sorted list.
+            all_suggestions = sorted(list(set(base_suggestions + dynamic_suggestions + command_names)))
+            return [s for s in all_suggestions if s.startswith(text)]
 
         # 4. Context-sensitive completion for 'tool update <name> <command> ...'
         if num_tokens == 4 and tokens[1] == 'update':
