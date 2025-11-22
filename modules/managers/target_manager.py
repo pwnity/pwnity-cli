@@ -45,6 +45,23 @@ class TargetManager(JSONManager):
         target_data = self.load(target_name)
         if not target_data:
             return # load() already logs an error
+
+        # If a specific field is requested, print only that value.
+        if args.field:
+            # --- FIX: Handle nested fields using dot notation ---
+            keys = args.field.split('.')
+            value = target_data
+            try:
+                for key in keys:
+                    value = value[key]
+            except (KeyError, TypeError):
+                log.error(f"Field '{args.field}' not found in target '{target_name}'.")
+                return
+
+            if value is not None:
+                cli.poutput(json.dumps(value, indent=2) if isinstance(value, (dict, list)) else str(value))
+            return
+
         self._format_and_show_entity(target_data, cli.console)
 
     def _is_local_target(self, target):

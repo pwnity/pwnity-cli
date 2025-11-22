@@ -168,7 +168,8 @@ def test_report_file_view(report_manager, mock_cli, tmp_path):
     mock_cli.console.print = capture_print
 
     # Führe den `view`-Befehl aus
-    view_args = type('Args', (), {'file_name': "scan.txt"})()
+    # Simuliert den Aufruf 'report view scan.txt', wobei 'scan.txt' zu arg1 wird.
+    view_args = type('Args', (), {'arg1': "scan.txt", 'arg2': None})()
     report_manager._cmd_view(view_args, mock_cli)
 
     # Überprüfe, ob das Panel mit dem korrekten Inhalt "gedruckt" wurde

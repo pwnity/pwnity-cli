@@ -713,6 +713,7 @@ class ParserFactory:
         show_parser = subparsers.add_parser("show", help="Show the contents of a report.", formatter_class=self.formatter, add_help=False)
         self._add_custom_help(show_parser, "show")
         show_parser.add_argument("name", nargs='?', default=None, help="Name of the report to show. If omitted, shows the loaded report.", choices_provider=report_completer)
+        show_parser.add_argument("field", nargs="?", default=None, help="Optional: Display only the value of this specific field.")
         show_parser.examples = [
             ("report show my-report", "Shows the contents of 'my-report'."),
             ("report show", "Shows the contents of the currently loaded report.")

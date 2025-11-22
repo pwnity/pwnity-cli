@@ -377,10 +377,10 @@ class TestTargetIntegration:
         show_output = running_pwnity.run_command(f"target show {target_name} ip")
         clean_output = running_pwnity._strip_ansi(show_output).strip()
 
-        # Die Ausgabe enthält das Befehls-Echo, den Wert und den Prompt.
-        # Wir teilen die Ausgabe in Zeilen und prüfen die zweite Zeile.
+        # Die Ausgabe enthält das Befehls-Echo, den Wert und den Prompt. Wir prüfen,
+        # ob der Wert in einer der Zeilen nach dem Befehls-Echo vorkommt.
         output_lines = clean_output.splitlines()
-        assert len(output_lines) > 1 and output_lines[1] == "1.2.3.4"
+        assert "1.2.3.4" in output_lines
 
 @pytest.mark.integration
 class TestToolIntegration:

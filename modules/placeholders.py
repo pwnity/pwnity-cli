@@ -13,10 +13,10 @@ import json
 # Pattern for the innermost function call, e.g., func(arg) where arg has no parentheses
 FUNC_PATTERN = re.compile(r'(\w+)\(([^()]*)\)')
 
-# Pattern for simple placeholders. Makes the attribute path optional.
-# It uses a more specific pattern for function-like placeholders to correctly separate them from the attribute path.
-# It matches either a function `word.word(...)` or a simple `word`.
-SIMPLE_PLACEHOLDER_PATTERN = re.compile(r"\$((?:[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\([^)]*\))|[a-zA-Z_][a-zA-Z0-9_]*)(\.([a-zA-Z0-9_@.#\[\]]+))?")
+# --- FIX: Allow hyphens in attribute paths ---
+# The character set for the attribute path was missing the hyphen '-'.
+# This prevented placeholders like '$target.http_headers.Cache-Control' from being resolved.
+SIMPLE_PLACEHOLDER_PATTERN = re.compile(r"\$((?:[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_]*\([^)]*\))|[a-zA-Z_][a-zA-Z0-9_]*)(\.([a-zA-Z0-9_@.#\[\]\-]+))?")
 
 def xml_to_dict(element):
     """

@@ -35,16 +35,23 @@ class Completer:
         A robust filter that handles both lists of strings and lists of CompletionItem objects.
         """
         filtered = []
+        # If the user is typing a nested path, we should only suggest direct children.
+        # For example, if text is "http_headers.", we should suggest "http_headers.Connection",
+        # but not "http_headers.Connection.some_sub_field".
+        is_nested_path = '.' in text and text.endswith('.')
+
         for s in suggestions:
             # --- FINAL, ROBUST FIX for cmd2 version incompatibility ---
             # The CompletionItem API changed across cmd2 versions.
             # Older versions use '.text', newer versions use '.completion'.
             # This code now robustly handles both cases.
             if isinstance(s, CompletionItem):
-                # Check for the attribute's existence to support both old and new cmd2.
                 completion_text = getattr(s, 'completion', getattr(s, 'text', ''))
             else:
                 completion_text = s # It's just a string
+
+            if is_nested_path and completion_text.startswith(text) and text.count('.') == completion_text.count('.'):
+                continue # Skip suggestions that are not direct children of the nested path
 
             if completion_text.startswith(text):
                 filtered.append(s)
@@ -230,7 +237,7 @@ class Completer:
                 return [t for t in self.cli.target_mgr.list_all() if t.startswith(text)]
 
         # 3. Context-sensitive completion for 'target update <name> ...' or 'target delete <name> ...'
-        if num_tokens == 3 and tokens[1] in ['update', 'delete']:
+        if num_tokens == 3 and tokens[1] in ['update', 'delete', 'show']:
             target_name = tokens[2]
             target_data = self.cli.target_mgr.load(target_name)
             if not target_data:
@@ -241,7 +248,10 @@ class Completer:
             # --- NEW: Use recursive helper to get all nested paths ---
             dynamic_suggestions = self._generate_paths_recursively(target_data)
             all_suggestions = list(self._create_completion_items_from_paths(target_data, dynamic_suggestions)) + base_suggestions
-            return self._filter_completions(text, all_suggestions)
+
+            # --- FINAL FIX for nested path completion ---
+            # This correctly filters suggestions whether the text is a partial top-level field or a partial nested path.
+            return [s for s in all_suggestions if getattr(s, 'completion', s).startswith(text)]
 
         return []
 
