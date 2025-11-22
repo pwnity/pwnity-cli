@@ -7,7 +7,7 @@ from rich.panel import Panel
 from rich.table import Table, box
 from rich.text import Text
 from rich.console import Group, Console
-from . import functions as pwn_functions
+from modules import functions as pwn_functions
 
 class _CustomHelpAction(argparse.Action):
     """Base class for custom help actions that exit cleanly in cmd2."""
@@ -459,6 +459,19 @@ class HelpManager:
                 ("heartbeat show <name>", "Show a live dashboard of the monitoring data."),
                 ("heartbeat stop [name]", "Stop the monitoring process for the specified or loaded target."),
                 ("heartbeat list", "List all running and saved heartbeats."),
+            ], border_color="blue")
+
+    def show_help_library(self):
+        self._show_custom_command_help(
+            command_name="library",
+            description="Manages a library of useful links and resources, allowing you to quickly open or check them.",
+            examples=[
+                ("library add <name>", "Create a new, empty library entry."),
+                ("library update <name> url <url>", "Add or change the URL for an entry."),
+                ("library open <name>", "Open the entry's URL in your browser."),
+                ("library check <name|all>", "Check if the URL is reachable."),
+                ("library list", "List all entries, grouped by category."),
+                ("library destroy <name>", "Delete an entry from the library."),
             ], border_color="blue")
 
     def show_help_overview(self):

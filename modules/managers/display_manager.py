@@ -5,8 +5,8 @@ from rich.columns import Columns
 from rich.console import Console, Group
 from rich.table import Table, box
 from rich.text import Text
-from .placeholders import resolve_placeholders
-from .services import log
+from modules.placeholders import resolve_placeholders
+from modules.services import log
 
 class DisplayManager:
     def __init__(self, console: Console):

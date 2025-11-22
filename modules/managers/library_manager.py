@@ -85,6 +85,11 @@ class LibraryManager(JSONManager):
                 display_names.append(data.get('name', self._desanitize_name(s_name)))
         return sorted(display_names, key=str.lower)
 
+    def list_sanitized_names(self) -> list:
+        """Lists all entities by their sanitized filenames, suitable for completion."""
+        # The parent's list_all() method returns the sanitized filenames directly.
+        return super().list_all()
+
     # --- Custom Command Handlers ---
 
     def dispatch(self, subcommand, args, cli_instance):
@@ -101,18 +106,22 @@ class LibraryManager(JSONManager):
         from rich.panel import Panel
         from rich.table import Table
 
-        items = []
-        for name in self.list_all():
-            item_data = self.load(name)
-            if item_data:
-                items.append(item_data)
-        
-        if not items:
+        # Get sanitized names to ensure we can show both versions
+        sanitized_names = self.list_sanitized_names()
+        if not sanitized_names:
             log.info("No library entries found.")
             return
 
+        items_with_details = []
+        for s_name in sanitized_names:
+            item_data = self.load(s_name)
+            if item_data:
+                # Add the sanitized name for the new table column
+                item_data['sanitized_name'] = s_name
+                items_with_details.append(item_data)
+
         grouped_items = {}
-        for item in items:
+        for item in items_with_details:
             category = item.get('category', 'Uncategorized')
             if category not in grouped_items:
                 grouped_items[category] = []
@@ -130,10 +139,73 @@ class LibraryManager(JSONManager):
         for cat in all_found_categories:
             if cat not in sorted_categories:
                 sorted_categories.append(cat)
-        
+
+        # Create a single table for a uniform look
+        table = Table(box=None, expand=True, show_header=True, header_style="bold blue")
+        table.add_column("Name", style="green", no_wrap=True)
+        table.add_column("URL", style="dim", no_wrap=False, ratio=2)
+
+        first_category = True
         for category in sorted_categories:
             if category in grouped_items:
-                cli.display_mgr.display_simple_list([item.get('name') for item in grouped_items[category]], category)
+                # Add a separator for each category
+                if not first_category:
+                    table.add_row() # Add a blank line for spacing
+                table.add_row(f"[bold dim]{category}[/bold dim]", end_section=True)
+                first_category = False
+
+                for item in grouped_items[category]:
+                    table.add_row(item.get('sanitized_name'), item.get('url', 'N/A'))
+
+        cli.console.print(Panel(table, title="[bold]Library[/bold]", border_style="blue"))
+
+    def _format_and_show_entity(self, entity, console):
+        """Overridden formatting for a nicer, tabular output of library entry details."""
+        from rich.panel import Panel
+        from rich.table import Table
+        from rich.text import Text
+        from rich.console import Group
+
+        name = entity.get('name', 'N/A')
+        
+        # --- Main Info ---
+        main_info_table = Table(box=None, show_header=False, padding=(0, 1))
+        main_info_table.add_column(style="bold blue", no_wrap=True, width=12)
+        main_info_table.add_column(style="green")
+
+        main_info_table.add_row("URL", entity.get('url', '[dim]Not set[/dim]'))
+        main_info_table.add_row("Category", entity.get('category', '[dim]Not set[/dim]'))
+        main_info_table.add_row("Comment", entity.get('comment', '[dim]Not set[/dim]'))
+
+        # --- URL Status ---
+        status_code = entity.get('url_status_code')
+        last_checked_str = entity.get('url_last_checked')
+        
+        status_color = "dim"
+        if isinstance(status_code, int):
+            if 200 <= status_code < 300: status_color = "green"
+            elif 300 <= status_code < 400: status_color = "yellow"
+            else: status_color = "red"
+        elif status_code == "Error":
+            status_color = "bold red"
+
+        status_text = Text(str(status_code) if status_code is not None else "Not checked", style=status_color)
+
+        if last_checked_str:
+            try:
+                last_checked_dt = datetime.fromisoformat(last_checked_str)
+                display_time = last_checked_dt.strftime('%Y-%m-%d %H:%M:%S UTC')
+            except (ValueError, TypeError):
+                display_time = last_checked_str # Fallback to raw string
+        else:
+            display_time = "Never"
+
+        status_panel = Panel(
+            f"Status: {status_text}\nLast Checked: [dim]{display_time}[/dim]",
+            title="[bold]URL Status[/bold]", border_style="dim", expand=False
+        )
+
+        console.print(Panel(Group(main_info_table, Text(""), status_panel), title=f"[bold]Library Entry: {name}[/bold]", border_style="blue"))
 
     def check_all_entries_on_startup(self):
         """

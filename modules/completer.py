@@ -30,6 +30,120 @@ class Completer:
 
         return []
 
+    def complete_tool(self, text, line, begidx, endidx):
+        """Autocompletion for the 'tool' command."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        # 1. Complete subcommand (add, list, update, etc.)
+        if num_tokens == 1:
+            subcommands = ['add', 'list', 'update', 'delete', 'reorder', 'destroy', 'load', 'show', 'export', 'help']
+            return [s for s in subcommands if s.startswith(text)]
+
+        # 2. Complete tool name for most subcommands
+        if num_tokens == 2:
+            if tokens[1] in ['update', 'delete', 'reorder', 'destroy', 'load', 'show', 'export']:
+                return [t for t in self.cli.tool_mgr.list_all() if t.startswith(text)]
+
+        # 3. Context-sensitive completion for 'tool update <name> ...'
+        if num_tokens == 3 and tokens[1] == 'update':
+            tool_name = tokens[2]
+            tool_data = self.cli.tool_mgr.load(tool_name)
+            if not tool_data:
+                return []
+            
+            # Suggest top-level fields and existing commands
+            suggestions = ['path', 'sudo', 'name', 'command']
+            command_names = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
+            suggestions.extend(command_names)
+            return [s for s in suggestions if s.startswith(text)]
+
+        # 4. Context-sensitive completion for 'tool update <name> <command> ...'
+        if num_tokens == 4 and tokens[1] == 'update':
+            tool_name = tokens[2]
+            command_name = tokens[3]
+            tool_data = self.cli.tool_mgr.load(tool_name)
+            if not tool_data:
+                return []
+
+            # Check if the third token is a valid command for the tool
+            is_command = any(cmd.get('name') == command_name for cmd in tool_data.get("commands", []))
+            if is_command:
+                # Suggest actions for a command: add a parameter or update a command-level field
+                suggestions = ['param', 'execute_per_param']
+                return [s for s in suggestions if s.startswith(text)]
+
+        return []
+
+    def complete_target(self, text, line, begidx, endidx):
+        """Autocompletion for the 'target' command."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        # 1. Complete subcommand (add, list, update, etc.)
+        if num_tokens == 1:
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'help']
+            return [s for s in subcommands if s.startswith(text)]
+
+        # 2. Complete target name for most subcommands
+        if num_tokens == 2:
+            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export']:
+                return [t for t in self.cli.target_mgr.list_all() if t.startswith(text)]
+
+        # 3. Context-sensitive completion for 'target update <name> ...' or 'target delete <name> ...'
+        if num_tokens == 3 and tokens[1] in ['update', 'delete']:
+            target_name = tokens[2]
+            target_data = self.cli.target_mgr.load(target_name)
+            if not target_data:
+                return []
+            suggestions = ['url'] + list(target_data.keys())
+            return sorted([s for s in set(suggestions) if s.startswith(text)])
+
+        return []
+
+    def complete_preset(self, text, line, begidx, endidx):
+        """Autocompletion for the 'preset' command."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        # 1. Complete subcommand
+        if num_tokens == 1:
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'save', 'export', 'help']
+            return [s for s in subcommands if s.startswith(text)]
+
+        # 2. Complete preset name for most subcommands
+        if num_tokens == 2:
+            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'export']:
+                return [p for p in self.cli.preset_mgr.list_all() if p.startswith(text)]
+
+        # 3. Context-sensitive completion for 'preset update <name> ...'
+        if num_tokens == 3 and tokens[1] == 'update':
+            suggestions = ['target', 'tool', 'wordlist', 'report']
+            return [s for s in suggestions if s.startswith(text)]
+
+        # 4. Context-sensitive completion for 'preset update <name> <field> ...'
+        if num_tokens == 4 and tokens[1] == 'update':
+            field = tokens[3]
+            if field == 'target':
+                return [t for t in self.cli.target_mgr.list_all() if t.startswith(text)]
+            elif field == 'tool':
+                return [t for t in self.cli.tool_mgr.list_all() if t.startswith(text)]
+            elif field == 'wordlist':
+                return [w for w in self.cli.wordlist_mgr.list_all() if w.startswith(text)]
+            elif field == 'report':
+                return [r for r in self.cli.report_mgr.list_all() if r.startswith(text)]
+
+        return []
+
     def complete_help(self, text, line, begidx, endidx):
         """Autocompletion for the help command, including subcommands."""
         try:
@@ -106,11 +220,11 @@ class Completer:
         num_tokens = len(tokens)
 
         if num_tokens == 1:
-            return [s for s in ['add', 'load', 'unload', 'list', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render', 'view'] if s.startswith(text)]
+            return [s for s in ['add', 'load', 'unload', 'list', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render', 'view', 'help'] if s.startswith(text)]
         if num_tokens == 2:
-            if tokens[1] in ['load', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render']:
+            if tokens[1] in ['load', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render', 'view']:
                 return [r_name for r_name in self.cli.report_mgr.list_all() if r_name.startswith(text)]
-            if tokens[1] == 'view' and self.cli.session.report:
+        if num_tokens == 3 and tokens[1] == 'view':
                 files = self.cli.report_mgr.list_files(self.cli.session.report)
                 return [f for f in files if f.startswith(text)] if files else []
         return []
@@ -141,24 +255,30 @@ class Completer:
         return []
 
     def complete_library(self, text, line, begidx, endidx):
+        import argparse # Import the argparse module
         try:
             tokens = shlex.split(line[:begidx])
         except ValueError: tokens = line[:begidx].split()
         num_tokens = len(tokens)
 
-        subparsers_action = next((action for action in self.cli.library_parser._actions if isinstance(action, self.cli.argparse._SubParsersAction)), None)
+        subparsers_action = next((action for action in self.cli.library_parser._actions if isinstance(action, argparse._SubParsersAction)), None)
         if not subparsers_action: return []
         subcommand_names = list(subparsers_action.choices.keys())
         for sub_parser in subparsers_action.choices.values():
             subcommand_names.extend(getattr(sub_parser, 'aliases', []))
 
         if num_tokens == 1:
+            # Provide suggestions for the subcommand itself
             return [s for s in sorted(list(set(subcommand_names))) if s.startswith(text)]
+
         if num_tokens == 2:
-            if tokens[1] in ['show', 'rename', 'update', 'delete', 'destroy', 'open', 'export', 'reverse', 'check']:
-                completions = self.cli.library_mgr.list_all()
+            # Provide suggestions for the entity name for commands that require it
+            if tokens[1] in ['show', 'rename', 'update', 'delete', 'destroy', 'open', 'export', 'reverse', 'check', 'add']:
+                # Use the new method to get sanitized names for completion
+                completions = self.cli.library_mgr.list_sanitized_names()
                 if tokens[1] == 'check': completions.append('all')
                 return [t for t in completions if t.startswith(text)]
+
         return []
 
     def complete_workflow(self, text, line, begidx, endidx):

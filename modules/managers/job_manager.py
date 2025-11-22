@@ -10,9 +10,9 @@ from itertools import count
 from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
-from .managers import LogbookManager, ReportManager
-from .managers.base_manager import BaseManager
-from .services import log
+from modules.managers import LogbookManager, ReportManager
+from modules.managers.base_manager import BaseManager
+from modules.services import log
 import argparse
 
 ANSI_ESCAPE_PATTERN = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')

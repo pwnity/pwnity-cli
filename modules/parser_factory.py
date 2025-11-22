@@ -1,6 +1,6 @@
 # modules/parser_factory.py
 import argparse
-from . import functions as pwn_functions
+from modules import functions as pwn_functions
 import sys
 from .services import config, log
 
@@ -111,7 +111,7 @@ class ParserFactory:
 
     def _add_custom_help(self, parser, subcommand_name):
         """Attaches the help manager and the custom help action to a parser."""
-        from managers.help_manager import RichSubcommandHelpAction
+        from modules.managers.help_manager import RichSubcommandHelpAction
         # The main command name is stored in the parser's 'prog' attribute
         command_name = parser.prog.split()[0]
         parser.add_argument('-h', '--help', action=RichSubcommandHelpAction,

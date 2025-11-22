@@ -2,7 +2,7 @@
 import pytest
 import time
 import argparse
-from modules.job_manager import JobManager, strip_ansi
+from modules.managers.job_manager import JobManager, strip_ansi
 
 @pytest.fixture
 def job_manager(mocker, monkeypatch):

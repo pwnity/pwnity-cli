@@ -1,7 +1,7 @@
 # tests/test_display_manager.py
 import pytest
 import os
-from modules.display_manager import DisplayManager
+from modules.managers.display_manager import DisplayManager
 from rich.console import Console
 from rich.panel import Panel
 from rich.columns import Columns

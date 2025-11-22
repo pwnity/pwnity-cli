@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 # This prevents a circular import at runtime but allows type checkers to see the import.
 if TYPE_CHECKING:
-    from modules.job_manager import JobManager
+    from modules.managers.job_manager import JobManager
 
 class CommandExecutor:
     def __init__(self, job_mgr: "JobManager", logbook_mgr, report_mgr, display_mgr):

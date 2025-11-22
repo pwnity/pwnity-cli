@@ -53,18 +53,18 @@ from rich.align import Align
 from rich.text import Text
 from modules.managers.help_manager import HelpManager, RichCommandHelpAction, _CustomHelpAction
 from modules.managers import TargetManager, WordlistManager, ToolManager, PresetManager, ProfileManager, ManualManager, ParserManager, LogbookManager, ReportManager, RevshellManager, HeartbeatManager, LibraryManager, WorkflowManager
-from modules.job_manager import JobManager
-from modules.display_manager import DisplayManager
+from modules.managers.job_manager import JobManager
+from modules.managers.display_manager import DisplayManager
 from modules.cli_sessions import CLISessionManager
 from modules.managers.command_executor import CommandExecutor
-from modules import placeholders
-from modules import functions as pwn_functions
 from modules.services import log, config # pwn_functions is not used directly here
 from modules.parser_factory import ParserFactory
 from modules.managers.proxy_manager import ProxyManager
 from modules.managers.config_manager import ConfigManager # This was the old completer import, now it's config_manager
 from modules.managers.utility_manager import UtilityManager
 from modules.managers.run_manager import RunManager
+from modules import functions as pwn_functions
+from modules import placeholders
 import threading, time
 from datetime import datetime
 try: # datetime is used in _write_state_to_file
@@ -707,17 +707,29 @@ class MyCLI(cmd2.Cmd):
         '''Manages targets for scans. Subcommands: add, list, update, delete, destroy, load, show, gather'''
         self._dispatch_command('target', args, self.target_mgr)
 
+    def complete_target(self, text, line, begidx, endidx):
+        """Custom completer for the 'target' command."""
+        return self.completer.complete_target(text, line, begidx, endidx)
+
     # wordlist
     @cmd2.with_argparser(wordlist_parser)
     def do_wordlist(self, args):
         '''Manages wordlists for fuzzing and brute-force. Subcommands: add, list, update, delete, destroy, load, show'''
         self._dispatch_command('wordlist', args, self.wordlist_mgr)
 
+    def complete_wordlist(self, text, line, begidx, endidx):
+        """Custom completer for the 'wordlist' command."""
+        return self.completer.complete_wordlist(text, line, begidx, endidx)
+
     # tool
     @cmd2.with_argparser(tool_parser)
     def do_tool(self, args):
         '''Configures external tools for execution. Subcommands: add, list, update, delete, reorder, destroy, load, show, export'''
         self._dispatch_command('tool', args, self.tool_mgr)
+
+    def complete_tool(self, text, line, begidx, endidx):
+        """Custom completer for the 'tool' command."""
+        return self.completer.complete_tool(text, line, begidx, endidx)
 
     # profile
     @cmd2.with_argparser(profile_parser)
@@ -730,6 +742,10 @@ class MyCLI(cmd2.Cmd):
     def do_preset(self, args):
         '''Manages presets (saved sessions). Subcommands: save, load, list, show, destroy'''
         self._dispatch_command('preset', args, self.preset_mgr)
+
+    def complete_preset(self, text, line, begidx, endidx):
+        """Custom completer for the 'preset' command."""
+        return self.completer.complete_preset(text, line, begidx, endidx)
 
     # proxy
     @cmd2.with_argparser(proxy_parser)
