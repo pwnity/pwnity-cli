@@ -1,7 +1,7 @@
 # tests/test_help_manager.py
 import pytest
 import argparse
-from modules.help_manager import HelpManager
+from modules.managers.help_manager import HelpManager
 from rich.console import Console
 from rich.console import Group
 from rich.panel import Panel

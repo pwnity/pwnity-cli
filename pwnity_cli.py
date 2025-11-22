@@ -51,7 +51,7 @@ _apply_test_mode_patches()
 from rich.console import Console as RichConsole, Group
 from rich.align import Align
 from rich.text import Text
-from modules.help_manager import HelpManager, RichCommandHelpAction, _CustomHelpAction
+from modules.managers.help_manager import HelpManager, RichCommandHelpAction, _CustomHelpAction
 from modules.managers import TargetManager, WordlistManager, ToolManager, PresetManager, ProfileManager, ManualManager, ParserManager, LogbookManager, ReportManager, RevshellManager, HeartbeatManager, LibraryManager, WorkflowManager
 from modules.job_manager import JobManager
 from modules.display_manager import DisplayManager
