@@ -144,6 +144,31 @@ class Completer:
 
         return []
 
+    def complete_wordlist(self, text, line, begidx, endidx):
+        """Autocompletion for the 'wordlist' command."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        # 1. Complete subcommand
+        if num_tokens == 1:
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'rename', 'export', 'help']
+            return [s for s in subcommands if s.startswith(text)]
+
+        # 2. Complete wordlist name for most subcommands
+        if num_tokens == 2:
+            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'rename', 'export']:
+                return [w for w in self.cli.wordlist_mgr.list_all() if w.startswith(text)]
+
+        # 3. Context-sensitive completion for 'wordlist update <name> ...' or 'wordlist delete <name> ...'
+        if num_tokens == 3 and tokens[1] in ['update', 'delete']:
+            # A wordlist object primarily has a 'path' field that can be modified.
+            return [s for s in ['path'] if s.startswith(text)]
+
+        return []
+
     def complete_help(self, text, line, begidx, endidx):
         """Autocompletion for the help command, including subcommands."""
         try:
@@ -221,12 +246,25 @@ class Completer:
 
         if num_tokens == 1:
             return [s for s in ['add', 'load', 'unload', 'list', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render', 'view', 'help'] if s.startswith(text)]
+        
         if num_tokens == 2:
-            if tokens[1] in ['load', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render', 'view']:
+            # If 'view' is the subcommand and a report is loaded, prioritize suggesting files from it.
+            if tokens[1] == 'view':
+                if self.cli.session.report: # If a report is loaded, suggest its files.
+                    files = self.cli.report_mgr.list_files(self.cli.session.report)
+                    return [f for f in files if f.startswith(text)] if files else []
+                # If no report is loaded, 'view' expects a report name next.
                 return [r_name for r_name in self.cli.report_mgr.list_all() if r_name.startswith(text)]
+            # For other commands, suggest report names.
+            if tokens[1] in ['load', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render']:
+                return [r_name for r_name in self.cli.report_mgr.list_all() if r_name.startswith(text)]
+
         if num_tokens == 3 and tokens[1] == 'view':
-                files = self.cli.report_mgr.list_files(self.cli.session.report)
-                return [f for f in files if f.startswith(text)] if files else []
+            # Autocomplete files for 'report view <report_name> <file_to_complete>'
+            report_name_arg = tokens[2]
+            files = self.cli.report_mgr.list_files(report_name_arg)
+            return [f for f in files if f.startswith(text)] if files else []
+
         return []
 
     def complete_revshell(self, text, line, begidx, endidx):

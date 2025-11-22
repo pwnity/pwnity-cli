@@ -377,11 +377,19 @@ class ReportManager(JSONManager):
 
     def _cmd_view(self, args, cli):
         """Handles 'report view <file_name>'."""
-        report_name, _ = self._get_current_report(cli)
-        if not report_name:
-            return
+        # Determine report_name and file_name based on provided arguments
+        if args.arg2:
+            # Case: report view <report_name> <file_name>
+            report_name = args.arg1
+            file_name = args.arg2
+        else:
+            # Case: report view <file_name> (requires a loaded report)
+            report_name, _ = self._get_current_report(cli)
+            if not report_name:
+                log.prompt("Or specify the report name: 'report view <report_name> <file_name>'")
+                return
+            file_name = args.arg1
 
-        file_name = args.file_name
         file_path = os.path.join(self.folder, report_name, file_name)
 
         if not os.path.isfile(file_path):

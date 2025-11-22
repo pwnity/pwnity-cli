@@ -723,9 +723,12 @@ class ParserFactory:
         # Custom 'view' command to see a file inside a report
         view_parser = subparsers.add_parser("view", help="View the content of a file within a report.", formatter_class=self.formatter, add_help=False)
         self._add_custom_help(view_parser, "view")
-        view_parser.add_argument("file_name", help="Name of the file to view within the loaded report.")
+        # This allows for 'view <file>' (if report is loaded) or 'view <report> <file>'
+        view_parser.add_argument("arg1", help="File to view, or report name if a second argument is given.")
+        view_parser.add_argument("arg2", nargs='?', default=None, help="Optional: File to view if the first argument is a report name.")
         view_parser.examples = [
-            ("report view nmap_scan.txt", "Displays the content of 'nmap_scan.txt' from the loaded report.")
+            ("report view nmap_scan.txt", "Displays 'nmap_scan.txt' from the loaded report."),
+            ("report view my-report nmap_scan.txt", "Displays 'nmap_scan.txt' from the specified 'my-report'.")
         ]
 
         # Add export parser
