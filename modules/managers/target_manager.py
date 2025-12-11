@@ -148,7 +148,20 @@ class TargetManager(JSONManager):
 
                 # Parse domain parts with tldextract
                 if tldextract:
-                    extracted = tldextract.extract(parsed.hostname)
+                    # The 'update=False' parameter is intended to prevent tldextract from
+                    # making network calls to update its TLD list, which can cause SSL errors
+                    # if an intercepting proxy with a self-signed certificate is in use.
+                    # This try-except block handles older versions of tldextract that
+                    # do not support the 'update' parameter, preventing a TypeError.
+                    # However, if 'update=False' is not supported, tldextract will proceed
+                    # with its default behavior, which might still involve network calls
+                    # and thus could still trigger the SSL error.
+                    try:
+                        extracted = tldextract.extract(parsed.hostname, update=False)
+                    except TypeError:
+                        extracted = tldextract.extract(parsed.hostname)
+                        log.warning("  -> 'tldextract' version does not support 'update=False'. Consider upgrading 'tldextract' (>=2.0.0) for better control over network calls and to prevent potential SSL errors from tldextract's internal updates.")
+
                     updates['domain'] = extracted.registered_domain
                     updates['domain_name'] = extracted.domain
                     updates['tld'] = extracted.suffix

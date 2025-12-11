@@ -1,0 +1,14 @@
+{
+  "name": "foo",
+  "protocol": "http",
+  "hostname": "foo.com",
+  "ip": "50.16.218.27",
+  "domain": "foo.com",
+  "domain_name": "foo",
+  "tld": "com",
+  "subdomains": [],
+  "port": "80",
+  "base_url": "http://foo.com",
+  "uri": "/",
+  "url": "http://foo.com"
+}

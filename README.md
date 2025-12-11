@@ -1,232 +1,344 @@
-# pwnity
+# **Pwnity – Command Automation for Pentesters**  
+**Stop typing. Start pwning.**
 
-> A flexible and session-based wrapper for orchestrating command-line tools for pentesting and CTFs.
+Pwnity is a flexible, session-based tool designed for pentesters, bug bounty hunters, and CTF players. It automates repetitive CLI tasks: define your targets, tools, and wordlists once, and Pwnity handles the execution. Keep your workspace clean, focus on the hunt, and leave the command chaos behind.
 
-`pwnity` is a framework designed to streamline the repetitive process of tool configuration and execution during a penetration test. It features a powerful interactive command-line interface (CLI) and a modern, reactive Web UI. Instead of manually assembling long commands over and over, you define how a tool (e.g., `nmap`, `gobuster`) is used once, and then you can quickly apply it to different targets.
+
+
 
 ## Table of Contents
 
 - Features
-- The Web UI
-- Core Concepts
 - Prerequisites
 - Installation
+- Quick Start
 - Configuration
-- Quick Start: A Simple Workflow
-- Key Concepts in Detail
-  - Placeholders
-  - Proxy Integration & Sudo
+- Core Concepts
+- The Web UI
 - Command Reference
-  - target
-  - tool
-  - wordlist
-  - revshell
-  - heartbeat
-  - parser
-  - library
-  - session
-  - preset
-  - proxy
-  - pwn / run
-  - jobs
-  - note & loot
-  - overview
-  - placeholders
-  - identify
-  - config
-  - profile
 - License
+
 
 ## Features
 
-*   **Modular Management:** Manage `Targets`, `Tools`, and `Wordlists` as reusable JSON objects.
-*   **Session-Based Workflow:** Keep your workspace clean by loading objects into sessions. Seamlessly switch between different projects.
-*   **Dynamic Placeholders:** Build commands with dynamic placeholders like `$target.ip` or `$wordlist.path` that are resolved at runtime.
-*   **Intelligent URL Parsing:** Automatically extract hostname, IP, port, domain, and query parameters when you set a target's URL.
-*   **Presets:** Save and load complete setups (Target + Tool + Wordlist + Proxy Settings) for recurring scans.
-*   **Information Gathering:** Automatically collect DNS, WHOIS, and HTTP information for your targets (`target gather`).
-*   **Notes & Loot:** Record your findings directly with the target (`note add`, `loot add`).
-*   **Centralized Reporting:** Collect notes, loot, and parser findings from multiple targets into a single, flexible report object.
-*   **Proxy Integration:** Route tool execution through a proxy (e.g., `proxychains-ng`) on a per-session basis.
-*   **Robust Sudo Handling:** The tool automatically prompts for `sudo` credentials when needed, even for background jobs.
-*   **Background Jobs:** Run long-lasting commands in the background and get notified upon completion.
-*   **Interactive Shell:** Benefit from autocompletion, command history, and a clear, modern UI thanks to `cmd2` and `rich`.
-*   **Web Interface:** A rich, single-page web application for a visual and interactive workflow, featuring a live terminal, drag-and-drop, and real-time updates.
-*   **Reference Library:** Manage a personal library of useful links and resources, complete with automatic URL status checking.
-*   **Export & Import:** Easily reconstruct your objects elsewhere with the `export` commands.
+### Modular by Design
+- Manage **Targets**, **Tools**, **Wordlists** and **Reports** as reusable JSON objects.
+- Build clean, repeatable workflows without rewriting commands.
 
-## Core Concepts
+### Smart CLI Automation
+- Use **dynamic placeholders** like `$target.ip`, `$target.url.host`, `$wordlist.path` etc., resolved at runtime.
+- Automatic URL parsing: hostname, IP, port, protocol, path, query parameters — all available as variables.
+- Create **presets** to store complete setups for recurring tasks or scans.
 
-*   **Targets:** The **What**. A target represents the goal of your engagement (e.g., an IP address, a domain). It stores all related information like URL, ports, and gathered data.
-*   **Tools:** The **How**. A tool is a template for an external command-line program. You define its subcommands (e.g., `dir` for `gobuster`) and its parameters.
-*   **Wordlists:** The **With What**. A simple reference to a text file used for activities like brute-forcing or fuzzing.
-*   **Reports:** The **Dossier**. A report is the central data container for an engagement. You load a report into your session, and all subsequent notes, loot, and parser findings are automatically saved to it. This allows you to collect data from multiple targets into one report.
-*   **Sessions:** Your current **Workspace**. A session "remembers" which target, tool, wordlist, and proxy settings you have currently loaded. The prompt always shows you the current status.
-*   **Revshells:** The **Callback**. A utility to quickly generate reverse shell one-liners for various languages.
-*   **Heartbeat:** The **Monitor**. A utility to continuously check a target's health (latency, status code, etc.) over time.
-*   **Presets:** A **saved session**. If you often use the same combination of target type, tool, and wordlist, you can save it as a preset and load it with a single command.
-*   **Parsers:** The **Eyes**. A parser is a collection of regex rules used to extract structured information (like IPs, emails, hostnames) from unstructured text output.
-*   **Library:** Your personal **Knowledge Base**. A collection of reference links, categorized and with automatic status checks to identify dead links.
+### Session-Based Workflow
+- Keep your workspace organized with isolated sessions.
+- Switch between projects instantly without losing context.
 
-## The Web UI
+### Built‑in Recon & Intelligence
+- `target gather`: DNS, WHOIS, HTTP metadata, service detection and more.
+- Centralized reporting: collect findings across tools and sessions.
+- **Notes & loot system**: attach comments, credentials, artifacts or links directly to your report entries.
 
-While `pwnity` is a fully-featured CLI application, it also includes a powerful web interface that provides a more visual and interactive way to manage your workflow.
+### Seamless Tool Execution
+- Per-session **proxy support** (e.g., proxychains-ng).
+- **sudo handling** with smart prompts.
+- **Background jobs** for long-running scans.
+- Full interactive shell with autocompletion & rich terminal output.
 
-**To start the Web UI:**
-```bash
-python3 web_ui/app.py
-```
-Then open `http://127.0.0.1:5001` in your browser.
+### Bring Your Own Tools
+- Run **any script or binary** directly through Pwnity.  
+- Full paths or simple executable names — Pwnity automatically detects and integrates them.
 
-**Web UI Features:**
-*   **Live Terminal:** An integrated `xterm.js` terminal that is fully synced with the backend `pwnity` shell.
-*   **Real-time Updates:** All views update in real-time as you execute commands in the terminal or interact with the UI.
-*   **Visual Management:** Manage all your Targets, Tools, Wordlists, and Library items through an intuitive card-based interface.
-*   **Drag-and-Drop:** Re-categorize library items or delete objects by dragging them to a drop zone.
-*   **Quick Actions Panel:** Quickly add loot/notes, generate reverse shells, or encode/decode data without leaving your current view.
-*   **Live System Stats:** Keep an eye on your system's CPU, Memory, and GPU usage.
+
+### Reference Library
+- Store useful links, snippets, cheat sheets or external resources.
+- Automatic health/status checking for all entries.
+
+### Import & Export
+- Convert your Pwnlabs objects back into raw commands for portability.
+- Export or sync your JSON objects with any backup tool — no database, no dumps, no pain.
+
+### Optional Web UI
+- A powerful WebUI is in active development — stay tuned.
+
+
 
 ## Prerequisites
 
-*   Python 3.x
-*   `pip` for installing packages
-*   The external tools you want to use (e.g., `nmap`, `gobuster`, `whatweb`) must be installed and available in the system's `PATH`.
-*   **Python Libraries:** `cmd2`, `rich`, `dnspython`, `python-whois`, `tldextract`, `rich-argparse`, `questionary`, `flask`, `flask-socketio`, `ptyprocess`, `requests`, `psutil`, `nvidia-ml-py`.
+Before installing Pwnity, make sure your system meets the following requirements:
 
-## Configuration
+- **Python 3.x**  
+- **pip** for installing Python packages  
+- Any external tools you plan to use (e.g., `nmap`, `gobuster`, `whatweb`).  
+  You can provide either the full path to the binary or just the executable name.  
+  If no full path is given, Pwnity will automatically search for the tool in your system’s `PATH`.
 
-The main configuration is located in `etc/config.json`. You can either edit this file directly or use the `config` command within the shell. It allows you to customize:
+## Installation
 
-*   **DIRS**: The directories where the JSON configurations for targets, tools, etc., are stored.
-*   **GLOBAL**: Global settings like the `DEBUG_LEVEL` or the path to the history file.
-*   **PROXY**: Global default settings for the proxy wrapper.
-*   **LIBRARY**: Settings for the reference library, such as URL check frequency.
+Getting started with Pwnity is straightforward.  
+Clone the repository, create your virtual environment, install the dependencies — done.
 
-## Quick Start: A Simple Workflow
+```bash
+git clone git@github.com:pwnity/pwnity-cli.git
+cd pwnity-cli
 
-1.  **Start the shell:**
+# Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate
+
+# Install required packages
+pip install -r requirements.txt
+
+# Make the CLI executable
+chmod +x pwnity
+
+# Start Pwnity
+./pwnity
+```
+
+
+
+## Quickstart Guide
+
+Pwnity ships with example configurations to help you get started quickly.  
+Just add a target, load your tools, and launch your first scan:
+
+1. **Start the interactive shell**
     ```bash
     python3 pwnity.py
     ```
 
-2.  **Create and load a report:** This will be our central data store.
-    ```
-    (default)> report add project-x
-    (default)> report load project-x
-    ```
-
-3.  **Create and configure a target:**
-    ```
-    (default)> target add web-server
-    (default)> target update web-server url http://192.168.1.10
-    ```
-    *This automatically extracts the IP, port, hostname, etc.*
-
-3.  **Create and configure a tool (e.g., `gobuster`):**
-    ```
-    (default | project-x)> tool add gobuster
-    (default)> tool update gobuster command dir
-    (default)> tool update gobuster dir param "dir"
-    (default)> tool update gobuster dir param "-u $target.base_url"
-    (default)> tool update gobuster dir param "-w $wordlist.path"
-    (default)> tool update gobuster dir param "-t 50"
-    (default)> tool update gobuster dir param "-o $report.path/gobuster.txt"
-    ```
-    *Note: Each parameter is added individually. `pwnity` is smart about where to place new parameters.*
-
-4.  **Add a wordlist:**
-    ```
-    (default)> wordlist add common
-    (default)> wordlist update common path /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+2. **Add your target**
+    ```bash
+    target add example.com
+    target update example.com url https://www.example.com
     ```
 
-5.  **Load everything into the session:**
-    ```
-    (default | project-x)> target load web-server
-    (web-server | project-x)> tool load gobuster
-    (web-server | gobuster | project-x)> wordlist load common
-    (web-server | gobuster | common | project-x)>
-    ```
-    *The prompt always shows you what is currently loaded.*
-
-6.  **Run the scan:**
-    ```
-    # Show a preview of the command that will be executed
-    (web-server | gobuster | common)> pwn dir
-
-    # Execute the command in the foreground now
-    (web-server | gobuster | common)> pwn dir now
-
-    # Or run it in the background
-    (web-server | gobuster | common)> pwn dir bg
+3. **Load your target and tool**
+    ```bash
+    target load example.com
+    tool load nmap
     ```
 
-7.  **Document your findings:**
-    ```
-    (web-server | gobuster | common | project-x)> note add Found admin panel at /admin
-    (web-server | gobuster | common | project-x)> loot add credential admin:admin
-    ```
-
-8.  **Get an overview:**
-    ```
-    (web-server | gobuster | common)> overview
+4. **Run your scan**
+    ```bash
+    pwn quick now
     ```
 
-## Key Concepts in Detail
+That's it — you’ve executed your first workflow with Pwnity.
 
-### Placeholders
+## Configuration
 
-Placeholders are the core of `pwnity`'s flexibility. They allow you to define command templates that are dynamically filled with data from your current session at runtime.
+Pwnity’s configuration is stored in `etc/config.json`.  
+Below is a description of all configuration sections and their parameters.
 
-#### Simple Placeholders
-*   **Syntax:** `$entity.path.to.value`
-*   **Examples:**
-    *   `$target.ip`: The IP address of the loaded target.
-    *   `$target.base_url`: The URL without path or query (`https://example.com:8080`).
-    *   `$target.query_values.id.0`: The first value of the 'id' query parameter.
-    *   `$wordlist.path`: The file path of the loaded wordlist.
-    *   `$profile.useragent`: A globally defined User-Agent string from your profile.
-    *   `$proxy.host`: The host of the currently configured proxy.
-    *   `$profile.lhost`: Your local listener IP (used by `revshell`).
-    *   `$profile.lport`: Your local listener port (used by `revshell`).
-    *   `$report.path`: The absolute path to the data directory of the loaded report (e.g., `/path/to/pwnity/data/reports/project-x`).
-*   `$report.name`: The name of the currently loaded report.
+---
 
-#### Function-based Placeholders
-You can chain placeholders with functions to manipulate data on the fly.
-*   **Syntax:** `function(placeholder)` or `function "value with $placeholder"`
-*   **Examples:**
-    *   `b64encode($target.name)`: Base64-encodes the target's name.
-    *   `print urlencode "some text with spaces"`: URL-encodes a static string.
-    *   `b64encode(urlencode($target.name))`: Nested functions are resolved from the inside out.
+### GLOBAL
+General application settings.
 
-Use the `placeholders functions` command to see a list of all available functions.
+- **DEBUG_LEVEL**  
+  Log verbosity level.
 
-Use the `placeholders <entity>` command to see all available placeholders for the loaded objects.
+- **HISTORY_FILE**  
+  Path to the shell history file.
 
-### Proxy Integration & Sudo
+- **ALIASES_FILE**  
+  Path to the aliases definition file.
 
-`pwnity` allows you to route tool execution through a proxy. These settings are **session-specific**, allowing you to work on different projects with different network configurations without conflict.
+- **LOOT_TYPES**  
+  List of allowed loot categories.
 
-1.  **Enable the proxy for the current session:**
-    ```
-    (default)> proxy on
-    ```
-    The prompt will now show a green `㉿` separator.
+---
 
-2.  **Configure the proxy (optional, overrides `config.json`):**
-    ```
-    (default)> proxy set type socks5
-    (default)> proxy set host 127.0.0.1
-    (default)> proxy set port 9050
-    ```
+### LIBRARY
+Settings for the reference library.
 
-3.  **Sudo-Handling:**
-    Some tools, or the proxy wrapper itself (`proxychains-ng`), require root privileges. `pwnity` handles this automatically.
-    *   To mark a tool to always run with `sudo`, use:
-        `tool update <tool_name> sudo true`
-    *   If the proxy wrapper needs `sudo` (default for `proxychains`), it will be applied automatically when the proxy is on.
-    *   If `sudo` is required, you will be prompted for your password interactively. This works for both foreground (`now`) and background (`bg`) jobs.
+- **CATEGORIES**  
+  Comma‑separated list of library categories.
+
+- **URL_CHECK_REFRESH_DAYS**  
+  Number of days before a library URL is revalidated.
+
+---
+
+### DIRS
+Directory structure for all stored objects.
+
+- **PRESETS** — Directory for presets  
+- **TARGETS** — Directory for target objects  
+- **WORDLISTS** — Directory for wordlists  
+- **TOOLS** — Directory for tool definitions  
+- **LIBRARY** — Directory for library entries  
+- **LOGBOOK** — Directory for logbook entries  
+- **REPORTS** — Directory for reports  
+- **WORKFLOWS** — Directory for workflow definitions  
+- **PARSERS** — Directory for parser definitions  
+- **HEARTBEATS** — Directory for heartbeat logs  
+- **REVSHELLS** — Path to the reverse shell template file  
+- **EXPORTS** — Directory for exported objects  
+- **MANUALS** — Directory for manuals  
+- **PROFILE_FILE** — Path to the user profile file  
+
+---
+
+### HEARTBEAT
+Controls the timing for job noise and stability checks.
+
+- **MIN_DELAY_SECONDS**  
+  Minimum interval between heartbeat checks.
+
+- **MAX_DELAY_SECONDS**  
+  Maximum interval between heartbeat checks.
+
+---
+
+### PROXY
+Default proxy wrapper configuration.
+
+- **ENABLED**  
+  Enables or disables proxy usage.
+
+- **TYPE**  
+  Proxy type (e.g., `socks5`).
+
+- **HOST**  
+  Proxy host.
+
+- **PORT**  
+  Proxy port.
+
+- **USERNAME**  
+  Proxy username.
+
+- **PASSWORD**  
+  Proxy password.
+
+- **WRAPPER_COMMAND**  
+  The proxy wrapper binary (e.g., `proxychains`).
+
+- **WRAPPER_OPTIONS**  
+  Additional options passed to the wrapper.
+
+- **WRAPPER_NEEDS_SUDO**  
+  Whether the wrapper requires `sudo`.
+
+---
+
+### COLORS
+ANSI color definitions used in the CLI.
+
+Each entry defines a foreground or background color code.
+
+
+# Core Concept Summary
+
+At its core, **pwnity** is a flexible, session-based CLI framework designed to structure, automate, and accelerate the penetration testing workflow.  
+It does **not replace tools** like Nmap or Gobuster — it intelligently orchestrates them.
+
+## The Core Idea
+
+pwnity centralizes everything that is typically scattered across multiple terminal windows, text files, and browser tabs into a single, consistent system:
+
+- Targets  
+- Tools  
+- Wordlists  
+- Reports  
+- Automation  
+- Parsing  
+- Workflows  
+
+Everything is contained within a well-defined working context: **the Session**.
+
+## Sessions: Your Workspace
+
+A session stores what is currently active:
+
+- **Target** – the entity under assessment (IP, domain, URL, metadata)  
+- **Tool** – the defined template for a CLI program  
+- **Wordlist** – e.g., for fuzzing or brute-forcing  
+- **Report** – central storage for all your findings  
+- **Proxy configuration** – optionally active  
+
+The prompt always reflects the current session state.  
+You can switch seamlessly between sessions or projects without losing context.
+
+## Dynamic Command Generation
+
+The core of pwnity:
+
+Commands contain **placeholders** such as:
+
+´´´
+$target.ip
+$target.url.hostname
+$wordlist.path
+$profile.lhost
+[...] (You define your placeholders :))
+´´´
+
+When executed, pwnity dynamically replaces them with real values from your current session and constructs the complete command automatically.  
+
+Define once — reuse reliably — every command runs correctly without copy-paste.
+
+## Centralized Data Collection & Analysis
+
+Everything you do during an engagement is automatically stored in one place.
+
+### Logbook
+Each execution is immutably recorded:
+
+- Timestamp  
+- Final command  
+- Full command output  
+
+### Parsers
+Parsers (regex rules) can be applied to logbook entries to automatically extract structured findings:
+
+- IP addresses  
+- Domains  
+- URLs  
+- Credentials  
+- Flags  
+- Error patterns  
+- Custom data structures  
+
+### Reports
+All notes, loot, and automatically extracted data are stored in the active report — organized per target but centrally accessible.
+
+
+
+# The Web UI
+
+The Web UI is an actively developed, premium extension designed to provide a graphical management layer for all pwnity features.  
+It introduces several UI‑exclusive capabilities that go beyond what the CLI offers, while still relying on the CLI as its underlying execution engine.
+
+## Key Features
+
+### Workflow Editor
+A node-based visual workflow builder that allows users to design complex, multi-step attack chains.  
+Each node represents a tool, parser, or action, and the data flow between them mirrors how commands are executed step by step.
+
+### Graphical Regex Builder
+A powerful interactive interface for crafting and testing regex-based parsers.  
+This makes it significantly easier to build reliable extraction rules for command output without trial-and-error in the terminal.
+
+### Full CLI Integration
+The Web UI does not replace the CLI — it orchestrates it.  
+Almost every action performed in the UI is translated directly into CLI operations behind the scenes.  
+This ensures:
+
+- Full compatibility  
+- Transparent execution  
+- Reproducible results  
+
+You can also trigger CLI commands directly from within the Web UI, making it a seamless hybrid environment.
+
+---
+
+The Web UI is evolving rapidly and will continue to expand with new visualization tools, workflow features, and automation capabilities.  
+Stay tuned!
+
 
 ## Command Reference
 
@@ -399,4 +511,4 @@ Manage global key-value settings.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more information.
+This project is licensed under Apache-2.0. See the `LICENSE` file for more information.

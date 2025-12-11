@@ -13,3 +13,7 @@ python-whois
 dnspython
 tldextract
 PySocks
+
+# Testing
+pytest
+pytest-order
