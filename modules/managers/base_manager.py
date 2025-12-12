@@ -308,8 +308,10 @@ class JSONManager(BaseManager):
 
     def _cmd_add(self, args, cli):
         entity_type = self._get_entity_type()
-        if self.create(args.name):
+        created = self.create(args.name)
+        if created:
             log.success(f"{entity_type} '{args.name}' added.")
+        return created
 
     def _cmd_update(self, args, cli):
         entity_type = self._get_entity_type()

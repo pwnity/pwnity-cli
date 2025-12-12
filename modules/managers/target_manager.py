@@ -27,9 +27,10 @@ class TargetManager(JSONManager):
 
     def _cmd_add(self, args, cli):
         """Provides a context-sensitive hint after creation."""
-        # Calls the parent class's _cmd_add to actually create the target
-        super()._cmd_add(args, cli)
-        log.prompt(f"Tip: Define the target's URL now with 'target update {args.name} url <your-url-here>'")
+        # Call the parent's add method and check if it was successful.
+        if super()._cmd_add(args, cli):
+            # Only show the tip if the target was actually created.
+            log.prompt(f"Tip: Define the target's URL now with 'target update {args.name} url <your-url-here>'")
 
     def _cmd_show(self, args, cli):
         """Handles 'target show [name]'."""
