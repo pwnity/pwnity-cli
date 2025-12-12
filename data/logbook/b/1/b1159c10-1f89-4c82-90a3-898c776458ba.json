@@ -1,0 +1,18 @@
+{
+  "id": "b1159c10-1f89-4c82-90a3-898c776458ba",
+  "timestamp": "2025-11-22 14:59:30",
+  "command": "sudo /usr/bin/echo -n admin:foooooo",
+  "context": {
+    "session": "test",
+    "target": "fritzbox",
+    "tool": "echo",
+    "wordlist": "rockyou"
+  },
+  "execution": {
+    "duration_seconds": 0.01,
+    "return_code": 0
+  },
+  "output": "admin:foooooo",
+  "source_job_id": null,
+  "additional_info": {}
+}

@@ -160,7 +160,6 @@ class TargetManager(JSONManager):
                         extracted = tldextract.extract(parsed.hostname, update=False)
                     except TypeError:
                         extracted = tldextract.extract(parsed.hostname)
-                        log.warning("  -> 'tldextract' version does not support 'update=False'. Consider upgrading 'tldextract' (>=2.0.0) for better control over network calls and to prevent potential SSL errors from tldextract's internal updates.")
 
                     updates['domain'] = extracted.registered_domain
                     updates['domain_name'] = extracted.domain

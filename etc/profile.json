@@ -2,5 +2,7 @@
   "useragent": "Vermillion",
   "searchkey": "admin",
   "user_agent": "MyTestAgent/1.0",
-  "mykey": "myvalue"
+  "mykey": "myvalue",
+  "lhost": "10.10.10.1",
+  "lport": "4444"
 }

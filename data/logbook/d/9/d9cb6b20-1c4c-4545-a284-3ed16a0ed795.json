@@ -1,0 +1,16 @@
+{
+  "id": "d9cb6b20-1c4c-4545-a284-3ed16a0ed795",
+  "timestamp": "2025-11-04 12:42:28",
+  "command": "/usr/bin/echo -n Success",
+  "context": {},
+  "execution": {
+    "duration_seconds": 0.1,
+    "return_code": 0
+  },
+  "output": "Success",
+  "source_job_id": "1f998d1c-14e4-4df5-a131-41b75d019597",
+  "additional_info": {
+    "node_id": 7,
+    "node_title": "echo"
+  }
+}

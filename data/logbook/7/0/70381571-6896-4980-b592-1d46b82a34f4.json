@@ -1,0 +1,18 @@
+{
+  "id": "70381571-6896-4980-b592-1d46b82a34f4",
+  "timestamp": "2025-12-12 00:10:14",
+  "command": "sudo proxychains -q /usr/bin/curl -L -4 -s https://iprs.fly.dev",
+  "context": {
+    "session": "mytutorial_preset",
+    "target": "iprs.fly.dev",
+    "tool": "curl",
+    "wordlist": "dns_5000"
+  },
+  "execution": {
+    "duration_seconds": 0.84,
+    "return_code": 0
+  },
+  "output": "192.42.116.191",
+  "source_job_id": null,
+  "additional_info": {}
+}

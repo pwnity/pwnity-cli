@@ -8,7 +8,6 @@
       "params": [
         "dir",
         "-w $wordlist.path",
-        "-b $tool.negative_codes",
         "-u $target.base_url"
       ]
     },

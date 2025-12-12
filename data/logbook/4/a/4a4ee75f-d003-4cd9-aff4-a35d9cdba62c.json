@@ -1,0 +1,16 @@
+{
+  "id": "4a4ee75f-d003-4cd9-aff4-a35d9cdba62c",
+  "timestamp": "2025-11-03 20:50:47",
+  "command": "/usr/bin/nc -l -p 1337 -v -n",
+  "context": {},
+  "execution": {
+    "duration_seconds": 5.01,
+    "return_code": 1
+  },
+  "output": "listening on [any] 1337 ...\n\n",
+  "source_job_id": "833e6b90-c291-4fa8-90a5-afce63582f97",
+  "additional_info": {
+    "node_id": 17,
+    "node_title": "nc"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "name": "tryhackme",
+  "findings": [
+    {
+      "timestamp": "2025-12-12T00:27:18.952897",
+      "source_log_id": "b1875567-1bde-41db-b523-3805f656df22",
+      "parser": "nmap",
+      "target": "tryhackme_challange",
+      "category": "ipv4",
+      "match": "10.80.128.241"
+    },
+    {
+      "timestamp": "2025-12-12T00:27:18.952915",
+      "source_log_id": "b1875567-1bde-41db-b523-3805f656df22",
+      "parser": "nmap",
+      "target": "tryhackme_challange",
+      "category": "tcp_port",
+      "match": "22"
+    },
+    {
+      "timestamp": "2025-12-12T00:27:18.952919",
+      "source_log_id": "b1875567-1bde-41db-b523-3805f656df22",
+      "parser": "nmap",
+      "target": "tryhackme_challange",
+      "category": "tcp_port",
+      "match": "443"
+    },
+    {
+      "timestamp": "2025-12-12T00:27:18.952921",
+      "source_log_id": "b1875567-1bde-41db-b523-3805f656df22",
+      "parser": "nmap",
+      "target": "tryhackme_challange",
+      "category": "tcp_port",
+      "match": "80"
+    },
+    {
+      "timestamp": "2025-12-12T00:27:18.952923",
+      "source_log_id": "b1875567-1bde-41db-b523-3805f656df22",
+      "parser": "nmap",
+      "target": "tryhackme_challange",
+      "category": "service_name",
+      "match": "http"
+    },
+    {
+      "timestamp": "2025-12-12T00:27:18.952925",
+      "source_log_id": "b1875567-1bde-41db-b523-3805f656df22",
+      "parser": "nmap",
+      "target": "tryhackme_challange",
+      "category": "service_name",
+      "match": "https"
+    },
+    {
+      "timestamp": "2025-12-12T00:27:18.952926",
+      "source_log_id": "b1875567-1bde-41db-b523-3805f656df22",
+      "parser": "nmap",
+      "target": "tryhackme_challange",
+      "category": "service_name",
+      "match": "ssh"
+    },
+    {
+      "timestamp": "2025-12-12T00:27:18.952928",
+      "source_log_id": "b1875567-1bde-41db-b523-3805f656df22",
+      "parser": "nmap",
+      "target": "tryhackme_challange",
+      "category": "service_version",
+      "match": "80/tcp  open  http"
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2025-12-12T00:28:29.970541",
+      "command": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirb/small.txt -b '$tool.negative_codes' -u http://10.80.128.241",
+      "logbook_id": "5d15157d-cc29-44b1-8857-4bbec19ec4e5",
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-12-12T00:29:23.794325",
+      "command": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirb/small.txt -u http://10.80.128.241",
+      "logbook_id": "5f4355c5-b165-4b18-91eb-6d8ea67d92f0",
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-12-12T00:30:18.852586",
+      "command": "/usr/bin/nmap -A -T4 10.80.128.241",
+      "logbook_id": "8c1f3ea1-ef56-43a8-a234-6d8b0659f432",
+      "tool": "nmap",
+      "tool_command": "aggressive"
+    },
+    {
+      "timestamp": "2025-12-12T00:30:22.447636",
+      "command": "/usr/bin/whatweb -v -a 3 http://10.80.128.241",
+      "logbook_id": "e26c95b8-7c5b-44e8-aa60-22245e1fe58c",
+      "tool": "whatweb",
+      "tool_command": "aggro"
+    },
+    {
+      "timestamp": "2025-12-12T00:32:23.225482",
+      "command": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u https://futurevera.thm",
+      "logbook_id": "8377033f-c2e8-43c3-b065-6aad5a566d5f",
+      "tool": "gobuster",
+      "tool_command": "dir"
+    },
+    {
+      "timestamp": "2025-12-12T00:36:37.743541",
+      "command": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://10.80.128.241",
+      "logbook_id": "0ab5f889-02b9-48e7-b586-a469e341181f",
+      "tool": "gobuster",
+      "tool_command": "dir"
+    }
+  ]
+}

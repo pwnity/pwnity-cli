@@ -1,0 +1,18 @@
+{
+  "id": "8c1f3ea1-ef56-43a8-a234-6d8b0659f432",
+  "timestamp": "2025-12-12 00:30:18",
+  "command": "/usr/bin/nmap -A -T4 10.80.128.241",
+  "context": {
+    "session": "default",
+    "target": "tryhackme_challange",
+    "tool": "whatweb",
+    "wordlist": "dir_medium"
+  },
+  "execution": {
+    "duration_seconds": 21.91,
+    "return_code": 0
+  },
+  "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-12 00:29 CET\nNmap scan report for 10.80.128.241\nHost is up (0.034s latency).\nNot shown: 997 closed tcp ports (reset)\nPORT    STATE SERVICE  VERSION\n22/tcp  open  ssh      OpenSSH 8.2p1 Ubuntu 4ubuntu0.13 (Ubuntu Linux; protocol 2.0)\n| ssh-hostkey: \n|   3072 41:a6:3d:d9:71:b9:b2:36:60:49:13:00:0e:10:fe:7a (RSA)\n|   256 7d:5b:76:99:46:ff:45:06:06:48:8d:d5:2e:df:35:63 (ECDSA)\n|_  256 a2:59:78:09:22:18:da:6a:73:a8:e1:a1:72:48:89:8a (ED25519)\n80/tcp  open  http     Apache httpd 2.4.41 ((Ubuntu))\n|_http-title: Did not follow redirect to https://futurevera.thm/\n|_http-server-header: Apache/2.4.41 (Ubuntu)\n443/tcp open  ssl/http Apache httpd 2.4.41 ((Ubuntu))\n|_ssl-date: TLS randomness does not represent time\n|_http-server-header: Apache/2.4.41 (Ubuntu)\n| ssl-cert: Subject: commonName=futurevera.thm/organizationName=Futurevera/stateOrProvinceName=Oregon/countryName=US\n| Not valid before: 2022-03-13T10:05:19\n|_Not valid after:  2023-03-13T10:05:19\n| tls-alpn: \n|_  http/1.1\n|_http-title: FutureVera\nDevice type: general purpose\nRunning: Linux 4.X\nOS CPE: cpe:/o:linux:linux_kernel:4.15\nOS details: Linux 4.15\nNetwork Distance: 3 hops\nService Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel\n\nTRACEROUTE (using port 1720/tcp)\nHOP RTT      ADDRESS\n1   32.30 ms 192.168.128.1\n2   ...\n3   32.79 ms 10.80.128.241\n\nOS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .\nNmap done: 1 IP address (1 host up) scanned in 21.88 seconds\n",
+  "source_job_id": "ee27da6c-b4a9-46fd-83fd-5961d4335515",
+  "additional_info": {}
+}

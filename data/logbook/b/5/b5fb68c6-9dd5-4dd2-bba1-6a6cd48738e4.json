@@ -1,0 +1,18 @@
+{
+  "id": "b5fb68c6-9dd5-4dd2-bba1-6a6cd48738e4",
+  "timestamp": "2025-12-11 23:45:00",
+  "command": "/usr/bin/gobuster dns -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt --wildcard -d moonandhoney.de",
+  "context": {
+    "session": "default",
+    "target": "moonandhoney.de",
+    "tool": "gobuster",
+    "wordlist": "dns_5000"
+  },
+  "execution": {
+    "duration_seconds": 18.39,
+    "return_code": 0
+  },
+  "output": "===============================================================\nGobuster v3.6\nby OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)\n===============================================================\n[+] Domain:            moonandhoney.de\n[+] Threads:           10\n[+] Wildcard forced:   true\n[+] Timeout:           1s\n[+] Wordlist:          /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt\n===============================================================\nStarting gobuster in DNS enumeration mode\n===============================================================\n\r\u001b[2KFound: www.moonandhoney.de\n\r\u001b[2KFound: autoconfig.moonandhoney.de\n\r\u001b[2KProgress: 68 / 4990 (1.36%)\r\u001b[2KProgress: 164 / 4990 (3.29%)\r\u001b[2KProgress: 318 / 4990 (6.37%)\r\u001b[2KProgress: 473 / 4990 (9.48%)\r\u001b[2KProgress: 594 / 4990 (11.90%)\r\u001b[2KProgress: 730 / 4990 (14.63%)\r\u001b[2KProgress: 852 / 4990 (17.07%)\r\u001b[2KProgress: 979 / 4990 (19.62%)\r\u001b[2KProgress: 1093 / 4990 (21.90%)\r\u001b[2KProgress: 1193 / 4990 (23.91%)\r\u001b[2KProgress: 1300 / 4990 (26.05%)\r\u001b[2KProgress: 1424 / 4990 (28.54%)\r\u001b[2KProgress: 1539 / 4990 (30.84%)\r\u001b[2KProgress: 1665 / 4990 (33.37%)\r\u001b[2KProgress: 1790 / 4990 (35.87%)\r\u001b[2KProgress: 1907 / 4990 (38.22%)\r\u001b[2KProgress: 2012 / 4990 (40.32%)\r\u001b[2KProgress: 2126 / 4990 (42.61%)\r\u001b[2KProgress: 2248 / 4990 (45.05%)\r\u001b[2KProgress: 2351 / 4990 (47.11%)\r\u001b[2KProgress: 2451 / 4990 (49.12%)\r\u001b[2KProgress: 2468 / 4990 (49.46%)\r\u001b[2KProgress: 2468 / 4990 (49.46%)\r\u001b[2KProgress: 2645 / 4990 (53.01%)\r\u001b[2KProgress: 2842 / 4990 (56.95%)\r\u001b[2KProgress: 3037 / 4990 (60.86%)\r\u001b[2KProgress: 3213 / 4990 (64.39%)\r\u001b[2KProgress: 3403 / 4990 (68.20%)\r\u001b[2KProgress: 3589 / 4990 (71.92%)\r\u001b[2KProgress: 3772 / 4990 (75.59%)\r\u001b[2KProgress: 3959 / 4990 (79.34%)\r\u001b[2KProgress: 4128 / 4990 (82.73%)\r\u001b[2KProgress: 4325 / 4990 (86.67%)\r\u001b[2KProgress: 4509 / 4990 (90.36%)\r\u001b[2KProgress: 4695 / 4990 (94.09%)\r\u001b[2KProgress: 4880 / 4990 (97.80%)\r\u001b[2KProgress: 4989 / 4990 (99.98%)\n===============================================================\nFinished\n===============================================================\n",
+  "source_job_id": null,
+  "additional_info": {}
+}

@@ -1,0 +1,16 @@
+{
+  "id": "d10be019-77b6-4939-9c16-086347599c47",
+  "timestamp": "2025-11-04 16:37:36",
+  "command": "/bin/sh -c 'echo kali | sudo -S /usr/bin/ping '\"'\"'-c 4'\"'\"' 127.0.0.1'",
+  "context": {},
+  "execution": {
+    "duration_seconds": 3.21,
+    "return_code": 0
+  },
+  "output": "\n\n\n\n\n\n\n\n\n",
+  "source_job_id": "0a77dc6c-8117-4d23-8e70-979501dac0fe",
+  "additional_info": {
+    "node_id": 20,
+    "node_title": "ping"
+  }
+}

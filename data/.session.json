@@ -1,22 +1,62 @@
 {
   "session_name": "default",
-  "target": "fritzbox",
-  "tool": null,
-  "wordlist": null,
-  "report": null,
+  "target": "tryhackme_challange",
+  "tool": "gobuster",
+  "wordlist": "dir_medium",
+  "report": "tryhackme",
   "proxy_enabled": false,
-  "jobs": [],
+  "jobs": [
+    {
+      "id": "01c2a398-7564-48bc-bee3-80aac30261f6",
+      "command_str": "sudo /usr/sbin/openvpn --config /home/kali/v3rm1ll1on.ovpn",
+      "status": "running",
+      "duration": "647.62s",
+      "logbook_id": null,
+      "start_time": 1765495549.6061473,
+      "output": "[sudo] password for kali: \r\n2025-12-12 00:26:05 Note: --cipher is not set. OpenVPN versions before 2.5 defaulted to BF-CBC as fallback when cipher negotiation failed in this case. If you need this fallback please add '--data-ciphers-fallback BF-CBC' to your configuration and/or add BF-CBC to --data-ciphers.\r\n2025-12-12 00:26:05 Note: Kernel support for ovpn-dco missing, disabling data channel offload.\r\n2025-12-12 00:26:05 OpenVPN 2.6.14 x86_64-pc-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL] [PKCS11] [MH/PKTINFO] [AEAD] [DCO]\r\n2025-12-12 00:26:05 library versions: OpenSSL 3.5.2 5 Aug 2025, LZO 2.10\r\n2025-12-12 00:26:05 DCO version: N/A\r\n2025-12-12 00:26:05 TCP/UDP: Preserving recently used remote address: [AF_INET]18.203.72.251:1194\r\n2025-12-12 00:26:05 Socket Buffers: R=[212992->212992] S=[212992->212992]\r\n2025-12-12 00:26:05 UDPv4 link local: (not bound)\r\n2025-12-12 00:26:05 UDPv4 link remote: [AF_INET]18.203.72.251:1194\r\n2025-12-12 00:26:05 TLS: Initial packet from [AF_INET]18.203.72.251:1194, sid=5eb0fbcb ccfe011d\r\n2025-12-12 00:26:05 WARNING: this configuration may cache passwords in memory -- use the auth-nocache option to prevent this\r\n2025-12-12 00:26:05 VERIFY OK: depth=1, CN=OpenVPN-CA\r\n2025-12-12 00:26:05 VERIFY KU OK\r\n2025-12-12 00:26:05 Validating certificate extended key usage\r\n2025-12-12 00:26:05 ++ Certificate has EKU (str) TLS Web Server Authentication, expects TLS Web Server Authentication\r\n2025-12-12 00:26:05 VERIFY EKU OK\r\n2025-12-12 00:26:05 VERIFY X509NAME OK: CN=openvpn-server\r\n2025-12-12 00:26:05 VERIFY OK: depth=0, CN=openvpn-server\r\n2025-12-12 00:26:05 Control Channel: TLSv1.3, cipher TLSv1.3 TLS_AES_256_GCM_SHA384, peer certificate: 2048 bits RSA, signature: RSA-SHA256, peer temporary key: 253 bits X25519\r\n2025-12-12 00:26:05 [openvpn-server] Peer Connection Initiated with [AF_INET]18.203.72.251:1194\r\n2025-12-12 00:26:05 TLS: move_session: dest=TM_ACTIVE src=TM_INITIAL reinit_src=1\r\n2025-12-12 00:26:05 TLS: tls_multi_process: initial untrusted session promoted to trusted\r\n2025-12-12 00:26:05 PUSH: Received control message: 'PUSH_REPLY,route 10.80.0.0 255.240.0.0,route-gateway 192.168.128.1,topology subnet,ping 10,ping-restart 120,ifconfig 192.168.204.36 255.255.128.0,peer-id 276,cipher AES-256-GCM,protocol-flags cc-exit tls-ekm dyn-tls-crypt,tun-mtu 1500'\r\n2025-12-12 00:26:05 OPTIONS IMPORT: --ifconfig/up options modified\r\n2025-12-12 00:26:05 OPTIONS IMPORT: route options modified\r\n2025-12-12 00:26:05 OPTIONS IMPORT: route-related options modified\r\n2025-12-12 00:26:05 OPTIONS IMPORT: tun-mtu set to 1500\r\n2025-12-12 00:26:05 net_route_v4_best_gw query: dst 0.0.0.0\r\n2025-12-12 00:26:05 net_route_v4_best_gw result: via 172.22.96.1 dev eth0\r\n2025-12-12 00:26:05 ROUTE_GATEWAY 172.22.96.1/255.255.240.0 IFACE=eth0 HWADDR=00:15:5d:81:a9:0c\r\n2025-12-12 00:26:05 TUN/TAP device tun0 opened\r\n2025-12-12 00:26:05 net_iface_mtu_set: mtu 1500 for tun0\r\n2025-12-12 00:26:05 net_iface_up: set tun0 up\r\n2025-12-12 00:26:05 net_addr_v4_add: 192.168.204.36/17 dev tun0\r\n2025-12-12 00:26:05 net_route_v4_add: 10.80.0.0/12 via 192.168.128.1 dev [NULL] table 0 metric -1\r\n2025-12-12 00:26:05 Initialization Sequence Completed\r\n2025-12-12 00:26:05 Data Channel: cipher 'AES-256-GCM', peer-id: 276\r\n2025-12-12 00:26:05 Timers: ping 10, ping-restart 120\r\n2025-12-12 00:26:05 Protocol options: explicit-exit-notify 1, protocol-flags cc-exit tls-ekm dyn-tls-crypt\r\n"
+    },
+    {
+      "id": "d476e632-28b3-47fc-a98f-c0740e9a797f",
+      "command_str": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://10.80.128.241",
+      "status": "running",
+      "duration": "416.49s",
+      "logbook_id": null,
+      "start_time": 1765495780.7436304,
+      "output": "[... Output truncated ...]\n)\r\u001b[2KProgress: 105618 / 220561 (47.89%)\r\u001b[2KProgress: 105767 / 220561 (47.95%)\r\u001b[2KProgress: 105917 / 220561 (48.02%)\r\u001b[2KProgress: 106047 / 220561 (48.08%)\r\u001b[2KProgress: 106197 / 220561 (48.15%)\r\u001b[2KProgress: 106337 / 220561 (48.21%)\r\u001b[2KProgress: 106486 / 220561 (48.28%)\r\u001b[2KProgress: 106616 / 220561 (48.34%)\r\u001b[2KProgress: 106766 / 220561 (48.41%)\r\u001b[2KProgress: 106906 / 220561 (48.47%)\r\u001b[2KProgress: 107056 / 220561 (48.54%)\r\u001b[2KProgress: 107206 / 220561 (48.61%)\r\u001b[2KProgress: 107356 / 220561 (48.67%)\r\u001b[2KProgress: 107505 / 220561 (48.74%)\r\u001b[2KProgress: 107655 / 220561 (48.81%)\r\u001b[2KProgress: 107795 / 220561 (48.87%)\r\u001b[2KProgress: 107945 / 220561 (48.94%)\r\u001b[2KProgress: 108095 / 220561 (49.01%)\r\u001b[2KProgress: 108245 / 220561 (49.08%)\r\u001b[2KProgress: 108386 / 220561 (49.14%)\r\u001b[2KProgress: 108533 / 220561 (49.21%)\r\u001b[2KProgress: 108672 / 220561 (49.27%)\r\u001b[2KProgress: 108822 / 220561 (49.34%)\r\u001b[2KProgress: 108962 / 220561 (49.40%)\r\u001b[2KProgress: 109112 / 220561 (49.47%)\r\u001b[2KProgress: 109262 / 220561 (49.54%)\r\u001b[2KProgress: 109412 / 220561 (49.61%)\r\u001b[2KProgress: 109560 / 220561 (49.67%)\r\u001b[2KProgress: 109710 / 220561 (49.74%)\r\u001b[2KProgress: 109852 / 220561 (49.81%)\r\u001b[2KProgress: 110000 / 220561 (49.87%)\r\u001b[2KProgress: 110150 / 220561 (49.94%)\r\u001b[2KProgress: 110300 / 220561 (50.01%)\r\u001b[2KProgress: 110450 / 220561 (50.08%)\r\u001b[2KProgress: 110598 / 220561 (50.14%)\r\u001b[2KProgress: 110738 / 220561 (50.21%)\r\u001b[2KProgress: 110888 / 220561 (50.28%)\r\u001b[2KProgress: 111028 / 220561 (50.34%)\r\u001b[2KProgress: 111171 / 220561 (50.40%)\r\u001b[2KProgress: 111321 / 220561 (50.47%)\r\u001b[2KProgress: 111471 / 220561 (50.54%)\r\u001b[2KProgress: 111611 / 220561 (50.60%)\r\u001b[2KProgress: 111763 / 220561 (50.67%)\r\u001b[2KProgress: 111908 / 220561 (50.74%)\r\u001b[2KProgress: 112058 / 220561 (50.81%)\r\u001b[2KProgress: 112208 / 220561 (50.87%)\r\u001b[2KProgress: 112358 / 220561 (50.94%)\r\u001b[2KProgress: 112508 / 220561 (51.01%)\r\u001b[2KProgress: 112647 / 220561 (51.07%)\r\u001b[2KProgress: 112797 / 220561 (51.14%)\r\u001b[2KProgress: 112937 / 220561 (51.20%)\r\u001b[2KProgress: 113076 / 220561 (51.27%)\r\u001b[2KProgress: 113226 / 220561 (51.34%)\r\u001b[2KProgress: 113376 / 220561 (51.40%)\r\u001b[2KProgress: 113520 / 220561 (51.47%)\r\u001b[2KProgress: 113671 / 220561 (51.54%)\r\u001b[2KProgress: 113815 / 220561 (51.60%)\r\u001b[2KProgress: 113965 / 220561 (51.67%)\r\u001b[2KProgress: 114115 / 220561 (51.74%)\r\u001b[2KProgress: 114256 / 220561 (51.80%)\r\u001b[2KProgress: 114406 / 220561 (51.87%)\r\u001b[2KProgress: 114556 / 220561 (51.94%)\r\u001b[2KProgress: 114695 / 220561 (52.00%)\r\u001b[2KProgress: 114845 / 220561 (52.07%)\r\u001b[2KProgress: 114995 / 220561 (52.14%)\r\u001b[2KProgress: 115137 / 220561 (52.20%)\r\u001b[2KProgress: 115284 / 220561 (52.27%)\r\u001b[2KProgress: 115434 / 220561 (52.34%)\r\u001b[2KProgress: 115584 / 220561 (52.40%)\r\u001b[2KProgress: 115724 / 220561 (52.47%)\r\u001b[2KProgress: 115873 / 220561 (52.54%)\r\u001b[2KProgress: 116023 / 220561 (52.60%)\r\u001b[2KProgress: 116173 / 220561 (52.67%)\r\u001b[2KProgress: 116323 / 220561 (52.74%)\r\u001b[2KProgress: 116463 / 220561 (52.80%)\r\u001b[2KProgress: 116611 / 220561 (52.87%)\r\u001b[2KProgress: 116761 / 220561 (52.94%)\r\u001b[2KProgress: 116911 / 220561 (53.01%)\r\u001b[2KProgress: 117061 / 220561 (53.07%)\r\u001b[2KProgress: 117211 / 220561 (53.14%)\r\u001b[2KProgress: 117361 / 220561 (53.21%)\r\u001b[2KProgress: 117511 / 220561 (53.28%)\r\u001b[2KProgress: 117659 / 220561 (53.35%)\r\u001b[2KProgress: 117799 / 220561 (53.41%)\r\u001b[2KProgress: 117948 / 220561 (53.48%)\r\u001b[2KProgress: 118090 / 220561 (53.54%)\r\u001b[2KProgress: 118239 / 220561 (53.61%)\r\u001b[2KProgress: 118389 / 220561 (53.68%)\r\u001b[2KProgress: 118538 / 220561 (53.74%)\r\u001b[2KProgress: 118682 / 220561 (53.81%)\r\u001b[2KProgress: 118822 / 220561 (53.87%)\r\u001b[2KProgress: 118972 / 220561 (53.94%)\r\u001b[2KProgress: 119121 / 220561 (54.01%)\r\u001b[2KProgress: 119271 / 220561 (54.08%)\r\u001b[2KProgress: 119421 / 220561 (54.14%)\r\u001b[2KProgress: 119571 / 220561 (54.21%)\r\u001b[2KProgress: 119717 / 220561 (54.28%)\r\u001b[2KProgress: 119868 / 220561 (54.35%)\r\u001b[2KProgress: 120021 / 220561 (54.42%)\r\u001b[2KProgress: 120158 / 220561 (54.48%)\r\u001b[2KProgress: 120308 / 220561 (54.55%)\r\u001b[2KProgress: 120458 / 220561 (54.61%)\r\u001b[2KProgress: 120608 / 220561 (54.68%)\r\u001b[2KProgress: 120758 / 220561 (54.75%)\r\u001b[2KProgress: 120898 / 220561 (54.81%)"
+    }
+  ],
   "sessions": {
     "default": {
       "name": "default",
-      "target": "fritzbox",
-      "tool": null,
+      "target": "tryhackme_challange",
+      "tool": "gobuster",
+      "wordlist": "dir_medium",
+      "report": "tryhackme"
+    },
+    "mytutorial_preset": {
+      "name": "mytutorial_preset",
+      "target": "scanme.nmap.org",
+      "tool": "nmap",
+      "wordlist": "dns_5000",
+      "report": "mytutorial"
+    },
+    "foo": {
+      "name": "foo",
+      "target": "mynetwork",
+      "tool": "nmap",
+      "wordlist": null,
+      "report": null
+    },
+    "ovpn": {
+      "name": "ovpn",
+      "target": null,
+      "tool": "openvpn",
       "wordlist": null,
       "report": null
     }
   },
   "monitoring_status": {
     "proxy_enabled": false,
-    "heartbeat_target": "fritzbox"
+    "heartbeat_target": null
   }
 }

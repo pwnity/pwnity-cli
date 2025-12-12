@@ -1,0 +1,18 @@
+{
+  "id": "720c21ad-5cfe-40a9-83ca-e099789b7a2c",
+  "timestamp": "2025-12-11 23:52:27",
+  "command": "/usr/bin/gobuster dns -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --wildcard -d moonandhoney.de",
+  "context": {
+    "session": "default",
+    "target": "moonandhoney.de",
+    "tool": "nmap",
+    "wordlist": "dns_5000"
+  },
+  "execution": {
+    "duration_seconds": 559.6,
+    "return_code": 0
+  },
+  "output": "===============================================================\nGobuster v3.6\nby OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)\n===============================================================\n[+] Domain:            moonandhoney.de\n[+] Threads:           10\n[+] Wildcard forced:   true\n[+] Timeout:           1s\n[+] Wordlist:          /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt\n===============================================================\nStarting gobuster in DNS enumeration mode\n===============================================================\nFound: www.moonandhoney.de\n\nFound: WWW.moonandhoney.de\n\nFound: Www.moonandhoney.de\n\nFound: WwW.moonandhoney.de\n\nProgress: 220560 / 220561 (100.00%)\n===============================================================\nFinished\n===============================================================\n",
+  "source_job_id": "3b446146-e334-4387-83eb-9a8d236f5e87",
+  "additional_info": {}
+}

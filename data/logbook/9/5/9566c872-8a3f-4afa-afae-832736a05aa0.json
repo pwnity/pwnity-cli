@@ -1,0 +1,16 @@
+{
+  "id": "9566c872-8a3f-4afa-afae-832736a05aa0",
+  "timestamp": "2025-11-04 12:43:11",
+  "command": "/usr/bin/echo -n Failed",
+  "context": {},
+  "execution": {
+    "duration_seconds": 0.1,
+    "return_code": 0
+  },
+  "output": "Failed",
+  "source_job_id": "4a13c211-356c-4a99-80ad-73ac210d6d56",
+  "additional_info": {
+    "node_id": 13,
+    "node_title": "echo"
+  }
+}

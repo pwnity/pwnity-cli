@@ -1,0 +1,18 @@
+{
+  "id": "2db9b370-cbb0-4d3b-ba83-746b4c2571a7",
+  "timestamp": "2025-12-12 00:18:56",
+  "command": "sudo /usr/sbin/openvpn --config /home/kali/v3rm1ll1on.ovpn",
+  "context": {
+    "session": "ovpn",
+    "target": null,
+    "tool": "openvpn",
+    "wordlist": null
+  },
+  "execution": {
+    "duration_seconds": 62.54,
+    "return_code": 1
+  },
+  "output": "[sudo] password for kali: \nsudo: a password is required\n",
+  "source_job_id": "31345d2a-0497-4143-9ad7-5072f33c3ee4",
+  "additional_info": {}
+}

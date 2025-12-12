@@ -1,0 +1,18 @@
+{
+  "id": "64488ba0-c6ff-4d32-9679-1228a5d84aab",
+  "timestamp": "2025-11-16 22:31:00",
+  "command": "sudo /usr/bin/ping -c 4 192.168.178.1",
+  "context": {
+    "session": "local_ping",
+    "target": "mynetwork",
+    "tool": "ping",
+    "wordlist": null
+  },
+  "execution": {
+    "duration_seconds": 3.02,
+    "return_code": 0
+  },
+  "output": "PING 192.168.178.1 (192.168.178.1) 56(84) bytes of data.\n64 bytes from 192.168.178.1: icmp_seq=1 ttl=63 time=2.71 ms\n64 bytes from 192.168.178.1: icmp_seq=2 ttl=63 time=2.69 ms\n64 bytes from 192.168.178.1: icmp_seq=3 ttl=63 time=2.54 ms\n64 bytes from 192.168.178.1: icmp_seq=4 ttl=63 time=2.11 ms\n\n--- 192.168.178.1 ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3005ms\nrtt min/avg/max/mdev = 2.114/2.513/2.705/0.238 ms\n",
+  "source_job_id": null,
+  "additional_info": {}
+}

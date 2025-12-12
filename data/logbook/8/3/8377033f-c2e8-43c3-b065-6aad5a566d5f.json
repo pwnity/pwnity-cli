@@ -1,0 +1,18 @@
+{
+  "id": "8377033f-c2e8-43c3-b065-6aad5a566d5f",
+  "timestamp": "2025-12-12 00:32:23",
+  "command": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u https://futurevera.thm",
+  "context": {
+    "session": "default",
+    "target": "tryhackme_challange",
+    "tool": "gobuster",
+    "wordlist": "dir_medium"
+  },
+  "execution": {
+    "duration_seconds": 0.13,
+    "return_code": 1
+  },
+  "output": "===============================================================\nGobuster v3.6\nby OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)\n===============================================================\n[+] Url:                     https://futurevera.thm\n[+] Method:                  GET\n[+] Threads:                 10\n[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt\n[+] Negative Status codes:   404\n[+] User Agent:              gobuster/3.6\n[+] Timeout:                 10s\n===============================================================\nStarting gobuster in directory enumeration mode\n===============================================================\n\nError: error on running gobuster: unable to connect to https://futurevera.thm/: Get \"https://futurevera.thm/\": tls: failed to verify certificate: x509: certificate has expired or is not yet valid: current time 2025-12-12T00:32:23+01:00 is after 2023-03-13T10:05:19Z\n",
+  "source_job_id": "41ed7bd2-1f4b-4ca4-98b9-53a2358f7242",
+  "additional_info": {}
+}

@@ -1,0 +1,16 @@
+{
+  "id": "71944b75-d3ab-4578-b3f5-6044a391bc37",
+  "timestamp": "2025-11-03 20:28:00",
+  "command": "/home/kali/fake_test.sh 5",
+  "context": {},
+  "execution": {
+    "duration_seconds": 15.63,
+    "return_code": 0
+  },
+  "output": "Username (default: guest): 123\nPassword: \ntest\nLogin OK (user: 123)\n[123] working (1/5)...\n[123] working (2/5)...\n[123] working (3/5)...\n[123] working (4/5)...\n[123] working (5/5)...\nSession ended.\n",
+  "source_job_id": "c9dff80e-6b41-4afc-aac8-03fe6f202cdf",
+  "additional_info": {
+    "node_id": 15,
+    "node_title": "faketest.sh"
+  }
+}

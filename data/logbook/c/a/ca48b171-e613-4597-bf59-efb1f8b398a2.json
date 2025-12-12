@@ -1,0 +1,16 @@
+{
+  "id": "ca48b171-e613-4597-bf59-efb1f8b398a2",
+  "timestamp": "2025-11-03 20:46:45",
+  "command": "/usr/bin/echo -n 'THIS IS A TEST'",
+  "context": {},
+  "execution": {
+    "duration_seconds": 0.1,
+    "return_code": 0
+  },
+  "output": "THIS IS A TEST",
+  "source_job_id": "0cec5819-9add-4c32-a874-3838c1f24749",
+  "additional_info": {
+    "node_id": 36,
+    "node_title": "echo"
+  }
+}

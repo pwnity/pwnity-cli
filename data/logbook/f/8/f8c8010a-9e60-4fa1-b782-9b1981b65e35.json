@@ -1,0 +1,18 @@
+{
+  "id": "f8c8010a-9e60-4fa1-b782-9b1981b65e35",
+  "timestamp": "2025-12-11 23:42:40",
+  "command": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -b '$tool.negative_codes' -u https://moonandhoney.de",
+  "context": {
+    "session": "default",
+    "target": "moonandhoney.de",
+    "tool": "gobuster",
+    "wordlist": "dir_medium"
+  },
+  "execution": {
+    "duration_seconds": 0.03,
+    "return_code": 1
+  },
+  "output": "Error: error on parsing arguments: invalid value for status-codes-blacklist: invalid string given: $tool.negative_codes\n",
+  "source_job_id": "4b9abdbd-8bf9-4f9c-9c98-3b7b7b59f559",
+  "additional_info": {}
+}

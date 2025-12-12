@@ -1,0 +1,18 @@
+{
+  "id": "0ab5f889-02b9-48e7-b586-a469e341181f",
+  "timestamp": "2025-12-12 00:36:37",
+  "command": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://10.80.128.241",
+  "context": {
+    "session": "default",
+    "target": "tryhackme_challange",
+    "tool": "gobuster",
+    "wordlist": "dir_medium"
+  },
+  "execution": {
+    "duration_seconds": 416.99,
+    "return_code": -15
+  },
+  "output": "===============================================================\nGobuster v3.6\nby OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)\n===============================================================\n[+] Url:                     http://10.80.128.241\n[+] Method:                  GET\n[+] Threads:                 10\n[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt\n[+] Negative Status codes:   404\n[+] User Agent:              gobuster/3.6\n[+] Timeout:                 10s\n===============================================================\nStarting gobuster in directory enumeration mode\n===============================================================\n/server-status        (Status: 403) [Size: 278]\nProgress: 121037 / 220561 (54.88%)",
+  "source_job_id": "d476e632-28b3-47fc-a98f-c0740e9a797f",
+  "additional_info": {}
+}

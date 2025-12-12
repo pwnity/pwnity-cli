@@ -533,6 +533,23 @@ class Completer:
         # No specific completions for a hash string.
         return []
 
+    def complete_session(self, text, line, begidx, endidx):
+        """Autocompletion for the 'session' command."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        # 1. Complete subcommand
+        if num_tokens == 1:
+            subcommands = ['new', 'switch', 'list', 'destroy', 'export', 'show', 'help']
+            return [s for s in subcommands if s.startswith(text)]
+
+        # 2. Complete session name for 'switch' and 'destroy'
+        if num_tokens == 2 and tokens[1] in ['switch', 'destroy']:
+            return [s_name for s_name in self.cli.session_mgr.list() if s_name.startswith(text)]
+
     def _get_pwn_completions(self, text, line, begidx, endidx):
         if not self.cli.session or not self.cli.session.tool: return []
         tool_data = self.cli.tool_mgr.load(self.cli.session.tool)

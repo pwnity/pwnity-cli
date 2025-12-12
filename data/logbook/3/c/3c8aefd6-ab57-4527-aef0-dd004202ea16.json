@@ -1,0 +1,18 @@
+{
+  "id": "3c8aefd6-ab57-4527-aef0-dd004202ea16",
+  "timestamp": "2025-11-22 15:00:28",
+  "command": "sudo /usr/bin/echo -n YWRtaW46Zm9vb29vbw==",
+  "context": {
+    "session": "test",
+    "target": "fritzbox",
+    "tool": "echo",
+    "wordlist": "rockyou"
+  },
+  "execution": {
+    "duration_seconds": 0.01,
+    "return_code": 0
+  },
+  "output": "YWRtaW46Zm9vb29vbw==",
+  "source_job_id": null,
+  "additional_info": {}
+}

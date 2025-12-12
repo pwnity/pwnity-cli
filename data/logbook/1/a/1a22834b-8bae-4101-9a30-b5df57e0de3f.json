@@ -1,0 +1,18 @@
+{
+  "id": "1a22834b-8bae-4101-9a30-b5df57e0de3f",
+  "timestamp": "2025-11-16 21:59:17",
+  "command": "/usr/bin/echo 'b64_encode(admin:foobar)'",
+  "context": {
+    "session": "default",
+    "target": "fritzbox",
+    "tool": "echo",
+    "wordlist": "dir_medium"
+  },
+  "execution": {
+    "duration_seconds": 0.0,
+    "return_code": 0
+  },
+  "output": "b64_encode(admin:foobar)\n",
+  "source_job_id": null,
+  "additional_info": {}
+}

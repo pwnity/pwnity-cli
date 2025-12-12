@@ -1,0 +1,16 @@
+{
+  "id": "6c24d426-44a9-4d22-a9b2-6ca2bbd22102",
+  "timestamp": "2025-11-03 20:52:14",
+  "command": "/home/kali/fake_test.sh 5",
+  "context": {},
+  "execution": {
+    "duration_seconds": 4.91,
+    "return_code": -15
+  },
+  "output": "Username (default: guest): ",
+  "source_job_id": "0f9f66b9-a18a-4f5b-9499-a793e26e7d3e",
+  "additional_info": {
+    "node_id": 15,
+    "node_title": "faketest.sh"
+  }
+}

@@ -759,6 +759,10 @@ class MyCLI(cmd2.Cmd):
         """Manages the working context (loaded targets, tools, etc.). Subcommands: new, switch, list, destroy, show"""
         self._dispatch_command('session', args, self.session_mgr)
 
+    def complete_session(self, text, line, begidx, endidx):
+        """Custom completer for the 'session' command."""
+        return self.completer.complete_session(text, line, begidx, endidx)
+
     # jobs
     @cmd2.with_argparser(jobs_parser)
     def do_jobs(self, args):

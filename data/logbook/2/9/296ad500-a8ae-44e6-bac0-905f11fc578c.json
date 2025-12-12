@@ -1,0 +1,18 @@
+{
+  "id": "296ad500-a8ae-44e6-bac0-905f11fc578c",
+  "timestamp": "2025-12-11 23:43:16",
+  "command": "/usr/bin/gobuster dns -w /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt --wildcard -d moonandhoney.de",
+  "context": {
+    "session": "default",
+    "target": "moonandhoney.de",
+    "tool": "gobuster",
+    "wordlist": "dir_medium"
+  },
+  "execution": {
+    "duration_seconds": 17.38,
+    "return_code": 0
+  },
+  "output": "===============================================================\nGobuster v3.6\nby OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)\n===============================================================\n[+] Domain:            moonandhoney.de\n[+] Threads:           10\n[+] Wildcard forced:   true\n[+] Timeout:           1s\n[+] Wordlist:          /home/kali/SecLists/Discovery/DNS/subdomains-top1million-5000.txt\n===============================================================\nStarting gobuster in DNS enumeration mode\n===============================================================\nFound: www.moonandhoney.de\n\nFound: autoconfig.moonandhoney.de\n\nProgress: 4989 / 4990 (99.98%)\n===============================================================\nFinished\n===============================================================\n",
+  "source_job_id": "453fb865-5f4b-4107-9808-b7e8fe428f99",
+  "additional_info": {}
+}

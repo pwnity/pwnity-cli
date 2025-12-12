@@ -1,0 +1,18 @@
+{
+  "id": "d36b3185-ef8f-48d2-bac8-ecd5bfc8dd49",
+  "timestamp": "2025-11-16 22:10:26",
+  "command": "/usr/bin/whatweb http://192.168.178.1",
+  "context": {
+    "session": "default",
+    "target": "fritzbox",
+    "tool": "whatweb",
+    "wordlist": "dir_medium"
+  },
+  "execution": {
+    "duration_seconds": 4.3,
+    "return_code": 0
+  },
+  "output": "\u001b[1m\u001b[34mhttp://192.168.178.1\u001b[0m [200 OK] \u001b[1mCountry\u001b[0m[\u001b[0m\u001b[22mRESERVED\u001b[0m][\u001b[1m\u001b[31mZZ\u001b[0m], \u001b[1mHTML5\u001b[0m, \u001b[1mIP\u001b[0m[\u001b[0m\u001b[22m192.168.178.1\u001b[0m], \u001b[1mScript\u001b[0m[\u001b[0m\u001b[22mmodule\u001b[0m], \u001b[1mTitle\u001b[0m[\u001b[1m\u001b[33mFRITZ!Box\u001b[0m][\u001b[1m\u001b[31mTitle element contains newline(s)!\u001b[0m], \u001b[1mUncommonHeaders\u001b[0m[\u001b[0m\u001b[22mx-content-type-options,content-security-policy,referrer-policy\u001b[0m], \u001b[1mX-Frame-Options\u001b[0m[\u001b[0m\u001b[22mSAMEORIGIN\u001b[0m], \u001b[1mX-UA-Compatible\u001b[0m[\u001b[0m\u001b[22mIE=edge\u001b[0m]\n",
+  "source_job_id": null,
+  "additional_info": {}
+}

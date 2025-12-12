@@ -1,0 +1,18 @@
+{
+  "id": "cf901184-723a-40ac-8cb2-ed359148059e",
+  "timestamp": "2025-12-12 00:26:32",
+  "command": "sudo /usr/bin/ping -c 4 10.80.128.241",
+  "context": {
+    "session": "default",
+    "target": "tryhackme_challange",
+    "tool": "ping",
+    "wordlist": null
+  },
+  "execution": {
+    "duration_seconds": 3.05,
+    "return_code": 0
+  },
+  "output": "PING 10.80.128.241 (10.80.128.241) 56(84) bytes of data.\n64 bytes from 10.80.128.241: icmp_seq=1 ttl=62 time=33.7 ms\n64 bytes from 10.80.128.241: icmp_seq=2 ttl=62 time=33.2 ms\n64 bytes from 10.80.128.241: icmp_seq=3 ttl=62 time=33.2 ms\n64 bytes from 10.80.128.241: icmp_seq=4 ttl=62 time=33.5 ms\n\n--- 10.80.128.241 ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss, time 3004ms\nrtt min/avg/max/mdev = 33.191/33.406/33.696/0.215 ms\n",
+  "source_job_id": null,
+  "additional_info": {}
+}

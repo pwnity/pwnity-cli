@@ -1,0 +1,18 @@
+{
+  "id": "d23d30bc-76a0-4746-af02-44e62a2fde70",
+  "timestamp": "2025-11-03 20:35:26",
+  "command": "/home/kali/fake_test.sh 30",
+  "context": {
+    "session": "localtest",
+    "target": "localhost",
+    "tool": "faketest.sh",
+    "wordlist": null
+  },
+  "execution": {
+    "duration_seconds": 38.36,
+    "return_code": 0
+  },
+  "output": "Username (default: guest): test\nPassword: \ntest\nLogin OK (user: test)\n[test] working (1/30)...\n[test] working (2/30)...\n[test] working (3/30)...\n[test] working (4/30)...\n[test] working (5/30)...\n[test] working (6/30)...\n[test] working (7/30)...\n[test] working (8/30)...\n[test] working (9/30)...\n[test] working (10/30)...\n[test] working (11/30)...\n[test] working (12/30)...\n[test] working (13/30)...\n[test] working (14/30)...\n[test] working (15/30)...\n[test] working (16/30)...\n[test] working (17/30)...\n[test] working (18/30)...\n[test] working (19/30)...\n[test] working (20/30)...\n[test] working (21/30)...\n[test] working (22/30)...\n[test] working (23/30)...\n[test] working (24/30)...\n[test] working (25/30)...\n[test] working (26/30)...\n[test] working (27/30)...\n[test] working (28/30)...\n[test] working (29/30)...\n[test] working (30/30)...\nSession ended.\n",
+  "source_job_id": "6295bbd1-8616-4707-8a7e-ead01691b9ba",
+  "additional_info": {}
+}

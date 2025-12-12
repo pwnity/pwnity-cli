@@ -1,0 +1,16 @@
+{
+  "id": "4e5f2253-a399-4ca8-a517-6123f6a12252",
+  "timestamp": "2025-11-04 12:18:52",
+  "command": "/usr/bin/echo -n Bara",
+  "context": {},
+  "execution": {
+    "duration_seconds": 0.1,
+    "return_code": 0
+  },
+  "output": "Bara",
+  "source_job_id": "b95ab96e-3556-4555-b72d-3312102635fc",
+  "additional_info": {
+    "node_id": 7,
+    "node_title": "echo"
+  }
+}
