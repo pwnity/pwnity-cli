@@ -769,6 +769,10 @@ class MyCLI(cmd2.Cmd):
         """Manages background jobs. Subcommands: list, show, kill, clear"""
         self._dispatch_command('jobs', args, self.job_mgr)
 
+    def complete_jobs(self, text, line, begidx, endidx):
+        """Custom completer for the 'jobs' command."""
+        return self.completer.complete_jobs(text, line, begidx, endidx)
+
     # overview
     @cmd2.with_argparser(overview_parser)
     def do_overview(self, args):

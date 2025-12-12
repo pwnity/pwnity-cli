@@ -580,3 +580,27 @@ class Completer:
 
     def complete_run(self, text, line, begidx, endidx):
         return self._get_pwn_completions(text, line, begidx, endidx)
+
+    def complete_jobs(self, text, line, begidx, endidx):
+        """Autocompletion for the 'jobs' command."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        # 1. Complete subcommand (list, show, kill, etc.)
+        if num_tokens == 1:
+            subcommands = ['list', 'show', 'kill', 'clear', 'input']
+            return [s for s in subcommands if s.startswith(text)]
+
+        # 2. Complete job ID for 'show', 'kill', and 'input'
+        if num_tokens == 2 and tokens[1] in ['show', 'kill', 'input']:
+            # Get all job objects
+            jobs = self.cli.job_mgr.list_jobs()
+            # Extract their IDs as strings
+            job_ids = [str(job.id) for job in jobs]
+            # Return matching job IDs
+            return [job_id for job_id in job_ids if job_id.startswith(text)]
+
+        return []

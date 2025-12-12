@@ -1,26 +1,26 @@
 {
   "session_name": "default",
   "target": null,
-  "tool": "openvpn",
+  "tool": "nc",
   "wordlist": null,
   "report": null,
   "proxy_enabled": false,
   "jobs": [
     {
-      "id": "e29d1351-8121-46f3-b28e-7de546261ab0",
-      "command_str": "/bin/sh -c 'echo kali | sudo -S -p '\"'\"''\"'\"' /usr/sbin/openvpn --config /home/kali/v3rm1ll1on.ovpn'",
+      "id": "21385871-20ad-44cd-b59d-cf46566bb7f9",
+      "command_str": "/usr/bin/nc -l -p 1337 -v -n",
       "status": "running",
-      "duration": "103.73s",
+      "duration": "55.49s",
       "logbook_id": null,
-      "start_time": 1765533743.0604374,
-      "output": "2025-12-12 11:02:23 Note: --cipher is not set. OpenVPN versions before 2.5 defaulted to BF-CBC as fallback when cipher negotiation failed in this case. If you need this fallback please add '--data-ciphers-fallback BF-CBC' to your configuration and/or add BF-CBC to --data-ciphers.\r\r\n2025-12-12 11:02:23 Note: Kernel support for ovpn-dco missing, disabling data channel offload.\r\r\n2025-12-12 11:02:23 OpenVPN 2.6.14 x86_64-pc-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL] [PKCS11] [MH/PKTINFO] [AEAD] [DCO]\r\r\n2025-12-12 11:02:23 library versions: OpenSSL 3.5.2 5 Aug 2025, LZO 2.10\r\r\n2025-12-12 11:02:23 DCO version: N/A\r\r\n2025-12-12 11:02:23 TCP/UDP: Preserving recently used remote address: [AF_INET]18.203.72.251:1194\r\r\n2025-12-12 11:02:23 Socket Buffers: R=[212992->212992] S=[212992->212992]\r\r\n2025-12-12 11:02:23 UDPv4 link local: (not bound)\r\r\n2025-12-12 11:02:23 UDPv4 link remote: [AF_INET]18.203.72.251:1194\r\r\n2025-12-12 11:02:23 TLS: Initial packet from [AF_INET]18.203.72.251:1194, sid=a551582c 6a4db707\r\r\n2025-12-12 11:02:23 WARNING: this configuration may cache passwords in memory -- use the auth-nocache option to prevent this\r\r\n2025-12-12 11:02:23 VERIFY OK: depth=1, CN=OpenVPN-CA\r\r\n2025-12-12 11:02:23 VERIFY KU OK\r\r\n2025-12-12 11:02:23 Validating certificate extended key usage\r\r\n2025-12-12 11:02:23 ++ Certificate has EKU (str) TLS Web Server Authentication, expects TLS Web Server Authentication\r\r\n2025-12-12 11:02:23 VERIFY EKU OK\r\r\n2025-12-12 11:02:23 VERIFY X509NAME OK: CN=openvpn-server\r\r\n2025-12-12 11:02:23 VERIFY OK: depth=0, CN=openvpn-server\r\r\n2025-12-12 11:02:23 Control Channel: TLSv1.3, cipher TLSv1.3 TLS_AES_256_GCM_SHA384, peer certificate: 2048 bits RSA, signature: RSA-SHA256, peer temporary key: 253 bits X25519\r\r\n2025-12-12 11:02:23 [openvpn-server] Peer Connection Initiated with [AF_INET]18.203.72.251:1194\r\r\n2025-12-12 11:02:23 TLS: move_session: dest=TM_ACTIVE src=TM_INITIAL reinit_src=1\r\r\n2025-12-12 11:02:23 TLS: tls_multi_process: initial untrusted session promoted to trusted\r\r\n2025-12-12 11:02:24 SENT CONTROL [openvpn-server]: 'PUSH_REQUEST' (status=1)\r\r\n2025-12-12 11:02:24 PUSH: Received control message: 'PUSH_REPLY,route 10.80.0.0 255.240.0.0,route-gateway 192.168.128.1,topology subnet,ping 10,ping-restart 120,ifconfig 192.168.204.36 255.255.128.0,peer-id 631,cipher AES-256-GCM,protocol-flags cc-exit tls-ekm dyn-tls-crypt,tun-mtu 1500'\r\r\n2025-12-12 11:02:24 OPTIONS IMPORT: --ifconfig/up options modified\r\r\n2025-12-12 11:02:24 OPTIONS IMPORT: route options modified\r\r\n2025-12-12 11:02:24 OPTIONS IMPORT: route-related options modified\r\r\n2025-12-12 11:02:24 OPTIONS IMPORT: tun-mtu set to 1500\r\r\n2025-12-12 11:02:24 net_route_v4_best_gw query: dst 0.0.0.0\r\r\n2025-12-12 11:02:24 net_route_v4_best_gw result: via 172.22.96.1 dev eth0\r\r\n2025-12-12 11:02:24 ROUTE_GATEWAY 172.22.96.1/255.255.240.0 IFACE=eth0 HWADDR=00:15:5d:81:a4:16\r\r\n2025-12-12 11:02:24 TUN/TAP device tun3 opened\r\r\n2025-12-12 11:02:24 net_iface_mtu_set: mtu 1500 for tun3\r\r\n2025-12-12 11:02:24 net_iface_up: set tun3 up\r\r\n2025-12-12 11:02:24 net_addr_v4_add: 192.168.204.36/17 dev tun3\r\r\n2025-12-12 11:02:24 net_route_v4_add: 10.80.0.0/12 via 192.168.128.1 dev [NULL] table 0 metric -1\r\r\n2025-12-12 11:02:24 sitnl_send: rtnl: generic error (-17): File exists\r\r\n2025-12-12 11:02:24 NOTE: Linux route add command failed because route exists\r\r\n2025-12-12 11:02:24 Initialization Sequence Completed\r\r\n2025-12-12 11:02:24 Data Channel: cipher 'AES-256-GCM', peer-id: 631\r\r\n2025-12-12 11:02:24 Timers: ping 10, ping-restart 120\r\r\n2025-12-12 11:02:24 Protocol options: explicit-exit-notify 1, protocol-flags cc-exit tls-ekm dyn-tls-crypt\r\r\n"
+      "start_time": 1765541638.3464491,
+      "output": "listening on [any] 1337 ...\r\n"
     }
   ],
   "sessions": {
     "default": {
       "name": "default",
       "target": null,
-      "tool": "openvpn",
+      "tool": "nc",
       "wordlist": null,
       "report": null
     }
