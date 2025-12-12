@@ -125,16 +125,16 @@ class MyCLI(cmd2.Cmd):
 
     def _display_welcome_banner(self):
         """Displays a custom welcome banner using rich."""
-        ascii_art = """ ██████╗  ██╗    ██╗ ███╗   ██╗ ██╗       █████╗  ██████╗  ███████╗
-██╔══██╗ ██║    ██║ ████╗  ██║ ██║      ██╔══██╗ ██╔══██╗ ██╔════╝
-██████╔╝ ██║ █╗ ██║ ██╔██╗ ██║ ██║      ███████║ ██████╔╝ ███████╗
-██╔═══╝  ██║███╗██║ ██║╚██╗██║ ██║      ██╔══██║ ██╔══██╗ ╚════██║
-██║      ╚███╔███╔╝ ██║ ╚████║ ███████╗ ██║  ██║ ██████╔╝ ███████║
-╚═╝       ╚══╝╚══╝  ╚═╝  ╚═══╝ ╚══════╝ ╚═╝  ╚═╝ ╚═════╝  ╚══════╝"""
+        ascii_art = """  ██████╗  ██╗    ██╗███╗   ██╗██╗████████╗██╗   ██╗
+  ██╔══██╗ ██║    ██║████╗  ██║██║╚══██╔══╝╚██╗ ██╔╝
+ ██████╔╝ ██║ █╗ ██║██╔██╗ ██║██║   ██║    ╚████╔╝ 
+██╔═══╝  ██║███╗██║██║╚██╗██║██║   ██║     ╚██╔╝  
+██║      ╚███╔███╔╝██║ ╚████║██║   ██║      ██║   
+╚═╝       ╚══╝╚══╝ ╚═╝  ╚═══╝╚═╝   ╚═╝      ╚═╝   """
         logo = Text(ascii_art, style="bold cyan", justify="center")
 
         tagline = Text.from_markup(
-            "A flexible and session-based wrapper for orchestrating command-line tools for pentesting and CTFs.",
+            "Your smart companion for pentesting, bug bounty hunting, and CTFs.",
             justify="center"
         )
         
