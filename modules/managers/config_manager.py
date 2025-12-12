@@ -42,3 +42,7 @@ class ConfigManager(BaseManager):
                 log.error(f"Failed to save configuration file.")
         else:
             log.error(f"Failed to set configuration key '{args.key}'. Check if the value is of the correct type (e.g., integer for PORT).")
+
+    def get_all_data(self):
+        """Returns the entire configuration dictionary."""
+        return config.get_all_data()

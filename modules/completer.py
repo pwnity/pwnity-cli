@@ -480,7 +480,7 @@ class Completer:
             return [s for s in ['list', 'get', 'set'] if s.startswith(text)]
         if num_tokens == 2 and tokens[1] in ['get', 'set']:
             all_keys = []
-            for section, settings in self.cli.config.get_all_data().items():
+            for section, settings in self.cli.config_mgr.get_all_data().items():
                 if isinstance(settings, dict):
                     for key in settings:
                         all_keys.append(f"{section}.{key}")
