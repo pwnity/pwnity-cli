@@ -320,8 +320,15 @@ class JSONManager(BaseManager):
         field = args.update_args[0]
         value = " ".join(args.update_args[1:])  # Value can contain spaces
         
+        # --- FIX: Prevent accidental renames with complex values ---
+        # The 'rename' action should only be triggered if the value is a single, simple word.
+        # A value with spaces (like 'foo.bar foo') should not trigger a rename.
         if field.lower() == 'name':
-            self.rename(args.name, value)
+            if ' ' in value.strip():
+                log.error(f"Cannot rename {entity_type} to a name with spaces: '{value}'")
+                log.prompt(f"Use 'target rename <old_name> <new_name>' with a single-word new name.")
+            else:
+                self.rename(args.name, value)
         else:
             self.update(args.name, field, value)
             log.success(f"{entity_type} '{args.name}' field '{field}' updated -> {value}")

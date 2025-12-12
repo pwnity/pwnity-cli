@@ -82,34 +82,42 @@ class TargetManager(JSONManager):
 
     def _cmd_update(self, args, cli):
         """Overrides the update logic to handle URLs intelligently."""
-        if len(args.update_args) >= 2 and args.update_args[0].lower() == 'url':
-            url_string = " ".join(args.update_args[1:])
-            self._parse_and_update_from_url(args.name, url_string, cli)
+        if len(args.update_args) < 2:
+            log.error("Invalid update command. Expected: update <name> <field> <value>")
+            return
+
+        field, value_str = args.update_args[0], " ".join(args.update_args[1:])
+        value = value_str # Default to string
+
+        # Priority 1: Handle nested updates first to prevent 'name.foo' from triggering a rename.
+        if '.' in field:
+            # --- FIX: Prevent nested updates on the 'name' field itself ---
+            # This stops 'target update mytarget name.foo bar' from corrupting the name.
+            if field.lower().startswith('name.'):
+                log.error("Cannot perform a nested update on the 'name' field.")
+                log.prompt("To rename the target, use: 'target rename <old_name> <new_name>' or 'target update <old_name> name <new_name>'.")
+                return
+            data = self.load(args.name)
+            if not data: return
+
+            keys = field.split('.')
+            current_level = data
+            # Traverse/create path until the last key
+            for key in keys[:-1]:
+                if key not in current_level or not isinstance(current_level[key], dict):
+                    current_level[key] = {} # Create a dict if it doesn't exist
+                current_level = current_level[key]
+            
+            # Set the value at the final key
+            current_level[keys[-1]] = value
+            self._save_data(args.name, data)
+            log.success(f"Target '{args.name}' nested field '{field}' updated -> {value}")
+        # Priority 2: Handle special 'url' field
+        elif field.lower() == 'url':
+            self._parse_and_update_from_url(args.name, value_str, cli)
+        # Priority 3: Fallback to default manager behavior for simple fields like 'name'
         else:
-            # --- NEW: Handle nested updates using dot notation, same as in ToolManager ---
-            if len(args.update_args) >= 2:
-                field, value_str = args.update_args[0], " ".join(args.update_args[1:])
-                value = value_str # Default to string
-
-                if '.' in field:
-                    data = self.load(args.name)
-                    if not data: return
-
-                    keys = field.split('.')
-                    current_level = data
-                    # Traverse/create path until the last key
-                    for key in keys[:-1]:
-                        if key not in current_level or not isinstance(current_level[key], dict):
-                            current_level[key] = {} # Create a dict if it doesn't exist
-                        current_level = current_level[key]
-                    
-                    # Set the value at the final key
-                    current_level[keys[-1]] = value
-                    self._save_data(args.name, data)
-                    log.success(f"Target '{args.name}' nested field '{field}' updated -> {value}")
-                else:
-                    # Fallback to default behavior for non-nested fields
-                    super()._cmd_update(args, cli)
+            super()._cmd_update(args, cli)
 
     def _parse_and_update_from_url(self, name, url_string, cli):
         """Parses a URL and updates multiple fields of the target."""

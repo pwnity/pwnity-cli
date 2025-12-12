@@ -227,19 +227,31 @@ class HelpManager:
                 subcommands_table.add_column(style="cyan", no_wrap=True, width=25)
                 subcommands_table.add_column(style="default")
 
-                # Create a mapping from subcommand name to its help text from the parser's internal actions.
-                help_map = {action.dest: action.help for action in subparsers_action._choices_actions}
+                # Create a mapping from subcommand name to its help text and aliases.
+                # This avoids displaying aliases as separate commands.
+                subcommand_info = {}
+                for sub_name, sub_parser in subparsers_action.choices.items():
+                    # The help text is stored in the action that created the subparser.
+                    # We find it by matching the destination variable.
+                    action = next((a for a in subparsers_action._choices_actions if a.dest == sub_name), None)
+                    help_text = ""
+                    if action and action.help and action.help != argparse.SUPPRESS:
+                        help_text = action.help
+                    elif sub_parser.description and sub_parser.description != argparse.SUPPRESS:
+                        help_text = sub_parser.description
+                    else:
+                        help_text = "" # Don't show "==SUPPRESS=="
+                    subcommand_info[sub_name] = {'help': help_text, 'aliases': getattr(sub_parser, 'aliases', [])}
 
-                for sub_name, sub_parser in sorted(subparsers_action.choices.items()):
-                    help_text = help_map.get(sub_name, "")
-                    
-                    aliases = getattr(sub_parser, 'aliases', [])
+                for sub_name in sorted(subcommand_info.keys()):
+                    info = subcommand_info[sub_name]
+                    help_text = info['help']
+                    aliases = info['aliases']
                     
                     display_name_str = sub_name
                     if aliases:
                         alias_str = ', '.join(aliases)
                         display_name_str = f"{sub_name} [dim]({alias_str})[/dim]"
-                    
                     subcommands_table.add_row(Text.from_markup(display_name_str), help_text)
                 
                 subcommands_panel = Panel(subcommands_table, title="[dim]Available Actions[/dim]", border_style="dim", expand=True)

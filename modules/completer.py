@@ -228,12 +228,12 @@ class Completer:
 
         # 1. Complete subcommand (add, list, update, etc.)
         if num_tokens == 1:
-            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'help']
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'help', 'rename']
             return [s for s in subcommands if s.startswith(text)]
 
         # 2. Complete target name for most subcommands
         if num_tokens == 2:
-            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export']:
+            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'rename']:
                 return [t for t in self.cli.target_mgr.list_all() if t.startswith(text)]
 
         # 3. Context-sensitive completion for 'target update <name> ...' or 'target delete <name> ...'
