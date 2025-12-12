@@ -56,11 +56,11 @@ class HelpManager:
         # This must be initialized here so that `add_command_to_category` can be
         # called during the application's startup phase.
         self._command_categories = {
-            "Core Workflow": ["report", "target", "tool", "wordlist", "pwn"],
+            "Core Workflow": ["target", "tool", "wordlist", "pwn"],
             "Session & State": ["session", "preset", "overview", "jobs", "heartbeat", "logbook"],
-            "Data Management": ["identify", "note", "loot", "parser", "revshell", "placeholders", "profile", "library"],
+            "Data Management": ["report", "identify", "note", "loot", "parser", "revshell", "placeholders", "profile", "library"],
             "Configuration & Shell": ["config", "print", "proxy", "alias", "history", "edit", "run_script", "shell", "quit"],
-            "Help & Information": ["manual", "help", "workflow"]
+            "Help & Information": ["manual", "help"]
         }
 
     def show_command_overview(self):

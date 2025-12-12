@@ -783,9 +783,6 @@ class ParserFactory:
             ("config set PROXY.ENABLED true", "Enables the proxy by default."),
         ]
 
-        if self.help_mgr:
-            self.help_mgr.add_command_to_category('config', 'Data Management', 'Manage application configuration.')
-
     def _populate_revshell_parser(self, parser):
         """Populates the parser for the 'revshell' command."""
         parser.description = "Generates reverse shell one-liner payloads for various languages. Defaults to using '$profile.lhost' and '$profile.lport'."
@@ -897,6 +894,3 @@ class ParserFactory:
         run_parser = subparsers.add_parser("run", help="Run a workflow.", formatter_class=self.formatter, add_help=False)
         self._add_custom_help(run_parser, "run")
         run_parser.add_argument("name", help="Name of the workflow to run.", choices_provider=workflow_completer)
-
-        if self.help_mgr:
-            self.help_mgr.add_command_to_category('workflow', 'Core Workflow', 'Create and manage node-based workflows.')
