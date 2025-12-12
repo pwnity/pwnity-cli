@@ -55,37 +55,81 @@ class LogbookManager(JSONManager):
             return entry_id
         return None
 
-    def _cmd_list(self, args, cli):
-        """Handles 'logbook list'."""
-        entries = self.list_all()
+    def _display_entries_table(self, entries, title, subtitle, console):
+        """Helper function to display a list of logbook entries in a table.""" # The 'entries' argument is now correctly used.
         if not entries:
             log.info("No logbook entries have been recorded yet.")
             return
 
         table = Table(show_header=True, header_style="bold blue", box=None, expand=True)
-        table.add_column("Log ID", style="cyan", no_wrap=True, width=8)
+        table.add_column("Log ID", style="cyan", no_wrap=True, width=38) # UUIDs are 36 chars
         table.add_column("Timestamp", style="dim", width=20)
         table.add_column("Command", style="green", ratio=1, no_wrap=False)
 
-        # --- FIX: Sort by timestamp string to handle UUIDs ---
-        # We load all entries, sort them by timestamp, then take the last 20.
-        all_entries_data = [self.load(entry_id) for entry_id in entries if self.load(entry_id)]
-        for entry_data in sorted(all_entries_data, key=lambda x: x.get('timestamp', ''))[-20:]:
+        for entry_data in entries:
             if entry_data:
                 table.add_row(
-                    str(entry_data.get('id')),
+                    str(entry_data.get('id', 'N/A')),
                     entry_data.get('timestamp'),
                     entry_data.get('command')
                 )
-        
+
         panel = Panel(
             table,
-            title=":scroll: [bold]Execution Logbook[/bold]",
-            subtitle="[dim]Showing the last 20 entries. Use 'logbook show <id>' for full output.[/dim]",
+            title=title,
+            subtitle=subtitle,
             border_style="cyan",
             expand=True
         )
-        cli.console.print(panel)
+        console.print(panel)
+
+    def _cmd_list(self, args, cli):
+        """Handles 'logbook list'."""
+        limit = args.limit
+        all_entry_ids = self.list_all()
+        all_entries_data = [self.load(entry_id) for entry_id in all_entry_ids if self.load(entry_id)]
+        
+        # Sort by timestamp and take the most recent ones
+        sorted_entries = sorted(all_entries_data, key=lambda x: x.get('timestamp', ''), reverse=True)
+        entries_to_show = sorted_entries[:limit]
+
+        self._display_entries_table(
+            entries=entries_to_show,
+            title=":scroll: [bold]Execution Logbook[/bold]",
+            subtitle=f"[dim]Showing the last {len(entries_to_show)} of {len(all_entries_data)} entries. Use 'logbook show <id>' for full output.[/dim]",
+            console=cli.console
+        )
+
+    def _cmd_filter(self, args, cli):
+        """Handles 'logbook filter'."""
+        all_entry_ids = self.list_all()
+        all_entries_data = [self.load(entry_id) for entry_id in all_entry_ids if self.load(entry_id)]
+
+        filtered_entries = []
+        filter_type = args.type
+        filter_value = args.value.lower()
+
+        for entry in all_entries_data:
+            if filter_type == 'status':
+                rc = entry.get('execution', {}).get('return_code')
+                is_success = rc == 0
+                if (filter_value == 'success' and is_success) or (filter_value in ['failed', 'fail'] and not is_success):
+                    filtered_entries.append(entry)
+            else: # target, tool, session
+                context_value = entry.get('context', {}).get(filter_type)
+                if context_value and context_value.lower() == filter_value:
+                    filtered_entries.append(entry)
+        
+        # Sort by timestamp and apply the limit
+        sorted_filtered = sorted(filtered_entries, key=lambda x: x.get('timestamp', ''), reverse=True)
+        entries_to_show = sorted_filtered[:args.limit]
+
+        self._display_entries_table(
+            entries=entries_to_show,
+            title=f":mag: [bold]Filtered Logbook: {args.type} = '{args.value}'[/bold]",
+            subtitle=f"[dim]Showing {len(entries_to_show)} of {len(filtered_entries)} matching entries.[/dim]",
+            console=cli.console
+        )
 
     def _cmd_show(self, args, cli):
         """Handles 'logbook show'."""

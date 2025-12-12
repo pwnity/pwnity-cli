@@ -689,6 +689,7 @@ class ParserFactory:
                                             description="Shows a history of the most recent command executions.",
                                             formatter_class=self.formatter, add_help=False)
         self._add_custom_help(list_parser, "list")
+        list_parser.add_argument("-n", "--limit", type=int, default=20, help="Number of entries to show (default: 20).")
 
         show_parser = subparsers.add_parser("show",
                                             help="Show the full output of a specific logbook entry.",
@@ -696,6 +697,19 @@ class ParserFactory:
                                             formatter_class=self.formatter, add_help=False)
         self._add_custom_help(show_parser, "show")
         show_parser.add_argument("id", type=str, help="The ID of the logbook entry to show.", choices_provider=logbook_completer)
+
+        filter_parser = subparsers.add_parser("filter",
+                                              help="Filter the logbook by a specific criterion.",
+                                              description="Filters the logbook history based on context like target, tool, session, or status.",
+                                              formatter_class=self.formatter, add_help=False)
+        self._add_custom_help(filter_parser, "filter")
+        filter_parser.add_argument("type", choices=['target', 'tool', 'session', 'status'], help="The field to filter by.")
+        filter_parser.add_argument("value", help="The value to filter for (e.g., a target name, 'nmap', 'success').")
+        filter_parser.add_argument("-n", "--limit", type=int, default=20, help="Number of entries to show (default: 20).")
+        filter_parser.examples = [
+            ("logbook filter target my-server", "Show logs for a specific target."),
+            ("logbook filter status failed -n 5", "Show the last 5 failed commands."),
+        ]
 
         # Add a custom help panel entry for 'logbook'
         if self.help_mgr:

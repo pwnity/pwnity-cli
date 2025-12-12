@@ -10,7 +10,7 @@
       "id": "21385871-20ad-44cd-b59d-cf46566bb7f9",
       "command_str": "/usr/bin/nc -l -p 1337 -v -n",
       "status": "running",
-      "duration": "55.49s",
+      "duration": "331.38s",
       "logbook_id": null,
       "start_time": 1765541638.3464491,
       "output": "listening on [any] 1337 ...\r\n"

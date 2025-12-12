@@ -421,8 +421,10 @@ class HelpManager:
             command_name="logbook",
             description="Manages and displays the immutable logs of previous command executions. Each execution creates a logbook entry with a unique ID.",
             examples=[
-                ("logbook list", "Show a list of the most recent execution logs."),
-                ("logbook show 1", "Display the full, raw output for log entry #1."),
+                ("logbook list -n 10", "Show the last 10 execution logs."),
+                ("logbook show <id>", "Display the full, raw output for a log entry."),
+                ("logbook filter target my-server", "Show all logs for a specific target."),
+                ("logbook filter status failed", "Show all failed commands."),
             ], border_color="cyan")
 
     def show_help_report(self):

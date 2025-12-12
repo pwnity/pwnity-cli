@@ -384,7 +384,35 @@ class Completer:
         return []
 
     def complete_logbook(self, text, line, begidx, endidx):
-        return self._basic_manager_completion(text, line, begidx, endidx, self.cli.logbook_mgr, ['list', 'show'])
+        """Autocompletion for the 'logbook' command."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        # 1. Complete subcommand (list, show, filter)
+        if num_tokens == 1:
+            subcommands = ['list', 'show', 'filter', 'help']
+            return [s for s in subcommands if s.startswith(text)]
+
+        # 2. Complete arguments for subcommands
+        if num_tokens == 2:
+            if tokens[1] == 'show':
+                return [str(l_id) for l_id in self.cli.logbook_mgr.list_all() if str(l_id).startswith(text)]
+            if tokens[1] == 'filter':
+                filter_types = ['target', 'tool', 'session', 'status']
+                return [t for t in filter_types if t.startswith(text)]
+
+        # 3. Complete values for 'filter'
+        if num_tokens == 3 and tokens[1] == 'filter':
+            filter_type = tokens[2]
+            if filter_type == 'target': return [t for t in self.cli.target_mgr.list_all() if t.startswith(text)]
+            if filter_type == 'tool': return [t for t in self.cli.tool_mgr.list_all() if t.startswith(text)]
+            if filter_type == 'session': return [s for s in self.cli.session_mgr.list() if s.startswith(text)]
+            if filter_type == 'status': return [s for s in ['success', 'failed'] if s.startswith(text)]
+
+        return []
 
     def complete_report(self, text, line, begidx, endidx):
         try:
