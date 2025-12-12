@@ -70,13 +70,15 @@ cover/
 data/.session.json      # Current session state
 data/.pwnity_history    # CLI history file (assuming rename from .pwnity_history)
 data/temp/              # Temporary files
-data/logbook/           # Execution logs
-data/reports/*          # Generated reports
+data/logbook/**         # Ignore all content inside the logbook directory recursively
+data/logbook/*/*
+data/logbook/*/*/*.json
+data/reports/           # Generated reports
 data/runs/              # Workflow run data
-data/targets/*          # User-defined targets
+data/targets/           # User-defined targets
 data/wordlists/         # User-defined wordlists
-data/presets/*          # User-defined presets
-data/heartbeats/*       # Heartbeat monitoring data
+data/presets/           # User-defined presets
+data/heartbeats/        # Heartbeat monitoring data
 etc/profile.json        # User's personal profile settings
 
 # --- Other Python-related ignores ---
