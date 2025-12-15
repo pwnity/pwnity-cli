@@ -1,0 +1,16 @@
+{
+  "name": "wpscan",
+  "path": "/usr/bin/wpscan",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "default",
+      "params": [
+        "--url",
+        "$target.base_url",
+        "--random-user-agent",
+        "--ignore-main-redirect"
+      ]
+    }
+  ]
+}

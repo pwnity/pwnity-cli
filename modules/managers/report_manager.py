@@ -322,19 +322,20 @@ class ReportManager(JSONManager):
                 if tool_cmd:
                     tool_display += f"([cyan]{tool_cmd}[/cyan])"
 
-                table.add_row(str(h.get('logbook_id', '')), h.get('timestamp', '').split('T')[0], Text.from_markup(tool_display), h.get('command', ''))
+                table.add_row(str(h.get('logbook_id', '')), h.get('timestamp', '').replace('T', ' '), Text.from_markup(tool_display), h.get('command', ''))
             panels.append(Panel(table, title="[bold]Command History[/bold]", border_style="dim"))
 
         # Findings Panel
         findings = entity.get('findings', [])
         if findings:
             table = Table(show_header=True, header_style="bold blue", box=None, expand=True)
+            table.add_column("Timestamp", style="dim")
             table.add_column("Source", style="dim")
             table.add_column("Target", style="green")
             table.add_column("Category", style="yellow")
             table.add_column("Match", style="default")
             for f in findings:
-                table.add_row(f"Log #{f.get('source_log_id')}", f.get('target', 'N/A'), f.get('category', 'N/A'), f.get('match', ''))
+                table.add_row(f.get('timestamp', '').replace('T', ' '), f"Log #{f.get('source_log_id')}", f.get('target', 'N/A'), f.get('category', 'N/A'), f.get('match', ''))
             panels.append(Panel(table, title="[bold]Parser Findings[/bold]", border_style="dim"))
 
         # Notes Panel
@@ -346,7 +347,7 @@ class ReportManager(JSONManager):
             table.add_column("Target", style="green")
             table.add_column("Note", style="default")
             for i, n in enumerate(notes, 1):
-                table.add_row(str(i), n.get('timestamp', '').split('T')[0], n.get('target', 'N/A'), n.get('text', ''))
+                table.add_row(str(i), n.get('timestamp', '').replace('T', ' '), n.get('target', 'N/A'), n.get('text', ''))
             panels.append(Panel(table, title="[bold]Notes[/bold]", border_style="dim"))
 
         # Loot Panel
@@ -361,7 +362,7 @@ class ReportManager(JSONManager):
             for i, l in enumerate(loots, 1):
                 table.add_row(
                     str(i),
-                    l.get('timestamp', '').split('T')[0],
+                    l.get('timestamp', '').replace('T', ' '),
                     l.get('target', 'N/A'),
                     l.get('type', 'N/A'),
                     l.get('value', '')
@@ -475,21 +476,53 @@ class ReportManager(JSONManager):
         if not data:
             return
 
+        # --- REFACTOR: Modularize the rendering process for clarity and better output ---
         lines = []
         lines.append(f"# pwnity Report: {name}")
         lines.append(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+
+        # --- NEW: Identify and summarize all targets involved in the report ---
+        all_targets = set()
+        for section in ['notes', 'loot', 'findings']:
+            for item in data.get(section, []):
+                if item.get('target') and item.get('target') != 'N/A':
+                    all_targets.add(item.get('target'))
+        if all_targets:
+            lines.append("## Involved Targets\n")
+            for target in sorted(list(all_targets)):
+                lines.append(f"- `{target}`")
+            lines.append("")
+
+        # --- NEW: Render Command History ---
+        history = data.get('history', [])
+        if history:
+            lines.append("## Command History\n")
+            lines.append("| Timestamp | Tool | Command | Log ID |")
+            lines.append("|---|---|---|---|")
+            for item in history:
+                ts = datetime.fromisoformat(item.get('timestamp', '')).strftime('%Y-%m-%d %H:%M')
+                tool = item.get('tool', 'N/A')
+                cmd = item.get('command', '')
+                log_id = item.get('logbook_id', 'N/A')
+                lines.append(f"| {ts} | `{tool}` | `{cmd}` | `{log_id}` |")
+            lines.append("")
 
         # Render Notes
         notes = data.get('notes', [])
         if notes:
             lines.append("## Notes\n")
+            lines.append("| Timestamp | Target | Note |")
+            lines.append("|---|---|---|")
             for note in notes:
                 ts = datetime.fromisoformat(note.get('timestamp', '')).strftime('%Y-%m-%d')
                 target_ctx = note.get('target', 'N/A')
                 lines.append(f"- **[{ts} | Target: {target_ctx}]** {note.get('text', '')}")
+                text = note.get('text', '').replace('|', '\|') # Escape pipe characters for table
+                lines.append(f"| {ts} | `{target_ctx}` | {text} |")
             lines.append("")
 
         # Render Loot
+        # --- REFACTORED: Render Loot grouped by type in tables ---
         loots = data.get('loot', [])
         if loots:
             lines.append("## Loot\n")
@@ -497,15 +530,52 @@ class ReportManager(JSONManager):
                 target_ctx = loot.get('target', 'N/A')
                 lines.append(f"- **Type:** `{loot.get('type', 'N/A')}` | **Target:** `{target_ctx}`")
                 lines.append(f"  - **Value:** `{loot.get('value', '')}`")
+            grouped_loot = {}
+            for item in loots:
+                loot_type = item.get('type', 'Uncategorized')
+                grouped_loot.setdefault(loot_type, []).append(item)
+            
+            for loot_type, items in sorted(grouped_loot.items()):
+                lines.append(f"### Loot Type: `{loot_type}`\n")
+                lines.append("| Target | Value |")
+                lines.append("|---|---|")
+                for item in items:
+                    target = item.get('target', 'N/A')
+                    value = item.get('value', '').replace('|', '\|')
+                    lines.append(f"| `{target}` | `{value}` |")
+                lines.append("")
             lines.append("")
 
         # Render Parser Findings
+        # --- REFACTORED: Render Parser Findings grouped by category in tables ---
         findings = data.get('findings', [])
         if findings:
             lines.append("## Parser Findings\n")
             for finding in findings:
                 lines.append(f"- **Category:** `{finding.get('category', 'N/A')}` | **Target:** `{finding.get('target', 'N/A')}` | **Source:** `Log #{finding.get('source_log_id')}`")
                 lines.append(f"  - **Match:** `{finding.get('match', '')}`")
+            grouped_findings = {}
+            for item in findings:
+                category = item.get('category', 'Uncategorized')
+                grouped_findings.setdefault(category, []).append(item)
+
+            for category, items in sorted(grouped_findings.items()):
+                lines.append(f"### Finding Category: `{category}`\n")
+                lines.append("| Target | Match | Source Log |")
+                lines.append("|---|---|---|")
+                unique_items = []
+                for item in items:
+                    # Create a tuple to identify unique findings within the category
+                    unique_key = (item.get('target'), item.get('match'))
+                    if unique_key not in [ui[0] for ui in unique_items]:
+                        unique_items.append((unique_key, item))
+                
+                for _, item in unique_items:
+                    target = item.get('target', 'N/A')
+                    match = item.get('match', '').replace('|', '\|')
+                    log_id = item.get('source_log_id', 'N/A')
+                    lines.append(f"| `{target}` | `{match}` | `Log #{log_id}` |")
+                lines.append("")
             lines.append("")
 
         output_content = "\n".join(lines)

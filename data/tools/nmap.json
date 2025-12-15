@@ -9,7 +9,8 @@
         "-T4",
         "-F",
         "$target.ip"
-      ]
+      ],
+      "description": "Just a quick scan"
     },
     {
       "name": "full",
@@ -47,5 +48,7 @@
         "$target.ip"
       ]
     }
-  ]
+  ],
+  "description": "This is my Nmap tool",
+  "howto": "just load a target and put an ip into it with target update YOUR_TARGET ip X.X.X.X. Load the target and this tool to fire a nmap scan against ist"
 }

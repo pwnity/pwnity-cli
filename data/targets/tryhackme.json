@@ -1,0 +1,14 @@
+{
+  "name": "tryhackme",
+  "ip": "10.80.144.104",
+  "protocol": "http",
+  "hostname": "10.80.144.104",
+  "domain": "",
+  "domain_name": "10.80.144.104",
+  "tld": "",
+  "subdomains": [],
+  "port": "80",
+  "base_url": "http://10.80.144.104",
+  "uri": "/",
+  "url": "http://10.80.144.104"
+}

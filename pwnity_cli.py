@@ -832,6 +832,11 @@ class MyCLI(cmd2.Cmd):
             if subparsers_action:
                 return [s for s in subparsers_action.choices if s.startswith(text)]
 
+        if num_tokens == 2 and tokens[1] == 'add':
+            # Suggest loot types from the configuration
+            loot_types = config.get_loot_types()
+            return [lt for lt in loot_types if lt.startswith(text)]
+
         if num_tokens == 2 and tokens[1] == 'delete':
             if not self.session.report: return []
             report_data = self.report_mgr.load(self.session.report)

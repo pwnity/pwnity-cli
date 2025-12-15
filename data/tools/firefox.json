@@ -1,0 +1,13 @@
+{
+  "name": "firefox",
+  "path": "/usr/bin/firefox",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "open",
+      "params": [
+        "--url $target.url"
+      ]
+    }
+  ]
+}

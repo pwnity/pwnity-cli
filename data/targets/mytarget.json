@@ -1,3 +1,5 @@
 {
-  "name": "mytarget"
+  "name": "mytarget",
+  "ip": "192.168.178.1",
+  "description": "This is my router"
 }

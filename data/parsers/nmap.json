@@ -1,6 +1,6 @@
 {
   "name": "Nmap Scan Artifacts",
-  "description": "Regex patterns for parsing Nmap scan outputs, including open ports, services, versions, hostnames, and HTTP/CMS info.",
+  "description": "This is my parser",
   "rules": [
     {
       "name": "ipv4",
