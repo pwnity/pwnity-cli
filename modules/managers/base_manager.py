@@ -15,6 +15,14 @@ class BaseManager:
         settings = config.get_section("DIRS")
         return settings.get(key, fallback)
 
+    def get_available_subcommands(self):
+        """
+        Inspects the manager instance and returns a list of all available subcommands
+        by finding all methods that start with '_cmd_'.
+        """
+        return [method_name.replace('_cmd_', '').replace('_', '-')
+                for method_name in dir(self) if callable(getattr(self, method_name)) and method_name.startswith('_cmd_')]
+
     def dispatch(self, subcommand, args, cli):
         """
         Dynamically dispatches a subcommand to a handler method (_cmd_<subcommand>).
@@ -189,6 +197,27 @@ class JSONManager(BaseManager):
                 os.remove(temp_file_path)
             return False
 
+    def copy(self, source_name, dest_name):
+        """Copies an entity to a new name."""
+        entity_type = self._get_entity_type()
+
+        if self.exists(dest_name):
+            log.error(f"A {entity_type} with the name '{dest_name}' already exists.")
+            return False
+
+        source_data = self.load(source_name)
+        if not source_data:
+            # self.load() already logs the error
+            return False
+
+        # Update the internal name to the new name
+        source_data['name'] = dest_name
+
+        if self._save_data(dest_name, source_data):
+            log.success(f"{entity_type} '{source_name}' successfully copied to '{dest_name}'.")
+            return True
+        return False
+
     def create(self, name):
         """Creates a new, empty JSON file for an entity, ensuring it's synced to disk."""
         path = os.path.join(self.folder, f"{self._sanitize_filename(name)}.json")
@@ -312,6 +341,12 @@ class JSONManager(BaseManager):
         if created:
             log.success(f"{entity_type} '{args.name}' added.")
         return created
+
+    def _cmd_copy(self, args, cli):
+        """Handles the 'copy' subcommand."""
+        source_name = args.source_name
+        dest_name = args.dest_name
+        self.copy(source_name, dest_name)
 
     def _cmd_update(self, args, cli):
         entity_type = self._get_entity_type()

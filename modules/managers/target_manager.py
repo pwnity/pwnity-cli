@@ -370,6 +370,7 @@ class TargetManager(JSONManager):
             'name_servers': 'dns',
             'ipv6_addresses': 'dns',
             'cname_records': 'dns',
+            'geo_intel': 'geo',
         }
         for key, value in target_data.items():
             if key in gather_map:

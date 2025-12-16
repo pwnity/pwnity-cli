@@ -105,12 +105,12 @@ class Completer:
 
         # 1. Complete subcommand (add, list, update, etc.)
         if num_tokens == 1:
-            subcommands = ['add', 'list', 'update', 'delete', 'reorder', 'destroy', 'load', 'show', 'export', 'help']
+            subcommands = ['add', 'list', 'update', 'delete', 'reorder', 'destroy', 'load', 'show', 'export', 'help', 'copy']
             return [s for s in subcommands if s.startswith(text)]
 
         # 2. Complete tool name for most subcommands
         if num_tokens == 2:
-            if tokens[1] in ['update', 'delete', 'reorder', 'destroy', 'load', 'show', 'export']:
+            if tokens[1] in ['update', 'delete', 'reorder', 'destroy', 'load', 'show', 'export', 'copy', 'rename']:
                 return [t for t in self.cli.tool_mgr.list_all() if t.startswith(text)]
 
         # 3. Context-sensitive completion for 'tool update <name> ...'
@@ -228,12 +228,12 @@ class Completer:
 
         # 1. Complete subcommand (add, list, update, etc.)
         if num_tokens == 1:
-            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'help', 'rename']
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'help', 'rename', 'copy']
             return [s for s in subcommands if s.startswith(text)]
 
         # 2. Complete target name for most subcommands
         if num_tokens == 2:
-            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'rename']:
+            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'rename', 'copy']:
                 return [t for t in self.cli.target_mgr.list_all() if t.startswith(text)]
 
         # 3. Context-sensitive completion for 'target update <name> ...' or 'target delete <name> ...'
@@ -265,12 +265,12 @@ class Completer:
 
         # 1. Complete subcommand
         if num_tokens == 1:
-            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'save', 'export', 'help']
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'save', 'export', 'help', 'copy']
             return [s for s in subcommands if s.startswith(text)]
 
         # 2. Complete preset name for most subcommands
         if num_tokens == 2:
-            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'export']:
+            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'export', 'copy', 'rename']:
                 return [p for p in self.cli.preset_mgr.list_all() if p.startswith(text)]
 
         # 3. Context-sensitive completion for 'preset update <name> ...'
@@ -302,12 +302,12 @@ class Completer:
 
         # 1. Complete subcommand
         if num_tokens == 1:
-            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'rename', 'export', 'help']
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'rename', 'export', 'help', 'copy']
             return [s for s in subcommands if s.startswith(text)]
 
         # 2. Complete wordlist name for most subcommands
         if num_tokens == 2:
-            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'rename', 'export']:
+            if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'rename', 'export', 'copy']:
                 return [w for w in self.cli.wordlist_mgr.list_all() if w.startswith(text)]
 
         # 3. Context-sensitive completion for 'wordlist update <name> ...' or 'wordlist delete <name> ...'

@@ -378,10 +378,28 @@ class ToolManager(JSONManager):
                 if cmd.get('execute_per_param'):
                     commands.append(f"tool update {name} {cmd_name} execute_per_param true")
 
+                # Export other custom fields within the command
+                handled_cmd_keys = {'name', 'params', 'execute_per_param'}
+                for key, value in cmd.items():
+                    if key not in handled_cmd_keys:
+                        val_str = json.dumps(value) if isinstance(value, (dict, list)) else str(value)
+                        commands.append(f"tool update {name} {cmd_name} {key} {shlex.quote(val_str)}")
+
                 if 'params' in cmd and isinstance(cmd['params'], list):
                     for param in cmd['params']:
                         commands.append(f"tool update {name} {cmd_name} param {shlex.quote(param)}")
+                
+                # Export other custom fields within the command
+                handled_cmd_keys = {'name', 'params', 'execute_per_param'}
+                for key, value in cmd.items():
+                    pass # This block was moved up to ensure correct order
 
+        # Export all other top-level custom fields
+        handled_top_level_keys = {'name', 'path', 'sudo', 'commands'}
+        for key, value in data.items():
+            if key not in handled_top_level_keys:
+                val_str = json.dumps(value) if isinstance(value, (dict, list)) else str(value)
+                commands.append(f"tool update {name} {key} {shlex.quote(val_str)}")
         log.header(f"Export für Tool '{name}'")
         cli.poutput("\n".join(commands))
 

@@ -1,4 +1,5 @@
 {
   "name": "dir_small",
-  "path": "/usr/share/wordlists/dirb/small.txt"
+  "path": "/usr/share/wordlists/dirb/small.txt",
+  "description": "This is a test"
 }

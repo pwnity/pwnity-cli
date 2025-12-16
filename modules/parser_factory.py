@@ -145,6 +145,16 @@ class ParserFactory:
             self._add_custom_help(rename_parser, "rename")
             rename_parser.add_argument("old_name", help=f"The current name of the {entity_name_singular}.", choices_provider=choices_provider)
             rename_parser.add_argument("new_name", help=f"The new name for the {entity_name_singular}.")
+
+        if "copy" not in exclude:
+            copy_parser = subparsers.add_parser("copy",
+                                                help=f"Copy a {entity_name_singular}.",
+                                                description=f"Copies a {entity_name_singular} from <source_name> to <dest_name>.",
+                                                formatter_class=self.formatter, add_help=False)
+            self._add_custom_help(copy_parser, "copy")
+            copy_parser.add_argument("source_name", help=f"The name of the {entity_name_singular} to copy.", choices_provider=choices_provider)
+            copy_parser.add_argument("dest_name", help=f"The new name for the copied {entity_name_singular}.")
+
         if "update" not in exclude:
             update_parser = subparsers.add_parser("update",
                                                   help=f"Update an existing {entity_name_singular} (e.g., URL, path, parameters).",
