@@ -111,12 +111,12 @@ class RunManager(BaseManager):
 
                 conf_content = template_content
                 for key, value in processed_proxy_config.items():
-                    if value is not None:
-                        if key == 'host' and str(value).lower() == 'localhost':
-                            value_to_replace = '127.0.0.1'
-                        else:
-                            value_to_replace = str(value)
-                        conf_content = conf_content.replace(f"$proxy.{key}", value_to_replace)
+                    # Ensure None values are replaced with an empty string
+                    value_to_replace = value if value is not None else ""
+                    if key == 'host' and str(value_to_replace).lower() == 'localhost':
+                        value_to_replace = '127.0.0.1'
+                    
+                    conf_content = conf_content.replace(f"$proxy.{key}", str(value_to_replace))
                 
                 try:
                     run_dir = config.get_parameter("DIRS", "RUN", "data/run")
