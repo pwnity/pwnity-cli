@@ -88,66 +88,34 @@ class RunManager(BaseManager):
         
         return effective_command_name, is_per_param_execution
 
-    def _prepare_proxy_environment(self, cli, initial_proxy_config: dict | None) -> tuple[dict | None, str | None, list[str]]:
+    def _prepare_proxy_environment(self, cli, initial_proxy_config: dict | None) -> tuple[dict | None, str | None]:
         """
-        Prepares the proxy environment, including creating a temporary config file if needed.
-        Returns (modified_proxy_config, temp_proxy_conf_path, proxy_notes).
+        Prepares the proxy configuration and the content for a temporary config file.
+        Returns (modified_proxy_config, temp_proxy_conf_content).
         """
         processed_proxy_config = initial_proxy_config.copy() if initial_proxy_config else None
-        temp_proxy_conf_path = None
-        proxy_notes = []
+        temp_proxy_conf_content = None
 
         if processed_proxy_config and processed_proxy_config.get('wrapper_template'):
             template_name = processed_proxy_config['wrapper_template']
             template_dir = config.get_parameter("DIRS", "PROXY_TEMPLATES", "etc/proxy_templates")
             template_path = os.path.join(template_dir, template_name)
 
-            if not os.path.exists(template_path):
+            if not os.path.isfile(template_path):
                 log.error(f"Proxy template file not found: {template_path}")
                 processed_proxy_config = None # Disable proxy for this run
             else:
                 with open(template_path, 'r') as f:
                     template_content = f.read()
 
-                conf_content = template_content
+                temp_proxy_conf_content = template_content
                 for key, value in processed_proxy_config.items():
-                    # Ensure None values are replaced with an empty string
-                    value_to_replace = value if value is not None else ""
+                    value_to_replace = str(value) if value is not None else ""
                     if key == 'host' and str(value_to_replace).lower() == 'localhost':
                         value_to_replace = '127.0.0.1'
-                    
-                    conf_content = conf_content.replace(f"$proxy.{key}", str(value_to_replace))
-                
-                try:
-                    run_dir = config.get_parameter("DIRS", "RUN", "data/run")
-                    os.makedirs(run_dir, exist_ok=True)
+                    temp_proxy_conf_content = temp_proxy_conf_content.replace(f"$proxy.{key}", value_to_replace)
 
-                    with tempfile.NamedTemporaryFile(
-                        mode='w', delete=False, suffix='.conf', 
-                        prefix='pwnity_proxy_', dir=run_dir
-                    ) as temp_f:
-                        temp_f.write(conf_content)
-                        temp_proxy_conf_path = temp_f.name
-                    
-                    base_opts = cli.proxy_mgr.get_effective_config(cli.session).get('wrapper_options', '')
-                    processed_proxy_config['wrapper_options'] = f"-f {temp_proxy_conf_path} {base_opts}".strip()
-                    log.debug(f"Created temporary proxychains config at: {temp_proxy_conf_path}")
-
-                    if processed_proxy_config.get('wrapper_needs_sudo', False):
-                        if not self._ensure_sudo_credentials():
-                            return None, None, [] # Abort if sudo fails
-
-                except Exception as e:
-                    log.error(f"Failed to create temporary proxychains config: {e}")
-                    processed_proxy_config = None # Disable proxy for this run
-        
-        if processed_proxy_config and processed_proxy_config.get('wrapper_command'):
-            wrapper_cmd_str = processed_proxy_config['wrapper_command']
-            wrapper_opts_str = processed_proxy_config.get('wrapper_options', '')
-            full_wrapper_str = f"{wrapper_cmd_str} {wrapper_opts_str}".strip()
-            proxy_notes.append(f"Proxy: Enabled ('{full_wrapper_str}')")
-
-        return processed_proxy_config, temp_proxy_conf_path, proxy_notes
+        return processed_proxy_config, temp_proxy_conf_content
 
     def _build_single_final_command(self, raw_cmd_list: list[str], tool_name: str, tool_needs_sudo: bool, proxy_config: dict | None, temp_proxy_conf_path: str | None, cli) -> tuple[list[str], list[str]]:
         """
@@ -217,8 +185,39 @@ class RunManager(BaseManager):
         execution_notes = []
         tool_needs_sudo = tool_data.get('sudo', False)
         initial_proxy_config = cli.proxy_mgr.get_effective_config(cli.session)
-        processed_proxy_config, temp_proxy_conf_path, proxy_notes = self._prepare_proxy_environment(cli, initial_proxy_config)
-        execution_notes.extend(proxy_notes)
+        processed_proxy_config, temp_proxy_conf_content = self._prepare_proxy_environment(cli, initial_proxy_config)
+        temp_proxy_conf_path = None # Will be set only on execution
+
+        # --- FIX: Create temp file only on execution, not for preview ---
+        if processed_proxy_config:
+            # For preview, use a placeholder name. For execution, create the real file.
+            if run_now or run_bg:
+                try:
+                    run_dir = config.get_parameter("DIRS", "RUN", "data/run")
+                    os.makedirs(run_dir, exist_ok=True)
+                    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.conf', prefix='pwnity_proxy_', dir=run_dir) as temp_f:
+                        temp_f.write(temp_proxy_conf_content)
+                        temp_proxy_conf_path = temp_f.name
+                    log.debug(f"Created temporary proxy config at: {temp_proxy_conf_path}")
+                except Exception as e:
+                    log.error(f"Failed to create temporary proxy config: {e}")
+                    processed_proxy_config = None # Disable proxy for this run
+            else:
+                # For preview mode, just generate a representative path.
+                run_dir = config.get_parameter("DIRS", "RUN", "data/run")
+                temp_proxy_conf_path = os.path.join(run_dir, "pwnity_proxy_preview.conf")
+
+            # If we have a path (real or fake), update the wrapper options for display/execution
+            if temp_proxy_conf_path:
+                base_opts = cli.proxy_mgr.get_effective_config(cli.session).get('wrapper_options', '')
+                processed_proxy_config['wrapper_options'] = f"-f {temp_proxy_conf_path} {base_opts}".strip()
+
+        # Build execution notes for the plan display
+        if processed_proxy_config and processed_proxy_config.get('wrapper_command'):
+            wrapper_cmd_str = processed_proxy_config['wrapper_command']
+            wrapper_opts_str = processed_proxy_config.get('wrapper_options', '')
+            full_wrapper_str = f"{wrapper_cmd_str} {wrapper_opts_str}".strip()
+            execution_notes.append(f"Proxy: Enabled ('{full_wrapper_str}')")
 
         for raw_cmd_list in commands_to_run:
             final_cmd_list, cmd_notes = self._build_single_final_command(
