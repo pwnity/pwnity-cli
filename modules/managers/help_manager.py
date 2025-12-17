@@ -307,7 +307,8 @@ class HelpManager:
                 ("target update <name> url <url>", "Set the URL, which automatically parses IP, domain, etc."),
                 ("target gather <name> all", "Actively gather DNS, WHOIS, and HTTP info."),
                 ("target load <name>", "Load the target into the current session."),
-                ("target show <name>", "Display all information for the target."),
+                ("target unload", "Unload the active target from the current session."),
+                ("target unload <name> force", "Unload the specified target from all sessions."),
                 ("target export <name>", "Generate commands to recreate the target."),
             ], border_color="green")
 
@@ -320,6 +321,8 @@ class HelpManager:
                 ("tool update <name> command <cmd>", "Add a subcommand, e.g., 'stealth-scan'."),
                 ("tool update <name> <cmd> param <p>", "Add a parameter with placeholders, e.g., '-p- $target.ip'."),
                 ("tool load <name>", "Load the tool into the current session."),
+                ("tool unload", "Unload the active tool from the current session."),
+                ("tool unload <name> force", "Unload the specified tool from all sessions."),
                 ("tool show <name>", "Display the tool's configuration."),
                 ("tool update <name> sudo true", "Mark the tool to always run with sudo."),
             ], border_color="yellow")
@@ -332,6 +335,8 @@ class HelpManager:
                 ("wordlist add <name>", "Create a new wordlist reference."),
                 ("wordlist update <name> path <path>", "Set the path to the wordlist file."),
                 ("wordlist load <name>", "Load the wordlist into the current session."),
+                ("wordlist unload", "Unload the active wordlist from the current session."),
+                ("wordlist unload <name> force", "Unload the specified wordlist from all sessions."),
                 ("wordlist list", "List all available wordlists."),
             ], border_color="magenta")
 
@@ -454,7 +459,8 @@ class HelpManager:
                 ("report list", "List all available reports."),
                 ("report export my-project", "Prints the commands to recreate the report."),
                 ("report render my-project", "Saves a human-readable summary to a file."),
-                ("report unload", "Unload the report from the session."),
+                ("report unload", "Unload the active report from the current session."),
+                ("report unload <name> force", "Unload the specified report from all sessions."),
             ], border_color="yellow")
 
     def show_help_placeholders(self):

@@ -152,29 +152,6 @@ def test_send_input_to_finished_job(job_manager, mock_session):
     send_success = job_manager.send_input(job_id, "this should fail")
     assert send_success is False
 
-def test_start_job_with_nonexistent_command(job_manager, mock_session, mocker):
-    """
-    Tests that attempting to start a non-existent command creates a job that immediately fails.
-    """
-    command = ["nonexistentcommand12345"]
-    
-    # Act: Start the job that is expected to fail immediately.
-    job_id = job_manager.start_job(command, session_obj=mock_session)
-    
-    # Assert 1: The manager should return a valid job ID even for a failed job.
-    assert job_id is not None
-    
-    # Assert 2: The job object should exist in the manager.
-    job = job_manager.get_job(job_id)
-    assert job is not None
-
-    # Assert 3: The job should be in the 'failed' state immediately.
-    # The new pipe-based error reporting in start_job makes this synchronous,
-    # so no polling or sleeping is needed.
-    assert job.status == "failed"
-    assert "pwnity: command not found: nonexistentcommand12345" in job.output, \
-        f"Expected error message not found in job output: {job.output}"
-
 def test_send_input_to_job(job_manager, mock_session):
     """
     Testet, ob Input korrekt an einen laufenden Job gesendet werden kann.

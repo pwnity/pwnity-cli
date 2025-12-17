@@ -101,15 +101,6 @@ class ReportManager(JSONManager):
         cli.session.report = args.name
         log.success(f"Report '{args.name}' loaded into session.")
 
-    def _cmd_unload(self, args, cli):
-        """Unloads the report from the active session."""
-        if not cli.session.report:
-            log.info("No report is currently loaded.")
-            return
-        report_name = cli.session.report
-        cli.session.report = None
-        log.success(f"Report '{report_name}' unloaded from session.")
-
     def add_history_entry(self, report_name, command_str, logbook_id, tool_name, tool_command_name):
         """Adds a command execution to the report's history."""
         report_data = self.load(report_name)

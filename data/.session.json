@@ -1,26 +1,26 @@
 {
   "session_name": "default",
-  "target": "iprs.fly.dev",
-  "tool": "curl",
+  "target": "moonandhoney.de",
+  "tool": "subfinder",
   "wordlist": null,
   "report": null,
   "proxy_enabled": false,
   "jobs": [
     {
-      "id": "4c3d4d68-447e-4acc-9e60-567653b24cb7",
-      "command_str": "/usr/bin/curl -I -s -A Vermillion -k https://iprs.fly.dev",
-      "status": "finished",
-      "duration": "0.43s",
-      "logbook_id": "8e356523-0715-43ba-9d20-ef498f5ab7d6",
-      "start_time": 1765978495.889074,
-      "output": "HTTP/2 200 \r\r\n\u001b[1mcontent-type\u001b[0m: text/plain; charset=utf-8\r\r\n\u001b[1mcontent-length\u001b[0m: 14\r\r\n\u001b[1mdate\u001b[0m: Wed, 17 Dec 2025 13:34:57 GMT\r\r\n\u001b[1mserver\u001b[0m: Fly/c51817cfd (2025-12-11)\r\r\n\u001b[1mvia\u001b[0m: 2 fly.io, 2 fly.io\r\r\n\u001b[1mfly-request-id\u001b[0m: 01KCP8AR1AQ6J9ZE7C8EHRRAWH-fra\r\r\n\r\r\n"
+      "id": "37946beb-36d8-438c-98f7-3967d3480ffd",
+      "command_str": "/usr/bin/nikto -h https://www.moonandhoney.de",
+      "status": "running",
+      "duration": "272.86s",
+      "logbook_id": null,
+      "start_time": 1766004258.592112,
+      "output": "- Nikto v2.5.0\r\n---------------------------------------------------------------------------\r\n+ Target IP:          92.205.62.58\r\n+ Target Hostname:    www.moonandhoney.de\r\n+ Target Port:        443\r\n---------------------------------------------------------------------------\r\n+ SSL Info:        Subject:  /CN=www.moonandhoney.de\r\n                   Ciphers:  TLS_AES_256_GCM_SHA384\r\n                   Issuer:   /C=US/O=Let's Encrypt/CN=R13\r\n+ Start Time:         2025-12-17 21:44:19 (GMT1)\r\n---------------------------------------------------------------------------\r\n+ Server: Apache/2.4.52 (Debian)\r\n+ /: Retrieved x-powered-by header: PHP/7.4.27.\r\n+ /: Uncommon header 'x-redirect-by' found, with contents: WordPress.\r\n+ /: The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type. See: https://www.netsparker.com/web-vulnerability-scanner/vulnerabilities/missing-content-type-header/\r\n+ Root page / redirects to: https://moonandhoney.de/\r\n+ : Server banner changed from 'Apache/2.4.52 (Debian)' to 'Apache/2.4.41 (Ubuntu)'.\r\n+ No CGI Directories found (use '-C all' to force check all possible dirs)\r\n+ Apache/2.4.52 appears to be outdated (current is at least Apache/2.4.54). Apache 2.2.34 is the EOL for the 2.x branch.\r\n+ /favicon.ico: Drupal Link header found with value: <https://moonandhoney.de/wp-json/>; rel=\"https://api.w.org/\". See: https://www.drupal.org/\r\n+ /: Web Server returns a valid response with junk HTTP methods which may cause false positives.\r\n"
     }
   ],
   "sessions": {
     "default": {
       "name": "default",
-      "target": "iprs.fly.dev",
-      "tool": "curl",
+      "target": "moonandhoney.de",
+      "tool": "subfinder",
       "wordlist": null,
       "report": null
     }

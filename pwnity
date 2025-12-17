@@ -41,7 +41,7 @@ def start_web_ui():
         # If the plugin is not found, display the PRO feature message.
         log.header("PRO Feature: Web UI")
         log.info("The Web UI is a premium feature.")
-        log.prompt("To get access, please visit: https://your-website.com/pro")
+        log.prompt("To get access, please visit: https://www.pwnity.com/ui")
 
 def main():
     """Main entry point for the pwnity application."""

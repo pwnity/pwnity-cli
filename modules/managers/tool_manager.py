@@ -427,7 +427,7 @@ class ToolManager(JSONManager):
         
         path = os.path.join(self.folder, f"{args.name}.json")
         if os.path.exists(path):
-            log.error(f"{entity_type} '{args.name}' existiert bereits.")
+            log.error(f"{entity_type} '{args.name}' already exists.")
             return
 
         # Try to find the tool's path automatically
@@ -523,6 +523,24 @@ class ToolManager(JSONManager):
         self._save_data(tool_name, tool)
         log.info(f"Param '{param}' added to {tool_name} {command_name}.")
         return cmd
+
+    def _cmd_destroy(self, args, cli):
+        """
+        Overrides the default destroy to prevent deletion if the tool is loaded in any session.
+        """
+        tool_to_delete = args.name
+
+        # Check all active sessions
+        for session_name, session_obj in cli.session_mgr.sessions.items():
+            if session_obj.tool == tool_to_delete:
+                log.error(f"Cannot delete tool '{tool_to_delete}' because it is currently loaded in session '{session_name}'.")
+                log.prompt(f"Switch to session '{session_name}' and run 'tool unload' first.")
+                return
+
+        # If the check passes, proceed with the default destroy logic from the parent class.
+        log.info(f"Tool '{tool_to_delete}' is not loaded in any active session. Proceeding with deletion...")
+        super()._cmd_destroy(args, cli)
+
 
     def _cmd_show(self, args, cli):
         """Handles 'tool show [name]'."""

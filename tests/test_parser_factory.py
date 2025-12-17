@@ -194,7 +194,8 @@ def test_populate_proxy_parser(parser_factory, empty_parsers):
     set_parser = get_subparser(proxy_parser, "set")
     assert set_parser is not None
     actions = [action.dest for action in set_parser._actions]
-    assert "set_args" in actions
+    assert "key" in actions
+    assert "value" in actions
 
 def test_populate_config_parser(parser_factory, empty_parsers):
     """

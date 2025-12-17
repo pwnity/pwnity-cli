@@ -121,12 +121,19 @@ class Completer:
 
         # 1. Complete subcommand (add, list, update, etc.)
         if num_tokens == 1:
-            subcommands = ['add', 'list', 'update', 'delete', 'reorder', 'destroy', 'load', 'show', 'export', 'help', 'copy']
+            subcommands = ['add', 'list', 'update', 'delete', 'reorder', 'destroy', 'load', 'unload', 'show', 'export', 'help', 'copy']
             return [s for s in subcommands if s.startswith(text)]
 
         # 2. Complete tool name for most subcommands
         if num_tokens == 2:
             if tokens[1] in ['update', 'delete', 'reorder', 'destroy', 'load', 'show', 'export', 'copy', 'rename']:
+                return [t for t in self.cli.tool_mgr.list_all() if t.startswith(text)]
+            # For 'unload', suggest loaded tool name or all tools
+            if tokens[1] == 'unload' and not text:
+                if self.cli.session.tool:
+                    return [self.cli.session.tool] + [t for t in self.cli.tool_mgr.list_all() if t != self.cli.session.tool]
+                return self.cli.tool_mgr.list_all()
+            elif tokens[1] == 'unload':
                 return [t for t in self.cli.tool_mgr.list_all() if t.startswith(text)]
 
         # 3. Context-sensitive completion for 'tool update <name> ...'
@@ -244,12 +251,19 @@ class Completer:
 
         # 1. Complete subcommand (add, list, update, etc.)
         if num_tokens == 1:
-            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'help', 'rename', 'copy']
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'unload', 'show', 'gather', 'fork-domain', 'export', 'help', 'rename', 'copy']
             return [s for s in subcommands if s.startswith(text)]
 
         # 2. Complete target name for most subcommands
         if num_tokens == 2:
             if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'gather', 'fork-domain', 'export', 'rename', 'copy']:
+                return [t for t in self.cli.target_mgr.list_all() if t.startswith(text)]
+            # For 'unload', suggest loaded target name or all targets
+            if tokens[1] == 'unload' and not text:
+                if self.cli.session.target:
+                    return [self.cli.session.target] + [t for t in self.cli.target_mgr.list_all() if t != self.cli.session.target]
+                return self.cli.target_mgr.list_all()
+            elif tokens[1] == 'unload':
                 return [t for t in self.cli.target_mgr.list_all() if t.startswith(text)]
 
         # 3. Context-sensitive completion for 'target update <name> ...' or 'target delete <name> ...'
@@ -318,12 +332,19 @@ class Completer:
 
         # 1. Complete subcommand
         if num_tokens == 1:
-            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'show', 'rename', 'export', 'help', 'copy']
+            subcommands = ['add', 'list', 'update', 'delete', 'destroy', 'load', 'unload', 'show', 'rename', 'export', 'help', 'copy']
             return [s for s in subcommands if s.startswith(text)]
 
         # 2. Complete wordlist name for most subcommands
         if num_tokens == 2:
             if tokens[1] in ['update', 'delete', 'destroy', 'load', 'show', 'rename', 'export', 'copy']:
+                return [w for w in self.cli.wordlist_mgr.list_all() if w.startswith(text)]
+            # For 'unload', suggest loaded wordlist name or all wordlists
+            if tokens[1] == 'unload' and not text:
+                if self.cli.session.wordlist:
+                    return [self.cli.session.wordlist] + [w for w in self.cli.wordlist_mgr.list_all() if w != self.cli.session.wordlist]
+                return self.cli.wordlist_mgr.list_all()
+            elif tokens[1] == 'unload':
                 return [w for w in self.cli.wordlist_mgr.list_all() if w.startswith(text)]
 
         # 3. Context-sensitive completion for 'wordlist update <name> ...' or 'wordlist delete <name> ...'
@@ -450,6 +471,13 @@ class Completer:
             # For other commands, suggest report names.
             if tokens[1] in ['load', 'show', 'rename', 'destroy', 'delete', 'export', 'reverse', 'render']:
                 return [r_name for r_name in self.cli.report_mgr.list_all() if r_name.startswith(text)]
+            # For 'unload', suggest loaded report name or all reports
+            if tokens[1] == 'unload' and not text:
+                if self.cli.session.report:
+                    return [self.cli.session.report] + [r for r in self.cli.report_mgr.list_all() if r != self.cli.session.report]
+                return self.cli.report_mgr.list_all()
+            elif tokens[1] == 'unload':
+                return [r for r in self.cli.report_mgr.list_all() if r.startswith(text)]
 
         if num_tokens == 3 and tokens[1] == 'view':
             # Autocomplete files for 'report view <report_name> <file_to_complete>'
@@ -616,6 +644,11 @@ class Completer:
     def _get_pwn_completions(self, text, line, begidx, endidx):
         if not self.cli.session or not self.cli.session.tool: return []
         tool_data = self.cli.tool_mgr.load(self.cli.session.tool)
+        # --- FIX: Gracefully handle if the loaded tool was deleted ---
+        if not tool_data:
+            # The tool file doesn't exist anymore. Return no completions.
+            return []
+
         tool_commands = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
 
         try:

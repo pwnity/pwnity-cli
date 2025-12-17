@@ -441,18 +441,52 @@ class JSONManager(BaseManager):
 
     def _cmd_unload(self, args, cli):
         """Handles the 'unload' subcommand for entities that can be loaded into a session."""
+        # Determine if 'force' was used. The 'name' argument will hold the entity name,
+        # and 'force' will be a separate flag.
+        force_unload = hasattr(args, 'force') and args.force == 'force'
         entity_type_lower = self._get_entity_type().lower()
-        
+
         if not hasattr(cli.session, entity_type_lower):
             log.error(f"Session object has no attribute '{entity_type_lower}'. This is a bug.")
             return
 
-        loaded_item = getattr(cli.session, entity_type_lower)
-        if not loaded_item:
-            log.info(f"No {entity_type_lower} is currently loaded.")
+        if force_unload:
+            # --- FIX: Prioritize the name given in the command for 'force' unload. ---
+            # If 'tool unload foo force' is run, args.name will be 'foo'.
+            # If 'tool unload force' is run (without a name), args.name will be None.
+            item_to_unload_name = args.name
+
+            # If no name was provided with the force command, fall back to the currently loaded item.
+            if not item_to_unload_name:
+                item_to_unload_name = getattr(cli.session, entity_type_lower)
+
+            if not item_to_unload_name:
+                log.error(f"No {entity_type_lower} specified and none is loaded in the current session to identify what to unload globally.")
+                return
+
+            unloaded_count = 0
+            for session_obj in cli.session_mgr.sessions.values():
+                if getattr(session_obj, entity_type_lower) == item_to_unload_name:
+                    setattr(session_obj, entity_type_lower, None)
+                    unloaded_count += 1
+            
+            if unloaded_count > 0:
+                log.success(f"Force-unloaded {entity_type_lower} '{item_to_unload_name}' from {unloaded_count} session(s).")
+            else:
+                log.info(f"{entity_type_lower.capitalize()} '{item_to_unload_name}' was not found loaded in any session.")
         else:
-            log.success(f"Unloaded {entity_type_lower} '{loaded_item}'.")
-            setattr(cli.session, entity_type_lower, None)
+            # Unload from current session only.
+            # If a name is provided (e.g., 'tool unload foo'), unload that specific one if it's loaded.
+            # If no name is provided ('tool unload'), unload whatever is currently loaded.
+            item_to_unload = args.name or getattr(cli.session, entity_type_lower)
+
+            if not item_to_unload:
+                log.info(f"No {entity_type_lower} specified and none is currently loaded in this session.")
+            elif getattr(cli.session, entity_type_lower) == item_to_unload:
+                setattr(cli.session, entity_type_lower, None)
+                log.success(f"Unloaded {entity_type_lower} '{item_to_unload}' from the current session.")
+            else:
+                log.warning(f"{entity_type_lower.capitalize()} '{item_to_unload}' is not the one currently loaded in this session.")
 
     def _format_and_show_entity(self, entity, console):
         """Generic formatting for the details of an entity with rich.panel and rich.table."""

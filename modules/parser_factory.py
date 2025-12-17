@@ -221,9 +221,18 @@ class ParserFactory:
         if "unload" not in exclude:
             unload_parser = subparsers.add_parser("unload",
                                                   help=f"Unload the current {entity_name_singular} from the session.",
-                                                  description=f"Unloads the currently active {entity_name_singular} from the session, clearing it from the prompt.",
+                                                  description=f"Unloads an entity from the current session, or from all sessions if 'force' is used. Can target a specific entity by name or the currently active one.",
                                                   formatter_class=self.formatter, add_help=False)
             self._add_custom_help(unload_parser, "unload")
+            # --- NEW: Flexible unload syntax ---
+            unload_parser.add_argument("name", nargs='?', default=None, help=f"Optional: The name of the {entity_name_singular} to unload. If omitted, unloads the currently active one.")
+            unload_parser.add_argument("force", nargs='?', const='force', default=None, help="Optional: Use 'force' to unload the entity from all sessions.")
+            unload_parser.examples = [
+                (f"{entity_name_singular.lower()} unload", f"Unloads the active {entity_name_singular.lower()} from the current session."),
+                (f"{entity_name_singular.lower()} unload <name>", f"Unloads the specified {entity_name_singular.lower()} from the current session."),
+                (f"{entity_name_singular.lower()} unload <name> force", f"Unloads the specified {entity_name_singular.lower()} from ALL sessions."),
+                (f"{entity_name_singular.lower()} unload force", f"Unloads the active {entity_name_singular.lower()} from ALL sessions.")
+            ]
 
     def _populate_target_parser(self, parser, completer):
         subparsers = parser.add_subparsers(dest="subcommand", title="Available Actions", help="Target subcommands")
@@ -285,6 +294,7 @@ class ParserFactory:
         export_parser.add_argument("name", help="Name of the target to export.", choices_provider=completer)
         export_parser.examples = [("target export my-server", "Prints the commands to recreate 'my-server'.")]
 
+        # The 'unload' command is now handled by the common builder.
     def _add_help_subcommand_to_parser(self, subparsers, entity_name_singular):
         """Helper to add a 'help' subcommand to a given subparsers object."""
         help_parser = subparsers.add_parser("help",
@@ -354,6 +364,7 @@ class ParserFactory:
         export_parser.add_argument("name", help="Name of the tool to export.", choices_provider=completer)
         export_parser.examples = [("tool export nmap", "Prints the commands to recreate the 'nmap' tool.")]
 
+        # The 'unload' command is now handled by the common builder.
     def _populate_wordlist_parser(self, parser, completer):
         subparsers = parser.add_subparsers(dest="subcommand", title="Available Actions", help="Wordlist subcommands")
         self._build_common_subparsers(subparsers, completer, "Wordlist", "Wordlists")
@@ -364,10 +375,11 @@ class ParserFactory:
         self._add_custom_help(export_parser, "export")
         export_parser.add_argument("name", help="Name of the wordlist to export.", choices_provider=completer)
         export_parser.examples = [("wordlist export rockyou", "Prints the command to recreate the 'rockyou' wordlist.")]
+        # The 'unload' command is now handled by the common builder.
 
     def _populate_preset_parser(self, parser, completer):
         subparsers = parser.add_subparsers(dest="subcommand", title="Available Actions", help="Preset subcommands")
-        self._build_common_subparsers(subparsers, completer, "Preset", "Presets")
+        self._build_common_subparsers(subparsers, completer, "Preset", "Presets", exclude=['unload'])
         save_parser = subparsers.add_parser("save",
                                             help="Save the current session as a new preset.",
                                             description="Saves the currently loaded target, tool, wordlist, and proxy settings as a named preset for quick loading in the future.",

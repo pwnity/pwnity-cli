@@ -68,8 +68,9 @@ def test_report_create_and_load_unload(report_manager, mock_cli):
     assert mock_cli.session.report == report_name
 
     # 2. Entladen
-    unload_args = type('Args', (), {})()
-    report_manager._cmd_unload(unload_args, mock_cli)
+    # Simulate the args object for 'report unload' which has 'name' and 'force' as None
+    unload_args = argparse.Namespace(name=None, force=None)
+    report_manager._cmd_unload(unload_args, mock_cli) # This now uses the correct BaseManager._cmd_unload
     assert mock_cli.session.report is None
 
 def test_add_history_and_findings(report_manager):
@@ -251,6 +252,37 @@ def test_delete_with_invalid_index(report_manager, mock_cli, mocker):
     # Überprüfe, ob die Notiz noch vorhanden ist
     data = report_manager.load(report_name)
     assert len(data["notes"]) == 1
+
+def test_unload_force_from_different_session(report_manager, mocker):
+    """
+    Tests that 'unload <name> force' correctly unloads a report from all sessions.
+    """
+    report_name = "global-report"
+    report_manager.create(report_name)
+
+    # Mock the session manager and create two sessions
+    mock_session_mgr = mocker.MagicMock()
+    session1 = mocker.MagicMock()
+    session1.name = "session1"
+    session1.report = report_name  # Report is loaded in session1
+
+    session2 = mocker.MagicMock()
+    session2.name = "session2"
+    session2.report = None  # Report is NOT loaded in session2
+
+    mock_session_mgr.sessions = {"session1": session1, "session2": session2}
+
+    # Mock the main CLI object
+    mock_cli = mocker.MagicMock()
+    mock_cli.session_mgr = mock_session_mgr
+    mock_cli.session = session2 # We are in session2
+
+    # Simulate 'report unload global-report force'
+    unload_args = type('Args', (), {'name': report_name, 'force': 'force'})()
+    report_manager._cmd_unload(unload_args, mock_cli)
+
+    # Verify that the report is unloaded from session1
+    assert session1.report is None
 
 def test_list_files_details(report_manager, tmp_path):
     """

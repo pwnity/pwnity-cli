@@ -500,3 +500,34 @@ def test_target_export_logic(target_manager, mocker):
     # shlex.quote does not add quotes for simple strings like 'my_value'.
     # The test must expect the unquoted version.
     assert "target update export-test custom my_value" in output
+
+def test_unload_force_from_different_session(target_manager, mocker):
+    """
+    Tests that 'unload <name> force' correctly unloads a target from all sessions.
+    """
+    target_name = "global-target"
+    target_manager.create(target_name)
+
+    # Mock the session manager and create two sessions
+    mock_session_mgr = mocker.MagicMock()
+    session1 = mocker.MagicMock()
+    session1.name = "session1"
+    session1.target = target_name  # Target is loaded in session1
+
+    session2 = mocker.MagicMock()
+    session2.name = "session2"
+    session2.target = None  # Target is NOT loaded in session2
+
+    mock_session_mgr.sessions = {"session1": session1, "session2": session2}
+
+    # Mock the main CLI object
+    mock_cli = mocker.MagicMock()
+    mock_cli.session_mgr = mock_session_mgr
+    mock_cli.session = session2 # We are in session2
+
+    # Simulate 'target unload global-target force'
+    unload_args = type('Args', (), {'name': target_name, 'force': 'force'})()
+    target_manager._cmd_unload(unload_args, mock_cli)
+
+    # Verify that the target is unloaded from session1
+    assert session1.target is None

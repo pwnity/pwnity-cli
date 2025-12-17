@@ -254,7 +254,7 @@ class TestTargetIntegration:
         assert f"- [ {target_name} ]" in clean_load_output
 
         unload_output = running_pwnity.run_command("target unload")
-        assert f"Unloaded target '{target_name}'." in running_pwnity._strip_ansi(unload_output)
+        assert f"Unloaded target '{target_name}' from the current session." in running_pwnity._strip_ansi(unload_output)
         assert f"- [ {target_name} ]" not in unload_output # Der Prompt sollte wieder normal sein
 
     def test_target_destroy(self, running_pwnity, pwnity_env):
@@ -533,12 +533,12 @@ class TestToolIntegration:
 
         # Laden und Prompt überprüfen
         load_output = running_pwnity.run_command(f"tool load {tool_name}")
-        assert f"Tool '{tool_name}' loaded" in load_output
+        assert f"Tool '{tool_name}' loaded into active session" in load_output
         assert f"- [ {tool_name} ]" in running_pwnity._strip_ansi(load_output)
 
         # Entladen und Prompt überprüfen
         unload_output = running_pwnity.run_command("tool unload")
-        assert f"Unloaded tool '{tool_name}'" in unload_output
+        assert f"Unloaded tool '{tool_name}' from the current session." in running_pwnity._strip_ansi(unload_output)
         assert f"- [ {tool_name} ]" not in running_pwnity._strip_ansi(unload_output)
 
     def test_tool_delete_param_and_command(self, running_pwnity):
@@ -764,7 +764,7 @@ class TestReportIntegration:
         assert f"- [ {report_name} ]" in running_pwnity._strip_ansi(load_output)
 
         unload_output = running_pwnity.run_command("report unload")
-        assert f"Report '{report_name}' unloaded" in unload_output
+        assert f"Unloaded report '{report_name}' from the current session." in running_pwnity._strip_ansi(unload_output)
         assert f"- [ {report_name} ]" not in running_pwnity._strip_ansi(unload_output)
 
     def test_report_rename_updates_session(self, running_pwnity):
@@ -965,7 +965,7 @@ class TestWordlistIntegration:
         running_pwnity.run_command(f"wordlist load {wordlist_name}")
 
         unload_output = running_pwnity.run_command("wordlist unload")
-        assert f"Unloaded wordlist '{wordlist_name}'." in running_pwnity._strip_ansi(unload_output)
+        assert f"Unloaded wordlist '{wordlist_name}' from the current session." in running_pwnity._strip_ansi(unload_output)
         assert f"- [ {wordlist_name} ]" not in running_pwnity._strip_ansi(unload_output)
 
     def test_wordlist_export_command(self, running_pwnity):

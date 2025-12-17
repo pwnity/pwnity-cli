@@ -514,3 +514,36 @@ def test_build_command_with_invalid_path(tool_manager, mock_session_with_target,
     # In diesem Fall gibt build_command eine leere Liste zurück, da es keinen gültigen Befehl erstellen kann.
     result = tool_manager.build_command(tool_name, session=mock_session_with_target, command_to_run="scan")
     assert result[0][0] == str(tmp_path) # build_command gibt den Pfad so zurück, wie er ist. Der Fehler tritt bei der Ausführung auf.
+
+def test_unload_force_from_different_session(tool_manager, mocker):
+    """
+    Tests that 'unload force' correctly unloads a tool from all sessions,
+    even when executed from a session where the tool is not loaded.
+    """
+    tool_name = "global-tool"
+    tool_manager.create(tool_name)
+
+    # Mock the session manager and create two sessions
+    mock_session_mgr = mocker.MagicMock()
+    session1 = mocker.MagicMock()
+    session1.name = "session1"
+    session1.tool = tool_name  # Tool is loaded in session1
+
+    session2 = mocker.MagicMock()
+    session2.name = "session2"
+    session2.tool = None  # Tool is NOT loaded in session2
+
+    mock_session_mgr.sessions = {"session1": session1, "session2": session2}
+
+    # Mock the main CLI object
+    mock_cli = mocker.MagicMock()
+    mock_cli.session_mgr = mock_session_mgr
+    # We are in session2, trying to unload a tool that is loaded in session1
+    mock_cli.session = session2
+
+    # Simulate 'tool unload global-tool force'
+    unload_args = type('Args', (), {'name': tool_name, 'force': 'force'})()
+    tool_manager._cmd_unload(unload_args, mock_cli)
+
+    # Verify that the tool is unloaded from session1
+    assert session1.tool is None

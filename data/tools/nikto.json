@@ -1,0 +1,13 @@
+{
+  "name": "nikto",
+  "path": "/usr/bin/nikto",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "scan",
+      "params": [
+        "-h $target.base_url"
+      ]
+    }
+  ]
+}

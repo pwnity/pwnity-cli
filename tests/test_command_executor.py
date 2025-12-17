@@ -69,7 +69,8 @@ def test_execute_background_job(executor, mock_managers, mock_session):
         command_list,
         session_obj=mock_session,
         tool_name="nmap",
-        tool_command_name="scan"
+        tool_command_name="scan",
+        temp_proxy_conf_path=None
     )
 
 def test_execute_foreground_job_success(executor, mock_managers, mock_session, mocker):

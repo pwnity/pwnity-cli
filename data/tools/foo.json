@@ -1,0 +1,6 @@
+{
+  "name": "foo",
+  "path": "foo",
+  "sudo": false,
+  "commands": []
+}
