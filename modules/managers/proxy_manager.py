@@ -26,7 +26,7 @@ class ProxyManager(BaseManager):
             log.error("Cannot manage proxy settings without an active session.")
             return
         
-        valid_keys = ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password']
+        valid_keys = ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password', 'wrapper_template']
         if key not in valid_keys:
             log.error(f"Invalid key '{key}'.")
             log.prompt(f"Valid keys for 'set' are: {', '.join(valid_keys)}")
@@ -42,7 +42,7 @@ class ProxyManager(BaseManager):
             return
         if len(args.set_args) < 2:
             log.error("Invalid command. Expected: proxy set <key> <value>")
-            log.prompt("Available keys: wrapper_command, wrapper_options, wrapper_needs_sudo, type, host, port, username, password")
+            log.prompt("Available keys: wrapper_command, wrapper_options, wrapper_needs_sudo, type, host, port, username, password, wrapper_template")
             return
         key_to_set = args.set_args[0]
         value_to_set = " ".join(args.set_args[1:])
@@ -54,7 +54,7 @@ class ProxyManager(BaseManager):
             log.error("Cannot manage proxy settings without an active session.")
             return
         
-        all_proxy_keys = ['enabled', 'wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password']
+        all_proxy_keys = ['enabled', 'wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password', 'wrapper_template']
         if key == 'all':
             session.proxy_settings.clear()
             log.success("All session-specific proxy settings have been reset to global defaults.")
@@ -111,7 +111,7 @@ class ProxyManager(BaseManager):
         session_proxy_settings = session.proxy_settings if session else {}
 
         placeholder_config = {}
-        keys_to_check = ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password']
+        keys_to_check = ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password', 'wrapper_template']
 
         for key in keys_to_check:
             session_val = session_proxy_settings.get(key)
@@ -149,7 +149,7 @@ class ProxyManager(BaseManager):
             return None
 
         effective_config = {}
-        keys_to_check = ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password']
+        keys_to_check = ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password', 'wrapper_template']
 
         for key in keys_to_check:
             # Session settings (e.g., from 'proxy set host ...') take precedence.

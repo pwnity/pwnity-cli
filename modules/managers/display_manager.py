@@ -359,6 +359,7 @@ class DisplayManager:
             effective_table.add_row("Wrapper Options", effective_config.get('wrapper_options', '[dim]N/A[/dim]'))
             effective_table.add_row("Wrapper needs sudo", str(effective_config.get('wrapper_needs_sudo', 'N/A')))
             effective_table.add_row("Type", effective_config.get('type', '[dim]N/A[/dim]'))
+            effective_table.add_row("Wrapper Template", effective_config.get('wrapper_template', '[dim]N/A[/dim]'))
             effective_table.add_row("Host", effective_config.get('host', '[dim]N/A[/dim]'))
             effective_table.add_row("Port", str(effective_config.get('port', '[dim]N/A[/dim]')))
             effective_table.add_row("Username", effective_config.get('username', '[dim]N/A[/dim]'))
@@ -381,7 +382,7 @@ class DisplayManager:
         else:
             source_table.add_row("enabled", global_enabled_str, "Global", global_enabled_str) # Now global_enabled_str is guaranteed to be a string
 
-        for key in ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password']:
+        for key in ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password', 'wrapper_template']:
             global_key = key.upper()
             global_val = global_settings.get(global_key)
             session_val = session_settings.get(key)

@@ -26,6 +26,7 @@
     "REPORTS": "data/reports",
     "WORKFLOWS": "data/workflows",
     "PARSERS": "data/parsers",
+    "PROXY_TEMPLATES": "data/proxy_templates",
     "RUN": "data/run",
     "HEARTBEATS": "data/heartbeats",
     "REVSHELLS": "etc/revshells.json",
@@ -39,14 +40,15 @@
   },
   "PROXY": {
     "ENABLED": false,
-    "TYPE": "socks5",
+    "TYPE": "http",
     "HOST": "localhost",
-    "PORT": 9050,
+    "PORT": 8080,
     "USERNAME": "",
     "PASSWORD": "",
     "WRAPPER_COMMAND": "proxychains",
     "WRAPPER_OPTIONS": "-q",
-    "WRAPPER_NEEDS_SUDO": true
+    "WRAPPER_NEEDS_SUDO": true,
+    "WRAPPER_TEMPLATE": "proxychains.tmpl"
   },
   "COLORS": {
     "GREY": "\u001b[90m",

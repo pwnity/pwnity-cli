@@ -39,7 +39,7 @@ def strip_ansi(text: str) -> str:
 
 class Job:
     """Represents a single background process."""
-    def __init__(self, job_id, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None):
+    def __init__(self, job_id, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None):
         self.id = job_id
         self.command = command_list
         self.session_obj = session_obj
@@ -77,6 +77,8 @@ class Job:
         self.additional_info = additional_info or {}
         # --- FIX: Re-add executor_instance to allow callback on completion ---
         self.executor_instance = None
+        # --- FIX: Store path to temp proxy config for cleanup ---
+        self.temp_proxy_conf_path = temp_proxy_conf_path
 
     @property
     def duration(self):
@@ -380,10 +382,10 @@ class JobManager(BaseManager):
             log.error(f"Failed to add job for {tool_name}/{command_name}: {e}")
             return None
 
-    def start_job(self, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None):
+    def start_job(self, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None):
         """Starts a new command as a background job."""
-        job_id = str(uuid.uuid4()) # Use UUIDs for job IDs
-        job = Job(job_id, command_list, session_obj, tool_name=tool_name, tool_command_name=tool_command_name, additional_info=additional_info, display_command=display_command)
+        job_id = str(uuid.uuid4())
+        job = Job(job_id, command_list, session_obj, tool_name=tool_name, tool_command_name=tool_command_name, additional_info=additional_info, display_command=display_command, temp_proxy_conf_path=temp_proxy_conf_path)
         # --- FIX: Attach the manager's executor instance (if any) to the job object ---
         job.executor_instance = self.executor
         # job.workflow_context = None # Initialize attribute

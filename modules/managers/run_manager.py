@@ -104,19 +104,36 @@ class RunManager(BaseManager):
 
         # --- NEW: Job-based temporary proxychains config file ---
         temp_proxy_conf_path = None
-        if proxy_config and proxy_config.get('wrapper_command') == 'proxychains':
-            proxy_type = proxy_config.get('type')
-            proxy_host = proxy_config.get('host')
-            proxy_port = proxy_config.get('port')
+        if proxy_config and proxy_config.get('wrapper_template'):
+            template_name = proxy_config['wrapper_template']
+            template_dir = config.get_parameter("DIRS", "PROXY_TEMPLATES", "etc/proxy_templates")
+            template_path = os.path.join(template_dir, template_name)
 
-            if proxy_type and proxy_host and proxy_port:
-                # Use a secure, private directory within the application structure
-                run_dir = config.get_parameter("DIRS", "RUN", "data/run")
-                os.makedirs(run_dir, exist_ok=True)
+            if not os.path.exists(template_path):
+                log.error(f"Proxy template file not found: {template_path}")
+                proxy_config = None # Disable proxy for this run
+            else:
+                with open(template_path, 'r') as f:
+                    template_content = f.read()
 
-                conf_content = f"[ProxyList]\n{proxy_type} {proxy_host} {proxy_port}\n"
+                # --- FINAL FIX: Manually replace placeholders for robustness ---
+                # The main placeholder resolver is designed for the session context and can fail here.
+                # A direct string replacement is safer and more direct for this specific task.
+                conf_content = template_content
+                for key, value in proxy_config.items():
+                    if value is not None:  # Ensure we don't replace with 'None'
+                        # --- FIX: Re-introduce robust localhost resolution ---
+                        if key == 'host' and str(value).lower() == 'localhost':
+                            value_to_replace = '127.0.0.1'
+                        else:
+                            value_to_replace = str(value)
+                        conf_content = conf_content.replace(f"$proxy.{key}", value_to_replace)
                 
                 try:
+                    # Use a secure, private directory within the application structure
+                    run_dir = config.get_parameter("DIRS", "RUN", "data/run")
+                    os.makedirs(run_dir, exist_ok=True)
+
                     # Create a temporary file within our secure run directory
                     with tempfile.NamedTemporaryFile(
                         mode='w', delete=False, suffix='.conf', 
@@ -126,8 +143,11 @@ class RunManager(BaseManager):
                         temp_proxy_conf_path = temp_f.name
                     
                     # Prepend the -f option to the wrapper options for this run
-                    current_wrapper_opts = proxy_config.get('wrapper_options', '')
-                    proxy_config['wrapper_options'] = f"-f {temp_proxy_conf_path} {current_wrapper_opts}".strip()
+                    # --- FIX: Combine session and global options more intelligently ---
+                    # Use session options if they exist, otherwise fall back to global options.
+                    # This prevents accidentally losing the global '-q'.
+                    base_opts = cli.proxy_mgr.get_effective_config(cli.session).get('wrapper_options', '')
+                    proxy_config['wrapper_options'] = f"-f {temp_proxy_conf_path} {base_opts}".strip()
                     log.debug(f"Created temporary proxychains config at: {temp_proxy_conf_path}")
 
                 except Exception as e:
@@ -177,26 +197,19 @@ class RunManager(BaseManager):
         cli.console.print(execution_plan_panel)
 
         if run_bg or run_now:
-            try:
-                job_id = cli.executor.execute(
-                    command_lists=final_commands,
-                    session_obj=cli.session,
-                    tool_name=tool_name,
-                    tool_command_name=command_name,
-                    run_now=run_now,
-                    run_bg=run_bg,
-                    suppress_individual_summaries=is_per_param_execution and run_now
-                )
-                if run_bg and job_id:
-                    log.success(f"Job(s) {job_id} started in the background.")
-            finally:
-                # --- NEW: Guaranteed cleanup of the temporary proxy config file ---
-                if temp_proxy_conf_path and os.path.exists(temp_proxy_conf_path):
-                    try:
-                        os.remove(temp_proxy_conf_path)
-                        log.debug(f"Cleaned up temporary proxy config file: {temp_proxy_conf_path}")
-                    except OSError as e:
-                        log.warning(f"Failed to clean up temp proxy config file: {e}")
+            job_id = cli.executor.execute(
+                command_lists=final_commands,
+                session_obj=cli.session,
+                tool_name=tool_name,
+                tool_command_name=command_name,
+                run_now=run_now,
+                run_bg=run_bg,
+                suppress_individual_summaries=is_per_param_execution and run_now,
+                # --- FIX: Pass the temp file path to the executor to manage its lifecycle ---
+                temp_proxy_conf_path=temp_proxy_conf_path
+            )
+            if run_bg and job_id:
+                log.success(f"Job(s) {job_id} started in the background.")
         else:
             log.prompt("This is a preview. The command has not been executed yet.")
             preview_cmd = f"pwn {command_name or ''} {' '.join(shlex.quote(p) for p in extra_params)}".strip()
