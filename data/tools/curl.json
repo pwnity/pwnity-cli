@@ -21,15 +21,6 @@
         "-k",
         "$target.base_url"
       ]
-    },
-    {
-      "name": "ipv4",
-      "params": [
-        "-L",
-        "-4",
-        "-s",
-        "$target.base_url"
-      ]
     }
   ]
 }

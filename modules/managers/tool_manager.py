@@ -189,167 +189,151 @@ class ToolManager(JSONManager):
             log.error(f"Invalid index {index}. There are only {len(params)} parameters.")
 
     def _cmd_update(self, args, cli):
-        """
-        Intelligent, context-sensitive update command specifically for tools.
-        Infers the action based on the arguments.
-        """
+        """Dispatches tool update operations based on arguments."""
         tool_name = args.name
         update_args = args.update_args
         tool = self.load(tool_name)
         if not tool:
-            # self.load() already logs an error if not found
             return
 
-        # --- Syntax: `... param ...` ---
-        if 'param' in update_args:
-            param_index = update_args.index('param')
+        # Prioritize handlers from most specific to most general syntax
+        if self._handle_param_update(tool_name, update_args, tool):
+            return
+        if self._handle_command_update(tool_name, update_args, tool):
+            return
+        if self._handle_top_level_update(tool_name, update_args, tool):
+            return
 
-            # Case: `... <cmd_name> param ...`
-            if param_index == 1:
-                cmd_name = update_args[0]
-                param_args = update_args[2:]
+        log.error("Invalid arguments for 'tool update'.")
+        log.prompt("Use 'tool -h' for help.")
 
-                if not any(c.get("name") == cmd_name for c in tool.get("commands", [])):
-                    log.error(f"Command '{cmd_name}' not found in '{tool_name}'.")
-                    log.prompt(f"Create it first with: tool update {tool_name} command {cmd_name}")
-                    return
+    def _handle_param_update(self, tool_name, update_args, tool):
+        """Handles syntax related to adding or updating parameters."""
+        if 'param' not in update_args:
+            return False
 
-                # Subcase: `... param <index> <new_value>`
-                if len(param_args) >= 2:
-                    try:
-                        idx = int(param_args[0])
-                        new_value = " ".join(param_args[1:])
-                        self.update_param(tool_name, cmd_name, idx, new_value)
-                        return
-                    except ValueError:
-                        pass  # Fall through to add param
+        param_index = update_args.index('param')
 
-                # Subcase: `... param <value_to_add>`
-                param_to_add = " ".join(param_args)
-                if param_to_add:
-                    self.add_param(tool_name, cmd_name, param_to_add)
-                    log.success(f"Parameter added to '{tool_name} {cmd_name}': {param_to_add}")
-                else:
-                    log.error(f"Parameter missing after '{cmd_name} param'.")
-                return
+        # Syntax: `... <cmd_name> param ...`
+        if param_index == 1:
+            cmd_name = update_args[0]
+            param_args = update_args[2:]
 
-            # Case: `... param ...` (implicit command)
-            elif param_index == 0:
-                cmd_name = tool_name  # implicit command name
-                param_to_add = " ".join(update_args[1:])
-                if not param_to_add:
-                    log.error("Parameter fehlt nach 'param'.")
-                    return
-                if not any(c.get("name") == cmd_name for c in tool.get("commands", [])):
-                    self.add_command(tool_name, cmd_name)
+            if not any(c.get("name") == cmd_name for c in tool.get("commands", [])):
+                log.error(f"Command '{cmd_name}' not found in '{tool_name}'.")
+                log.prompt(f"Create it first with: tool update {tool_name} command {cmd_name}")
+                return True
+
+            # Subcase: `... param <index> <new_value>`
+            if len(param_args) >= 2:
+                try:
+                    idx = int(param_args[0])
+                    new_value = " ".join(param_args[1:])
+                    self.update_param(tool_name, cmd_name, idx, new_value)
+                    return True
+                except ValueError:
+                    pass  # Fall through to add param
+
+            # Subcase: `... param <value_to_add>`
+            param_to_add = " ".join(param_args)
+            if param_to_add:
                 self.add_param(tool_name, cmd_name, param_to_add)
-                log.success(f"Parameter added to '{tool_name}': {param_to_add}")
-                return
-
-            else:  # 'param' at weird position
-                log.error("Invalid syntax for 'param'.")
-                return
-
-        # --- Syntax: `... command ...` ---
-        if 'command' in update_args:
-            if len(update_args) == 2 and update_args[0] == 'command':
-                cmd_name = update_args[1]
-                self.add_command(tool_name, cmd_name)
-                log.success(f"Command '{cmd_name}' added to '{tool_name}'.")
-                log.prompt(f"Now add parameters with: tool update {tool_name} {cmd_name} param <param>")
-                return
+                log.success(f"Parameter added to '{tool_name} {cmd_name}': {param_to_add}")
             else:
-                log.error("Invalid syntax for 'command'.")
-                log.prompt("Example: 'tool update <name> command <cmd_name>'")
-                return
+                log.error(f"Parameter missing after '{cmd_name} param'.")
+            return True
 
-        # --- Syntax: `... <cmd_name> <field> <value>` (update command field) ---
+        log.error("Invalid syntax. 'param' keyword is in the wrong position.")
+        return True # Handled (by showing an error)
+
+    def _handle_command_update(self, tool_name, update_args, tool):
+        """Handles syntax related to adding or updating command fields."""
+        # Syntax: `... command <cmd_name>`
+        if len(update_args) == 2 and update_args[0] == 'command':
+            cmd_name = update_args[1]
+            self.add_command(tool_name, cmd_name)
+            log.success(f"Command '{cmd_name}' added to '{tool_name}'.")
+            log.prompt(f"Now add parameters with: tool update {tool_name} {cmd_name} param <param>")
+            return True
+
+        # Syntax: `... <cmd_name> <field> <value>`
         if len(update_args) >= 3:
-            potential_cmd_name = update_args[0]
-            cmd = next((c for c in tool.get("commands", []) if c.get("name") == potential_cmd_name), None)
+            cmd_name, field, value_str = update_args[0], update_args[1], " ".join(update_args[2:])
+            cmd = next((c for c in tool.get("commands", []) if c.get("name") == cmd_name), None)
+
             if cmd:
-                # We found a command, so this is the syntax we're looking for.
-                cmd_name = potential_cmd_name
-                field_to_update = update_args[1]
-                value_to_set_str = " ".join(update_args[2:])
+                if field in ['name', 'params']:
+                    log.error(f"Cannot update '{field}' directly. Use dedicated syntax.")
+                    return True
 
-                # Prevent direct modification of protected fields
-                if field_to_update in ['name', 'params']:
-                    log.error(f"Cannot update '{field_to_update}' directly. Use dedicated syntax like 'tool rename' or 'tool update ... param ...'.")
-                    return
+                value = self._convert_value(field, value_str)
+                if value is None and field == 'execute_per_param': # Conversion failed
+                    return True
 
-                value_to_set = value_to_set_str
-                # Handle boolean conversion for special fields
-                if field_to_update == 'execute_per_param':
-                    if value_to_set_str.lower() in ['true', '1', 'on', 'yes']:
-                        value_to_set = True
-                    elif value_to_set_str.lower() in ['false', '0', 'off', 'no']:
-                        value_to_set = False
-                    else:
-                        log.error(f"Invalid value for '{field_to_update}'. Please use 'true' or 'false'.")
-                        return
-
-                cmd[field_to_update] = value_to_set
+                cmd[field] = value
                 self.update(tool_name, "commands", tool["commands"])
-                log.success(f"Field '{field_to_update}' in command '{cmd_name}' updated to '{value_to_set}'.")
-                return
+                log.success(f"Field '{field}' in command '{cmd_name}' updated to '{value}'.")
+                return True
 
-        # --- Fallback: `... <field> <value>` ---
-        if len(update_args) >= 2:
-            field, value_str = update_args[0], " ".join(update_args[1:])
-            value = value_str # Default to string
+        return False
 
-            if field.lower() == 'name':
-                self.rename(tool_name, value_str)
-                return
+    def _handle_top_level_update(self, tool_name, update_args, tool):
+        """Handles syntax for updating top-level tool fields."""
+        if len(update_args) < 2:
+            return False
 
-            if field == 'path' and value_str.lower() == 'auto':
-                self._find_and_set_path(tool_name)
-                return
+        field, value_str = update_args[0], " ".join(update_args[1:])
 
-            # Handle boolean conversion for special top-level fields
-            if field.lower() == 'sudo':
-                if value_str.lower() in ['true', '1', 'on', 'yes']:
-                    value = True
-                elif value_str.lower() in ['false', '0', 'off', 'no']:
-                    value = False
-                else:
-                    log.error(f"Invalid value for 'sudo'. Please use 'true' or 'false'.")
-                    return
+        if field.lower() == 'name':
+            self.rename(tool_name, value_str)
+            return True
 
-            if field == 'command_style':
-                log.warning("The 'command_style' field is deprecated and no longer used.")
-                return
-            if field == 'commands':
-                log.error("The 'commands' list cannot be updated directly.")
-                log.prompt("Use 'tool update <name> command <cmd_name>' to edit a command.")
-                return
+        if field == 'path' and value_str.lower() == 'auto':
+            self._find_and_set_path(tool_name)
+            return True
 
-            # --- NEW: Handle nested updates using dot notation ---
-            if '.' in field:
-                data = self.load(tool_name)
-                if not data: return
+        if field in ['command_style', 'commands']:
+            log.error(f"The '{field}' field cannot be updated directly.")
+            return True
 
-                keys = field.split('.')
-                current_level = data
-                # Traverse/create path until the last key
-                for key in keys[:-1]:
-                    if key not in current_level or not isinstance(current_level[key], dict):
-                        current_level[key] = {} # Create a dict if it doesn't exist or isn't a dict
-                    current_level = current_level[key]
-                
-                # Set the value at the final key
-                final_key = keys[-1]
-                current_level[final_key] = value
-                self._save_data(tool_name, data) # Use _save_data to write the whole modified object
-                log.success(f"Tool '{tool_name}' nested field '{field}' updated -> {value}")
-                return
+        value = self._convert_value(field, value_str)
+        if value is None and field.lower() == 'sudo': # Conversion failed
+            return True
 
+        if '.' in field:
+            self._handle_nested_update(tool_name, field, value)
+        else:
             self.update(tool_name, field, value)
             log.success(f"Tool '{tool_name}' field '{field}' updated -> {value}")
-        else:
-            log.error("Invalid arguments for 'tool update'.")
-            log.prompt("Use 'tool -h' for help.")
+        return True
+
+    def _convert_value(self, field, value_str):
+        """Converts string value to boolean if the field requires it."""
+        if field.lower() in ['sudo', 'execute_per_param']:
+            if value_str.lower() in ['true', '1', 'on', 'yes']:
+                return True
+            elif value_str.lower() in ['false', '0', 'off', 'no']:
+                return False
+            else:
+                log.error(f"Invalid value for '{field}'. Please use 'true' or 'false'.")
+                return None
+        return value_str
+
+    def _handle_nested_update(self, tool_name, field, value):
+        """Handles nested field updates using dot notation."""
+        data = self.load(tool_name)
+        if not data: return
+
+        keys = field.split('.')
+        current_level = data
+        for key in keys[:-1]:
+            if key not in current_level or not isinstance(current_level[key], dict):
+                current_level[key] = {}
+            current_level = current_level[key]
+
+        current_level[keys[-1]] = value
+        self._save_data(tool_name, data)
+        log.success(f"Tool '{tool_name}' nested field '{field}' updated -> {value}")
 
     def _find_and_set_path(self, tool_name):
         """Tries to find and set the path for a tool automatically."""
@@ -599,12 +583,17 @@ class ToolManager(JSONManager):
                 # "single_line" - the original behavior.
                 # 1. Resolve placeholders in the raw parameter strings.
                 # The resolve_placeholders function now handles nested/recursive resolution internally.
-                resolved_param_strings = [resolve_placeholders(p, session=session, tool_name=tool_name, command_name=cmd.get("name")) for p in cmd.get("params", [])]
+                resolved_param_strings = [
+                    resolve_placeholders(p, session=session, tool_name=tool_name, command_name=cmd.get("name"))
+                    for p in cmd.get("params", [])
+                ]
 
                 # 2. Split each resolved string into individual arguments.
                 final_params = []
                 for s in resolved_param_strings:
-                    final_params.extend(shlex.split(s))
+                    # Filter out empty strings that can result from resolving an empty placeholder
+                    if s:
+                        final_params.extend(shlex.split(s))
                 full_cmd = [executable] + final_params
                 
                 # 3. Append temporary extra parameters if present

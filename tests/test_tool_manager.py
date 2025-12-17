@@ -247,6 +247,31 @@ def test_build_command_with_extra_params(tool_manager, mock_session_with_target)
     expected_command = ["nmap", "192.168.1.100", "-v", "--reason"]
     assert built_commands[0] == expected_command
 
+def test_build_command_with_ad_hoc_params(tool_manager, mock_session_with_target):
+    """
+    Testet, ob `build_command` ad-hoc Parameter (z.B. von `pwn scan -k -L now`)
+    korrekt als `extra_params` anhängt.
+    """
+    tool_name = "curl"
+    cmd_name = "bannergrab"
+    tool_manager.create(tool_name)
+    tool_manager.add_command(tool_name, cmd_name)
+    tool_manager.add_param(tool_name, cmd_name, "-s -D -")
+    tool_manager.add_param(tool_name, cmd_name, "$target.hostname")
+
+    # Simuliere die ad-hoc Parameter, die vom RunManager geparst würden
+    ad_hoc_params = ["-k", "-L"]
+
+    built_commands = tool_manager.build_command(
+        tool_name,
+        session=mock_session_with_target,
+        command_to_run=cmd_name,
+        extra_params=ad_hoc_params
+    )
+
+    expected_command = ["curl", "-s", "-D", "-", "test.server.local", "-k", "-L"]
+    assert built_commands[0] == expected_command
+
 def test_build_command_with_sudo(tool_manager, mock_session_with_target):
     """
     Testet, ob `build_command` das `sudo`-Kommando korrekt voranstellt,
@@ -321,7 +346,7 @@ def test_update_and_delete_negative_paths(tool_manager, mocker):
     # 2. Versuche, ein geschütztes Feld direkt zu aktualisieren
     update_args_protected = type('Args', (), {'name': tool_name, 'update_args': ['my-cmd', 'params', 'new-value']})()
     tool_manager._cmd_update(update_args_protected, cli=None)
-    mock_log_error.assert_called_with("Cannot update 'params' directly. Use dedicated syntax like 'tool rename' or 'tool update ... param ...'.")
+    mock_log_error.assert_called_with("Cannot update 'params' directly. Use dedicated syntax.")
 
     # 3. Versuche, die gesamte 'commands'-Liste zu löschen
     delete_args_commands = type('Args', (), {'name': tool_name, 'delete_args': ['commands']})()
@@ -547,3 +572,32 @@ def test_unload_force_from_different_session(tool_manager, mocker):
 
     # Verify that the tool is unloaded from session1
     assert session1.tool is None
+
+def test_destroy_fails_if_tool_is_loaded(tool_manager, mocker):
+    """
+    Tests that `_cmd_destroy` prevents deletion if the tool is loaded in any active session.
+    """
+    tool_name = "loaded-tool"
+    tool_manager.create(tool_name)
+
+    # 1. Mock the CLI and Session Manager
+    mock_cli = mocker.MagicMock()
+    mock_session_mgr = mocker.MagicMock()
+
+    # 2. Create a mock session where the tool is loaded
+    mock_session = mocker.MagicMock()
+    mock_session.name = "test-session"
+    mock_session.tool = tool_name
+    mock_session_mgr.sessions = {"test-session": mock_session}
+    mock_cli.session_mgr = mock_session_mgr
+
+    # 3. Mock the logger to capture the error message
+    mock_log_error = mocker.patch("modules.services.log.error")
+
+    # 4. Attempt to destroy the loaded tool
+    destroy_args = type('Args', (), {'name': tool_name})()
+    tool_manager._cmd_destroy(destroy_args, mock_cli)
+
+    # 5. Assert that the correct error was logged and the tool still exists
+    mock_log_error.assert_called_with(f"Cannot delete tool '{tool_name}' because it is currently loaded in session 'test-session'.")
+    assert tool_manager.exists(tool_name) is True
