@@ -40,9 +40,9 @@
   },
   "PROXY": {
     "ENABLED": false,
-    "TYPE": "http",
+    "TYPE": "socks5",
     "HOST": "localhost",
-    "PORT": 8080,
+    "PORT": 9050,
     "USERNAME": "",
     "PASSWORD": "",
     "WRAPPER_COMMAND": "proxychains",
