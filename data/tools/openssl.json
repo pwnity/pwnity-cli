@@ -1,0 +1,30 @@
+{
+  "name": "openssl",
+  "path": "/usr/bin/openssl",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "get-cert",
+      "params": [
+        "s_client",
+        "-connect",
+        "$target.hostname:$target.port",
+        "-servername",
+        "$target.hostname",
+        "-showcerts"
+      ]
+    },
+    {
+      "name": "check-cipher",
+      "params": [
+        "s_client",
+        "-connect",
+        "$target.hostname:$target.port",
+        "-servername",
+        "$target.hostname",
+        "-cipher"
+      ]
+    }
+  ],
+  "description": "The openssl tool to inspect SSL certificates"
+}

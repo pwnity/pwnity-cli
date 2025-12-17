@@ -1,0 +1,131 @@
+{
+  "name": "google.com",
+  "protocol": "https",
+  "hostname": "www.google.com",
+  "ip": "142.251.140.164",
+  "domain": "google.com",
+  "domain_name": "google",
+  "tld": "com",
+  "subdomains": [
+    "www"
+  ],
+  "port": "443",
+  "base_url": "https://www.google.com",
+  "uri": "/search",
+  "query_values": {
+    "q": [
+      "foobar"
+    ],
+    "oq": [
+      "foobar"
+    ],
+    "gs_lcrp": [
+      "EgZjaHJvbWUqDggAEEUYJxg7GIAEGIoFMg4IABBFGCcYOxiABBiKBTINCAEQABiDARixAxiABDINCAIQLhivARjHARiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTE5ODFqMGoxNagCCLACAfEFRbojIswHR0XxBUW6IyLMB0dF"
+    ],
+    "sourceid": [
+      "chrome"
+    ],
+    "ie": [
+      "UTF-8"
+    ]
+  },
+  "query_params": [
+    "q=foobar",
+    "oq=foobar",
+    "gs_lcrp=EgZjaHJvbWUqDggAEEUYJxg7GIAEGIoFMg4IABBFGCcYOxiABBiKBTINCAEQABiDARixAxiABDINCAIQLhivARjHARiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTE5ODFqMGoxNagCCLACAfEFRbojIswHR0XxBUW6IyLMB0dF",
+    "sourceid=chrome",
+    "ie=UTF-8"
+  ],
+  "url": "https://www.google.com/search?q=foobar&oq=foobar&gs_lcrp=EgZjaHJvbWUqDggAEEUYJxg7GIAEGIoFMg4IABBFGCcYOxiABBiKBTINCAEQABiDARixAxiABDINCAIQLhivARjHARiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTE5ODFqMGoxNagCCLACAfEFRbojIswHR0XxBUW6IyLMB0dF&sourceid=chrome&ie=UTF-8",
+  "ptr_record": "lcfraa-bt-in-f4.1e100.net",
+  "ssl_info": {
+    "subject": {
+      "commonName": "www.google.com"
+    },
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Google Trust Services",
+      "commonName": "WE2"
+    },
+    "valid_from": "Dec  3 15:57:31 2025 GMT",
+    "valid_to": "Feb 25 15:57:30 2026 GMT",
+    "sans": [
+      "www.google.com"
+    ]
+  },
+  "http_headers": {
+    "Location": "https://www.google.com/webhp",
+    "Cache-Control": "private",
+    "Content-Type": "text/html; charset=UTF-8",
+    "Content-Security-Policy": "object-src 'none';base-uri 'self';script-src 'nonce-J5GVdi7ib1KZKyfjEUvwBg' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/xsrp",
+    "P3P": "CP=\"This is not a P3P policy! See g.co/p3phelp for more info.\"",
+    "Date": "Wed, 17 Dec 2025 23:01:12 GMT",
+    "Server": "gws",
+    "Content-Length": "225",
+    "X-XSS-Protection": "0",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Set-Cookie": "__Secure-BUCKET=CLAF; expires=Mon, 15-Jun-2026 23:01:12 GMT; path=/; domain=.google.com; Secure; HttpOnly",
+    "Alt-Svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+  },
+  "whois_info": {
+    "domain_name": [
+      "GOOGLE.COM",
+      "google.com"
+    ],
+    "registrar": "MarkMonitor, Inc.",
+    "whois_server": "whois.markmonitor.com",
+    "updated_date": [
+      "2019-09-09T15:39:04",
+      "2024-08-02T02:17:33"
+    ],
+    "creation_date": [
+      "1997-09-15T04:00:00",
+      "1997-09-15T07:00:00"
+    ],
+    "expiration_date": [
+      "2028-09-14T04:00:00",
+      "2028-09-13T07:00:00"
+    ],
+    "name_servers": [
+      "NS1.GOOGLE.COM",
+      "NS2.GOOGLE.COM",
+      "NS3.GOOGLE.COM",
+      "NS4.GOOGLE.COM",
+      "ns3.google.com",
+      "ns4.google.com",
+      "ns1.google.com",
+      "ns2.google.com"
+    ],
+    "status": [
+      "clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited",
+      "clientTransferProhibited https://icann.org/epp#clientTransferProhibited",
+      "clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited",
+      "serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited",
+      "serverTransferProhibited https://icann.org/epp#serverTransferProhibited",
+      "serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited",
+      "clientUpdateProhibited (https://www.icann.org/epp#clientUpdateProhibited)",
+      "clientTransferProhibited (https://www.icann.org/epp#clientTransferProhibited)",
+      "clientDeleteProhibited (https://www.icann.org/epp#clientDeleteProhibited)",
+      "serverUpdateProhibited (https://www.icann.org/epp#serverUpdateProhibited)",
+      "serverTransferProhibited (https://www.icann.org/epp#serverTransferProhibited)",
+      "serverDeleteProhibited (https://www.icann.org/epp#serverDeleteProhibited)"
+    ],
+    "emails": [
+      "abusecomplaints@markmonitor.com",
+      "whoisrequest@markmonitor.com"
+    ],
+    "dnssec": "unsigned",
+    "org": "Google LLC",
+    "country": "US"
+  },
+  "geo_intel": {
+    "ip": "142.251.140.164",
+    "lat": 37.4225,
+    "lon": -122.085,
+    "city": "Mountain View",
+    "country": "United States",
+    "isp": "Google LLC",
+    "org": "Google LLC",
+    "as": "AS15169 Google LLC"
+  }
+}

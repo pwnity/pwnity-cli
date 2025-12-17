@@ -497,18 +497,32 @@ class TargetManager(JSONManager):
         # Use a minimal box style for a cleaner look inside the panel
         table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
         table.add_column("Name", style="green", no_wrap=True, min_width=15)
-        table.add_column("IP Address", style="white", no_wrap=True, width=16)
-        table.add_column("URL", style="cyan", no_wrap=False, ratio=2)
-        table.add_column("Description", style="dim", no_wrap=False, ratio=1)
+        table.add_column("IP Address", style="white", no_wrap=True, width=16, justify="left")
+        table.add_column("URL", style="cyan", no_wrap=False, ratio=1)
+        table.add_column("DNS", style="yellow", width=5, justify="center")
+        table.add_column("WHOIS", style="magenta", width=7, justify="center")
+        table.add_column("HTTP", style="blue", width=6, justify="center")
 
         for name in items:
             data = self.load(name)
             if data:
+                # Check for reconnaissance data
+                dns_info_keys = {'cname_records', 'ipv6_addresses', 'ptr_record', 'name_servers', 'mx_records', 'txt_records'}
+                has_dns = any(key in data for key in dns_info_keys)
+                has_whois = 'whois_info' in data
+                has_http = 'http_headers' in data or 'ssl_info' in data
+
+                dns_check = "✓" if has_dns else ""
+                whois_check = "✓" if has_whois else ""
+                http_check = "✓" if has_http else ""
+
                 table.add_row(
                     data.get('name', name),
                     data.get('ip', ''),
                     data.get('url', ''),
-                    data.get('description', '')
+                    dns_check,
+                    whois_check,
+                    http_check
                 )
         
         panel = Panel(

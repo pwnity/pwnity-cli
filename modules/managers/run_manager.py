@@ -68,7 +68,14 @@ class RunManager(BaseManager):
         if args_copy and not args_copy[0].startswith('-'):
             command_name = args_copy.pop(0)
         
-        extra_params = args_copy
+        # --- FIX: Correctly handle the '--' separator for extra parameters ---
+        # Find the '--' separator. If it exists, all subsequent arguments are extra_params.
+        try:
+            separator_index = args_copy.index('--')
+            extra_params = args_copy[separator_index + 1:]
+        except ValueError:
+            # No '--' found, so all remaining args are extra_params.
+            extra_params = args_copy
         return command_name, extra_params, run_now, run_bg
 
     def _get_effective_tool_command(self, tool_data: dict, command_name_arg: str | None, cli) -> tuple[str | None, bool]:

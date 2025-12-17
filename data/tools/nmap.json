@@ -49,6 +49,6 @@
       ]
     }
   ],
-  "description": "This is my Nmap tool",
+  "description": "Scans hosts or networks with the nmap scanner tool",
   "howto": "just load a target and put an ip into it with target update YOUR_TARGET ip X.X.X.X. Load the target and this tool to fire a nmap scan against ist"
 }

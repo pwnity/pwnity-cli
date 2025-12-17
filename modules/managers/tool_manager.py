@@ -684,10 +684,11 @@ class ToolManager(JSONManager):
 
         # Use a minimal box style for a cleaner look inside the panel
         table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
-        table.add_column("Name", style="yellow", no_wrap=True)
-        table.add_column("Path", style="cyan", no_wrap=False, max_width=50)
+        table.add_column("Name", style="yellow", no_wrap=True, min_width=15)
+        table.add_column("Description", style="dim", no_wrap=False, max_width=100)
+        table.add_column("Path", style="cyan", no_wrap=False, max_width=40)
         table.add_column("Sudo", style="red", width=5)
-        table.add_column("Commands", style="magenta", no_wrap=False, max_width=40)
+        table.add_column("Commands", style="magenta", no_wrap=False, max_width=100)
 
         for name in items:
             data = self.load(name)
@@ -699,6 +700,7 @@ class ToolManager(JSONManager):
 
                 table.add_row(
                     data.get('name', name),
+                    data.get('description', ''),
                     data.get('path', ''),
                     sudo_status,
                     commands_str

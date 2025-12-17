@@ -15,9 +15,11 @@
   "url": "https://scanme.nmap.org",
   "ptr_record": "scanme.nmap.org",
   "whois_info": {
-    "domain_name": "nmap.org",
+    "domain_name": [
+      "nmap.org",
+      "NMAP.ORG"
+    ],
     "registrar": "DYNADOT LLC",
-    "registrar_url": "http://www.dynadot.com",
     "whois_server": "whois.dynadot.com",
     "updated_date": [
       "2023-08-31T05:05:15",

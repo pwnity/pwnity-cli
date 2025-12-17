@@ -1,5 +1,5 @@
 {
-  "path": "/usr/bin/python",
+  "path": "/usr/bin/python3",
   "sudo": false,
   "name": "python3",
   "commands": [
@@ -9,6 +9,10 @@
         "-m http.server",
         "8080"
       ]
+    },
+    {
+      "name": "shell",
+      "params": []
     }
   ]
 }

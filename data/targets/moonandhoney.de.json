@@ -12,5 +12,63 @@
   "port": "443",
   "base_url": "https://www.moonandhoney.de",
   "uri": "/",
-  "url": "https://www.moonandhoney.de"
+  "url": "https://www.moonandhoney.de",
+  "cname_records": [
+    "moonandhoney.de"
+  ],
+  "name_servers": [
+    "docks19.rzone.de.",
+    "shades13.rzone.de."
+  ],
+  "mx_records": [
+    "5 smtpin.rzone.de."
+  ],
+  "ptr_record": "58.62.205.92.host.secureserver.net",
+  "ssl_info": {
+    "subject": {
+      "commonName": "www.moonandhoney.de"
+    },
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "R13"
+    },
+    "valid_from": "Dec  4 14:29:47 2025 GMT",
+    "valid_to": "Mar  4 14:29:46 2026 GMT",
+    "sans": [
+      "moonandhoney.de",
+      "www.moonandhoney.de"
+    ]
+  },
+  "http_headers": {
+    "Date": "Wed, 17 Dec 2025 23:05:33 GMT",
+    "Server": "Apache/2.4.52 (Debian)",
+    "Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+    "X-Powered-By": "PHP/7.4.27",
+    "X-Redirect-By": "WordPress",
+    "Location": "https://moonandhoney.de/",
+    "Content-Length": "0",
+    "Content-Type": "text/html; charset=UTF-8",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Referrer-Policy": "same-origin"
+  },
+  "whois_info": {
+    "domain_name": "moonandhoney.de",
+    "status": "connect",
+    "updated_date": "2025-08-05T16:28:35",
+    "name_servers": [
+      "docks19.rzone.de",
+      "shades13.rzone.de"
+    ]
+  },
+  "geo_intel": {
+    "ip": "92.205.62.58",
+    "lat": 48.5848,
+    "lon": 7.7419,
+    "city": "Strasbourg",
+    "country": "France",
+    "isp": "Host Europe GmbH",
+    "org": "Go Daddy Netherlands B.V",
+    "as": "AS21499 Host Europe GmbH"
+  }
 }
