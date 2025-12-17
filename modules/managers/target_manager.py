@@ -486,3 +486,36 @@ class TargetManager(JSONManager):
             expand=True
         )
         console.print(main_panel)
+
+    def _cmd_list(self, args, cli):
+        """Overrides the default list to show a detailed table inside a panel."""
+        items = self.list_all()
+        if not items:
+            log.info("No Targets found.")
+            return
+
+        # Use a minimal box style for a cleaner look inside the panel
+        table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
+        table.add_column("Name", style="green", no_wrap=True, min_width=15)
+        table.add_column("IP Address", style="white", no_wrap=True, width=16)
+        table.add_column("URL", style="cyan", no_wrap=False, ratio=2)
+        table.add_column("Description", style="dim", no_wrap=False, ratio=1)
+
+        for name in items:
+            data = self.load(name)
+            if data:
+                table.add_row(
+                    data.get('name', name),
+                    data.get('ip', ''),
+                    data.get('url', ''),
+                    data.get('description', '')
+                )
+        
+        panel = Panel(
+            table,
+            title="[bold]Available Targets[/bold]",
+            border_style="green",
+            expand=False,
+            subtitle=f"{len(items)} Targets total"
+        )
+        cli.console.print(panel)

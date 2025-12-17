@@ -602,3 +602,34 @@ class ReportManager(JSONManager):
             log.success(f"Report '{name}' rendered successfully to '{output_path}'.")
         except Exception as e:
             log.error(f"Failed to write rendered file to '{output_path}': {e}")
+
+    def _cmd_list(self, args, cli):
+        """Overrides the default list to show a detailed table with content counts inside a panel."""
+        items = self.list_all()
+        if not items:
+            log.info("No Reports found.")
+            return
+
+        # Use a minimal box style for a cleaner look inside the panel
+        table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
+        table.add_column("Name", style="yellow", no_wrap=True)
+        table.add_column("Notes", style="cyan", justify="right")
+        table.add_column("Loot", style="magenta", justify="right")
+        table.add_column("Findings", style="green", justify="right")
+
+        for name in items:
+            data = self.load(name)
+            if data:
+                notes_count = len(data.get('notes', []))
+                loot_count = len(data.get('loot', []))
+                findings_count = len(data.get('findings', []))
+                table.add_row(name, str(notes_count), str(loot_count), str(findings_count))
+
+        panel = Panel(
+            table,
+            title="[bold]Available Reports[/bold]",
+            border_style="white",
+            expand=False,
+            subtitle=f"{len(items)} Reports total"
+        )
+        cli.console.print(panel)

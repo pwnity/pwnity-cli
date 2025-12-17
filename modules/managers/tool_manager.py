@@ -674,3 +674,41 @@ class ToolManager(JSONManager):
             expand=True
         )
         console.print(main_panel)
+
+    def _cmd_list(self, args, cli):
+        """Overrides the default list to show a detailed table inside a panel."""
+        items = self.list_all()
+        if not items:
+            log.info("No Tools found.")
+            return
+
+        # Use a minimal box style for a cleaner look inside the panel
+        table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
+        table.add_column("Name", style="yellow", no_wrap=True)
+        table.add_column("Path", style="cyan", no_wrap=False, max_width=50)
+        table.add_column("Sudo", style="red", width=5)
+        table.add_column("Commands", style="magenta", no_wrap=False, max_width=40)
+
+        for name in items:
+            data = self.load(name)
+            if data:
+                sudo_status = "Yes" if data.get('sudo') else "No"
+                # --- NEW: Get command names instead of count ---
+                command_names = [cmd.get('name', '') for cmd in data.get('commands', [])]
+                commands_str = ", ".join(command_names)
+
+                table.add_row(
+                    data.get('name', name),
+                    data.get('path', ''),
+                    sudo_status,
+                    commands_str
+                )
+
+        panel = Panel(
+            table,
+            title="[bold]Available Tools[/bold]",
+            border_style="yellow",
+            expand=False,
+            subtitle=f"{len(items)} Tools total"
+        )
+        cli.console.print(panel)

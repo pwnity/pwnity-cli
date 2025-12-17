@@ -18,6 +18,8 @@
 
 from .base_manager import JSONManager
 from modules.services import log
+from rich.panel import Panel
+from rich.table import Table
 import shlex, os
 
 class WordlistManager(JSONManager):
@@ -71,3 +73,34 @@ class WordlistManager(JSONManager):
         
         log.header(f"Export für Wordlist '{name}'")
         cli.poutput("\n".join(commands))
+
+    def _cmd_list(self, args, cli):
+        """Overrides the default list to show a detailed table inside a panel."""
+        items = self.list_all()
+        if not items:
+            log.info("No Wordlists found.")
+            return
+
+        # Use a minimal box style for a cleaner look inside the panel
+        table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
+        table.add_column("Name", style="magenta", no_wrap=True, min_width=20)
+        table.add_column("Path", style="cyan", no_wrap=False, ratio=1)
+        table.add_column("Description", style="dim", no_wrap=False, max_width=40)
+
+        for name in items:
+            data = self.load(name)
+            if data:
+                table.add_row(
+                    data.get('name', name),
+                    data.get('path', ''),
+                    data.get('description', '')
+                )
+
+        panel = Panel(
+            table,
+            title="[bold]Available Wordlists[/bold]",
+            border_style="magenta",
+            expand=False,
+            subtitle=f"{len(items)} Wordlists total"
+        )
+        cli.console.print(panel)
