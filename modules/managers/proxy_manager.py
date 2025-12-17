@@ -40,13 +40,13 @@ class ProxyManager(BaseManager):
         if not cli.session:
             log.error("Cannot manage proxy settings without an active session.")
             return
-        if len(args.set_args) < 2:
+        if not args.key or not args.value:
             log.error("Invalid command. Expected: proxy set <key> <value>")
-            log.prompt("Available keys: wrapper_command, wrapper_options, wrapper_needs_sudo, type, host, port, username, password, wrapper_template")
+            log.prompt("Example: proxy set host 127.0.0.1")
             return
-        key_to_set = args.set_args[0]
-        value_to_set = " ".join(args.set_args[1:])
-        self.set_config(cli.session, key_to_set, value_to_set)
+        
+        # The key is now a dedicated argument, and value is the remainder.
+        self.set_config(cli.session, args.key, " ".join(args.value))
 
     def reset_config(self, session, key: str):
         """Resets a proxy setting for a given session."""

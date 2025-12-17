@@ -415,7 +415,10 @@ class ParserFactory:
         
         set_parser = subparsers.add_parser("set", help="Set a proxy configuration value for the current session.", formatter_class=self.formatter, add_help=False)
         self._add_custom_help(set_parser, "set")
-        set_parser.add_argument("set_args", nargs=argparse.REMAINDER, help="Key and value (e.g., 'host 127.0.0.1'). Valid keys: wrapper_command, wrapper_options, wrapper_needs_sudo, type, host, port, username, password.")
+        # --- FIX: Define key and value as separate arguments for better autocompletion ---
+        valid_set_keys = ['wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password', 'wrapper_template']
+        set_parser.add_argument("key", help="The configuration key to set.", choices=valid_set_keys)
+        set_parser.add_argument("value", nargs=argparse.REMAINDER, help="The value to assign to the key.")
         set_parser.examples = [
             ("proxy set host 127.0.0.1", "Sets the proxy host for the current session."),
             ("proxy set port 8080", "Sets the proxy port.")
@@ -423,7 +426,11 @@ class ParserFactory:
 
         reset_parser = subparsers.add_parser("reset", help="Reset a proxy setting to its global default by removing it from the session.", formatter_class=self.formatter, add_help=False)
         self._add_custom_help(reset_parser, "reset")
-        reset_parser.add_argument("key", nargs='?', default='all', help="The key to reset (e.g., 'host'). If 'all' or omitted, all session-specific proxy settings are reset.")
+        # --- FIX: Use choices for better autocompletion ---
+        valid_reset_keys = ['all', 'enabled', 'wrapper_command', 'wrapper_options', 'wrapper_needs_sudo', 'type', 'host', 'port', 'username', 'password', 'wrapper_template']
+        reset_parser.add_argument("key", nargs='?', default='all',
+                                  help="The key to reset (e.g., 'host'). If 'all' or omitted, all session-specific proxy settings are reset.",
+                                  choices=valid_reset_keys)
         reset_parser.examples = [
             ("proxy reset host", "Resets the session's host setting to the global default."),
             ("proxy reset all", "Resets all session-specific proxy settings.")

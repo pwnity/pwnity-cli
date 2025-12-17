@@ -498,6 +498,25 @@ class Completer:
     def complete_workflow(self, text, line, begidx, endidx):
         return self._basic_manager_completion(text, line, begidx, endidx, self.cli.workflow_mgr, ['add', 'list', 'show', 'rename', 'destroy', 'delete', 'run'])
 
+    def complete_proxy(self, text, line, begidx, endidx):
+        """Autocompletion for the 'proxy' command."""
+        try:
+            tokens = shlex.split(line[:begidx])
+        except ValueError:
+            tokens = line[:begidx].split()
+        num_tokens = len(tokens)
+
+        # 1. Complete subcommand (on, off, set, reset, show)
+        if num_tokens == 1:
+            subcommands = ['on', 'off', 'set', 'reset', 'show']
+            return [s for s in subcommands if s.startswith(text)]
+        
+        # The completion for 'set' and 'reset' keys is now handled directly by the
+        # argparse parser definition in ParserFactory using the 'choices' attribute.
+        # This makes the completer function simpler and more robust.
+
+        return []
+
     def complete_config(self, text, line, begidx, endidx):
         try:
             tokens = shlex.split(line[:begidx])
