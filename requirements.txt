@@ -1,5 +1,5 @@
 # Core CLI Framework & UI
-cmd2
+cmd2 < 3.0.0
 rich
 rich-argparse
 questionary

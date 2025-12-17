@@ -198,6 +198,7 @@ class MyCLI(cmd2.Cmd):
         self.last_command = None
         self._init_managers()
         self._init_placeholders()
+        self._original_stty_settings = None # Initialize attribute
         self._init_parsers()
         self._start_background_threads()
 
@@ -553,39 +554,30 @@ class MyCLI(cmd2.Cmd):
         Hook that runs once before the command loop starts.
         Used here to apply terminal compatibility fixes after cmd2 has initialized.
         """
-        # --- FIX: Terminal Backspace/Erase Compatibility ---
-        # The cmd2 library can set `stty erase ^H`, which breaks the Backspace key
-        # on modern terminals (e.g., MobaXterm) that expect `^?` (DEL).
-        # We run this in preloop() because cmd2 finalizes terminal settings after
-        # __init__() but before the command loop begins, overriding earlier changes.
-        # This fix only runs in standalone CLI mode.
+        # --- FIX: Save original terminal settings before modification ---
+        # This ensures we can restore them in postloop() to prevent breaking
+        # the user's shell after exiting pwnity.
         if not self.web_ui_mode:
-            self._apply_terminal_compatibility_fix()
+            self._save_and_fix_stty()
 
-    def _apply_terminal_compatibility_fix(self):
-        """
-        Checks and corrects the terminal's 'erase' setting for compatibility.
-        This is a targeted fix for issues where Backspace stops working in standalone mode.
-        """
-        # This fix is only relevant for Unix-like systems with `stty`.
-        if sys.platform == 'win32':
-            return
+    def _save_and_fix_stty(self):
+        """Saves current stty settings and applies a compatibility fix for the Backspace key."""
+        if sys.platform != 'win32':
+            try:
+                # Save the original settings
+                self._original_stty_settings = subprocess.check_output(['stty', '-g'], text=True, stderr=subprocess.DEVNULL).strip()
+                log.debug(f"Saved original stty settings: {self._original_stty_settings}")
 
-        try:
-            # Get the current 'erase' setting from stty.
-            original_stty = subprocess.check_output(['stty', '-a'], text=True, stderr=subprocess.DEVNULL)
-
-            # We are looking for a pattern like: `erase = ^H;`
-            # Using a regex is more robust against spacing variations.
-            if re.search(r"erase\s*=\s*\^H;", original_stty):
-                log.debug("Detected 'stty erase ^H'. Applying compatibility fix.")
-                # Set the erase character to '^?' (DEL), the modern standard.
-                subprocess.run(['stty', 'erase', '^?'], check=True, stderr=subprocess.DEVNULL)
-                log.info("Applied terminal compatibility fix for Backspace key.")
-        except (FileNotFoundError, subprocess.CalledProcessError) as e:
-            # This can happen if 'stty' is not in the PATH or if the command fails.
-            # We log a warning but don't crash the application.
-            log.warning(f"Could not apply terminal compatibility fix: {e}")
+                # Check if cmd2 set the erase character to ^H, which breaks modern terminals
+                current_stty = subprocess.check_output(['stty', '-a'], text=True, stderr=subprocess.DEVNULL)
+                if re.search(r"erase\s*=\s*\^H;", current_stty):
+                    log.debug("Detected 'stty erase ^H'. Applying compatibility fix.")
+                    # Set the erase character to '^?' (DEL), the modern standard
+                    subprocess.run(['stty', 'erase', '^?'], check=True, stderr=subprocess.DEVNULL)
+                    log.info("Applied terminal compatibility fix for Backspace key.")
+            except (FileNotFoundError, subprocess.CalledProcessError) as e:
+                log.warning(f"Could not manage terminal settings with 'stty': {e}")
+                self._original_stty_settings = None
 
     def _is_heartbeat_active(self, target_name: str) -> bool:
         """
@@ -896,6 +888,15 @@ class MyCLI(cmd2.Cmd):
             self.sync_thread.join(timeout=1) # Wait for the thread to finish
         self.job_mgr.shutdown()
         self.heartbeat_mgr.shutdown()
+
+        # --- FIX: Restore original terminal settings on exit ---
+        if self._original_stty_settings and sys.platform != 'win32':
+            try:
+                log.debug(f"Restoring original stty settings: {self._original_stty_settings}")
+                subprocess.run(['stty', self._original_stty_settings], check=True, stderr=subprocess.DEVNULL)
+            except (FileNotFoundError, subprocess.CalledProcessError) as e:
+                log.warning(f"Failed to restore terminal settings: {e}")
+
         self.poutput("Goodbye!")
 
     def export_current_session(self):

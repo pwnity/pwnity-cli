@@ -272,11 +272,13 @@ class ParserFactory:
     def _add_help_subcommand_to_parser(self, subparsers, entity_name_singular):
         """Helper to add a 'help' subcommand to a given subparsers object."""
         help_parser = subparsers.add_parser("help",
-                                            # --- UX IMPROVEMENT ---
-                                            # Keep the command functional, but hide it from help messages and autocompletion to reduce noise.
-                                            help=argparse.SUPPRESS,
+                                            # --- CORRECT FIX ---
+                                            # Using `help=argparse.SUPPRESS` causes the ugly '==SUPPRESS==' output in cmd2's completion hints.
+                                            # By omitting the `help` argument and setting `add_help=False`, we create a functional subcommand
+                                            # that is completely hidden from the top-level help and completion lists, which is the desired behavior.
+                                            add_help=False,
                                             description=f"Displays detailed help for the main {entity_name_singular} command.",
-                                            formatter_class=self.formatter, add_help=False)
+                                            formatter_class=self.formatter)
         self._add_custom_help(help_parser, "help")
 
 
