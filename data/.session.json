@@ -1,67 +1,28 @@
 {
-  "session_name": "nmap",
-  "target": "tryhackme",
-  "tool": "nmap",
+  "session_name": "default",
+  "target": "iprs.fly.dev",
+  "tool": "curl",
   "wordlist": null,
-  "report": "tryhackme",
+  "report": null,
   "proxy_enabled": false,
   "jobs": [
     {
-      "id": "831bb7dd-2ab7-4457-85d8-8865a29f09e4",
-      "command_str": "sudo /usr/sbin/openvpn --config /home/kali/v3rm1ll1on.ovpn",
-      "status": "running",
-      "duration": "1891.52s",
-      "logbook_id": null,
-      "start_time": 1765579577.6269088,
-      "output": "[sudo] password for kali: \r\n2025-12-12 23:46:47 Note: --cipher is not set. OpenVPN versions before 2.5 defaulted to BF-CBC as fallback when cipher negotiation failed in this case. If you need this fallback please add '--data-ciphers-fallback BF-CBC' to your configuration and/or add BF-CBC to --data-ciphers.\r\n2025-12-12 23:46:47 Note: Kernel support for ovpn-dco missing, disabling data channel offload.\r\n2025-12-12 23:46:47 OpenVPN 2.6.14 x86_64-pc-linux-gnu [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL] [PKCS11] [MH/PKTINFO] [AEAD] [DCO]\r\n2025-12-12 23:46:47 library versions: OpenSSL 3.5.2 5 Aug 2025, LZO 2.10\r\n2025-12-12 23:46:47 DCO version: N/A\r\n2025-12-12 23:46:47 TCP/UDP: Preserving recently used remote address: [AF_INET]18.203.72.251:1194\r\n2025-12-12 23:46:47 Socket Buffers: R=[212992->212992] S=[212992->212992]\r\n2025-12-12 23:46:47 UDPv4 link local: (not bound)\r\n2025-12-12 23:46:47 UDPv4 link remote: [AF_INET]18.203.72.251:1194\r\n2025-12-12 23:46:47 TLS: Initial packet from [AF_INET]18.203.72.251:1194, sid=df3e5643 09fb1f53\r\n2025-12-12 23:46:47 WARNING: this configuration may cache passwords in memory -- use the auth-nocache option to prevent this\r\n2025-12-12 23:46:47 VERIFY OK: depth=1, CN=OpenVPN-CA\r\n2025-12-12 23:46:47 VERIFY KU OK\r\n2025-12-12 23:46:47 Validating certificate extended key usage\r\n2025-12-12 23:46:47 ++ Certificate has EKU (str) TLS Web Server Authentication, expects TLS Web Server Authentication\r\n2025-12-12 23:46:47 VERIFY EKU OK\r\n2025-12-12 23:46:47 VERIFY X509NAME OK: CN=openvpn-server\r\n2025-12-12 23:46:47 VERIFY OK: depth=0, CN=openvpn-server\r\n2025-12-12 23:46:47 Control Channel: TLSv1.3, cipher TLSv1.3 TLS_AES_256_GCM_SHA384, peer certificate: 2048 bits RSA, signature: RSA-SHA256, peer temporary key: 253 bits X25519\r\n2025-12-12 23:46:47 [openvpn-server] Peer Connection Initiated with [AF_INET]18.203.72.251:1194\r\n2025-12-12 23:46:47 TLS: move_session: dest=TM_ACTIVE src=TM_INITIAL reinit_src=1\r\n2025-12-12 23:46:47 TLS: tls_multi_process: initial untrusted session promoted to trusted\r\n2025-12-12 23:46:47 PUSH: Received control message: 'PUSH_REPLY,route 10.80.0.0 255.240.0.0,route-gateway 192.168.128.1,topology subnet,ping 10,ping-restart 120,ifconfig 192.168.204.36 255.255.128.0,peer-id 10,cipher AES-256-GCM,protocol-flags cc-exit tls-ekm dyn-tls-crypt,tun-mtu 1500'\r\n2025-12-12 23:46:47 OPTIONS IMPORT: --ifconfig/up options modified\r\n2025-12-12 23:46:47 OPTIONS IMPORT: route options modified\r\n2025-12-12 23:46:47 OPTIONS IMPORT: route-related options modified\r\n2025-12-12 23:46:47 OPTIONS IMPORT: tun-mtu set to 1500\r\n2025-12-12 23:46:47 net_route_v4_best_gw query: dst 0.0.0.0\r\n2025-12-12 23:46:47 net_route_v4_best_gw result: via 172.22.96.1 dev eth0\r\n2025-12-12 23:46:47 ROUTE_GATEWAY 172.22.96.1/255.255.240.0 IFACE=eth0 HWADDR=00:15:5d:ac:16:aa\r\n2025-12-12 23:46:47 TUN/TAP device tun0 opened\r\n2025-12-12 23:46:47 net_iface_mtu_set: mtu 1500 for tun0\r\n2025-12-12 23:46:47 net_iface_up: set tun0 up\r\n2025-12-12 23:46:47 net_addr_v4_add: 192.168.204.36/17 dev tun0\r\n2025-12-12 23:46:47 net_route_v4_add: 10.80.0.0/12 via 192.168.128.1 dev [NULL] table 0 metric -1\r\n2025-12-12 23:46:47 Initialization Sequence Completed\r\n2025-12-12 23:46:47 Data Channel: cipher 'AES-256-GCM', peer-id: 10\r\n2025-12-12 23:46:47 Timers: ping 10, ping-restart 120\r\n2025-12-12 23:46:47 Protocol options: explicit-exit-notify 1, protocol-flags cc-exit tls-ekm dyn-tls-crypt\r\n"
-    },
-    {
-      "id": "e1dbb496-6dd1-4904-b89e-5a87148862af",
-      "command_str": "/usr/bin/gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://10.80.144.104",
-      "status": "running",
-      "duration": "535.95s",
-      "logbook_id": null,
-      "start_time": 1765580933.1947384,
-      "output": "[... Output truncated ...]\n)\r\u001b[2KProgress: 155584 / 220561 (70.54%)\r\u001b[2KProgress: 155752 / 220561 (70.62%)\r\u001b[2KProgress: 155912 / 220561 (70.69%)\r\u001b[2KProgress: 156082 / 220561 (70.77%)\r\u001b[2KProgress: 156241 / 220561 (70.84%)\r\u001b[2KProgress: 156402 / 220561 (70.91%)\r\u001b[2KProgress: 156570 / 220561 (70.99%)\r\u001b[2KProgress: 156730 / 220561 (71.06%)\r\u001b[2KProgress: 156890 / 220561 (71.13%)\r\u001b[2KProgress: 157060 / 220561 (71.21%)\r\u001b[2KProgress: 157220 / 220561 (71.28%)\r\u001b[2KProgress: 157380 / 220561 (71.35%)\r\u001b[2KProgress: 157549 / 220561 (71.43%)\r\u001b[2KProgress: 157717 / 220561 (71.51%)\r\u001b[2KProgress: 157877 / 220561 (71.58%)\r\u001b[2KProgress: 158037 / 220561 (71.65%)\r\u001b[2KProgress: 158197 / 220561 (71.72%)\r\u001b[2KProgress: 158367 / 220561 (71.80%)\r\u001b[2KProgress: 158527 / 220561 (71.87%)\r\u001b[2KProgress: 158695 / 220561 (71.95%)\r\u001b[2KProgress: 158855 / 220561 (72.02%)\r\u001b[2KProgress: 159025 / 220561 (72.10%)\r\u001b[2KProgress: 159185 / 220561 (72.17%)\r\u001b[2KProgress: 159355 / 220561 (72.25%)\r\u001b[2KProgress: 159515 / 220561 (72.32%)\r\u001b[2KProgress: 159684 / 220561 (72.40%)\r\u001b[2KProgress: 159832 / 220561 (72.47%)\r\u001b[2KProgress: 159992 / 220561 (72.54%)\r\u001b[2KProgress: 160162 / 220561 (72.62%)\r\u001b[2KProgress: 160323 / 220561 (72.69%)\r\u001b[2KProgress: 160492 / 220561 (72.77%)\r\u001b[2KProgress: 160650 / 220561 (72.84%)\r\u001b[2KProgress: 160808 / 220561 (72.91%)\r\u001b[2KProgress: 160968 / 220561 (72.98%)\r\u001b[2KProgress: 161128 / 220561 (73.05%)\r\u001b[2KProgress: 161288 / 220561 (73.13%)\r\u001b[2KProgress: 161458 / 220561 (73.20%)\r\u001b[2KProgress: 161617 / 220561 (73.28%)\r\u001b[2KProgress: 161775 / 220561 (73.35%)\r\u001b[2KProgress: 161935 / 220561 (73.42%)\r\u001b[2KProgress: 162095 / 220561 (73.49%)\r\u001b[2KProgress: 162255 / 220561 (73.56%)\r\u001b[2KProgress: 162425 / 220561 (73.64%)\r\u001b[2KProgress: 162584 / 220561 (73.71%)\r\u001b[2KProgress: 162742 / 220561 (73.79%)\r\u001b[2KProgress: 162912 / 220561 (73.86%)\r\u001b[2KProgress: 163072 / 220561 (73.94%)\r\u001b[2KProgress: 163241 / 220561 (74.01%)\r\u001b[2KProgress: 163402 / 220561 (74.08%)\r\u001b[2KProgress: 163572 / 220561 (74.16%)\r\u001b[2KProgress: 163740 / 220561 (74.24%)\r\u001b[2KProgress: 163900 / 220561 (74.31%)\r\u001b[2KProgress: 164060 / 220561 (74.38%)\r\u001b[2KProgress: 164220 / 220561 (74.46%)\r\u001b[2KProgress: 164390 / 220561 (74.53%)\r\u001b[2KProgress: 164550 / 220561 (74.61%)\r\u001b[2KProgress: 164710 / 220561 (74.68%)\r\u001b[2KProgress: 164878 / 220561 (74.75%)\r\u001b[2KProgress: 165038 / 220561 (74.83%)\r\u001b[2KProgress: 165198 / 220561 (74.90%)\r\u001b[2KProgress: 165368 / 220561 (74.98%)\r\u001b[2KProgress: 165528 / 220561 (75.05%)\r\u001b[2KProgress: 165698 / 220561 (75.13%)\r\u001b[2KProgress: 165856 / 220561 (75.20%)\r\u001b[2KProgress: 166026 / 220561 (75.27%)\r\u001b[2KProgress: 166186 / 220561 (75.35%)\r\u001b[2KProgress: 166356 / 220561 (75.42%)\r\u001b[2KProgress: 166516 / 220561 (75.50%)\r\u001b[2KProgress: 166676 / 220561 (75.57%)\r\u001b[2KProgress: 166842 / 220561 (75.64%)\r\u001b[2KProgress: 167002 / 220561 (75.72%)\r\u001b[2KProgress: 167162 / 220561 (75.79%)\r\u001b[2KProgress: 167332 / 220561 (75.87%)\r\u001b[2KProgress: 167492 / 220561 (75.94%)\r\u001b[2KProgress: 167652 / 220561 (76.01%)\r\u001b[2KProgress: 167809 / 220561 (76.08%)\r\u001b[2KProgress: 167979 / 220561 (76.16%)\r\u001b[2KProgress: 168132 / 220561 (76.23%)\r\u001b[2KProgress: 168302 / 220561 (76.31%)\r\u001b[2KProgress: 168462 / 220561 (76.38%)\r\u001b[2KProgress: 168632 / 220561 (76.46%)\r\u001b[2KProgress: 168792 / 220561 (76.53%)\r\u001b[2KProgress: 168958 / 220561 (76.60%)\r\u001b[2KProgress: 169128 / 220561 (76.68%)\r\u001b[2KProgress: 169288 / 220561 (76.75%)\r\u001b[2KProgress: 169458 / 220561 (76.83%)\r\u001b[2KProgress: 169618 / 220561 (76.90%)\r\u001b[2KProgress: 169788 / 220561 (76.98%)\r\u001b[2KProgress: 169945 / 220561 (77.05%)\r\u001b[2KProgress: 170105 / 220561 (77.12%)\r\u001b[2KProgress: 170275 / 220561 (77.20%)\r\u001b[2KProgress: 170435 / 220561 (77.27%)\r\u001b[2KProgress: 170604 / 220561 (77.35%)\r\u001b[2KProgress: 170774 / 220561 (77.43%)\r\u001b[2KProgress: 170930 / 220561 (77.50%)\r\u001b[2KProgress: 171100 / 220561 (77.57%)\r\u001b[2KProgress: 171260 / 220561 (77.65%)\r\u001b[2KProgress: 171430 / 220561 (77.72%)\r\u001b[2KProgress: 171590 / 220561 (77.80%)\r\u001b[2KProgress: 171760 / 220561 (77.87%)\r\u001b[2KProgress: 171925 / 220561 (77.95%)\r\u001b[2KProgress: 172085 / 220561 (78.02%)\r\u001b[2KProgress: 172255 / 220561 (78.10%)\r\u001b[2KProgress: 172415 / 220561 (78.17%)\r\u001b[2KProgress: 172585 / 220561 (78.25%)"
-    },
-    {
-      "id": "a9355525-cb2a-4919-8f20-0b071ccf9f79",
-      "command_str": "/usr/bin/nmap -p- -T4 --min-rate=1000 -v 10.80.144.104",
+      "id": "4c3d4d68-447e-4acc-9e60-567653b24cb7",
+      "command_str": "/usr/bin/curl -I -s -A Vermillion -k https://iprs.fly.dev",
       "status": "finished",
-      "duration": "13.62s",
-      "logbook_id": "e7815ee6-501b-4a25-80c8-92f0524962a9",
-      "start_time": 1765581071.5300717,
-      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2025-12-13 00:11 CET\r\nInitiating Ping Scan at 00:11\r\nScanning 10.80.144.104 [4 ports]\r\nCompleted Ping Scan at 00:11, 0.06s elapsed (1 total hosts)\r\nInitiating Parallel DNS resolution of 1 host. at 00:11\r\nCompleted Parallel DNS resolution of 1 host. at 00:11, 0.01s elapsed\r\nInitiating SYN Stealth Scan at 00:11\r\nScanning 10.80.144.104 [65535 ports]\r\nDiscovered open port 80/tcp on 10.80.144.104\r\nDiscovered open port 21/tcp on 10.80.144.104\r\nDiscovered open port 22/tcp on 10.80.144.104\r\nCompleted SYN Stealth Scan at 00:11, 13.38s elapsed (65535 total ports)\r\nNmap scan report for 10.80.144.104\r\nHost is up (0.030s latency).\r\nNot shown: 65532 closed tcp ports (reset)\r\nPORT   STATE SERVICE\r\n21/tcp open  ftp\r\n22/tcp open  ssh\r\n80/tcp open  http\r\n\r\nRead data files from: /usr/share/nmap\r\nNmap done: 1 IP address (1 host up) scanned in 13.60 seconds\r\n           Raw packets sent: 66018 (2.905MB) | Rcvd: 69855 (3.678MB)\r\n"
+      "duration": "0.43s",
+      "logbook_id": "8e356523-0715-43ba-9d20-ef498f5ab7d6",
+      "start_time": 1765978495.889074,
+      "output": "HTTP/2 200 \r\r\n\u001b[1mcontent-type\u001b[0m: text/plain; charset=utf-8\r\r\n\u001b[1mcontent-length\u001b[0m: 14\r\r\n\u001b[1mdate\u001b[0m: Wed, 17 Dec 2025 13:34:57 GMT\r\r\n\u001b[1mserver\u001b[0m: Fly/c51817cfd (2025-12-11)\r\r\n\u001b[1mvia\u001b[0m: 2 fly.io, 2 fly.io\r\r\n\u001b[1mfly-request-id\u001b[0m: 01KCP8AR1AQ6J9ZE7C8EHRRAWH-fra\r\r\n\r\r\n"
     }
   ],
   "sessions": {
     "default": {
       "name": "default",
-      "target": "tryhackme",
-      "tool": "gobuster",
-      "wordlist": "dir_medium",
-      "report": "tryhackme"
-    },
-    "openvpn": {
-      "name": "openvpn",
-      "target": null,
-      "tool": "openvpn",
+      "target": "iprs.fly.dev",
+      "tool": "curl",
       "wordlist": null,
       "report": null
-    },
-    "firefox": {
-      "name": "firefox",
-      "target": "tryhackme",
-      "tool": "firefox",
-      "wordlist": null,
-      "report": "tryhackme"
-    },
-    "nmap": {
-      "name": "nmap",
-      "target": "tryhackme",
-      "tool": "nmap",
-      "wordlist": null,
-      "report": "tryhackme"
     }
   },
   "monitoring_status": {
