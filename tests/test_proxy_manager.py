@@ -219,8 +219,11 @@ def test_cmd_off(proxy_manager, mock_cli_with_session, mocker):
 def test_cmd_set_valid_key(proxy_manager, mock_cli_with_session, mocker):
     """Testet den _cmd_set Befehl mit gültigen Argumenten."""
     mock_log_success = mocker.patch("modules.services.log.success")
-    set_args = ['host', '192.168.1.1']
-    args = type('Args', (), {'set_args': set_args})()
+    # Simuliert das Ergebnis des Parsers: args.key und args.value
+    args = type('Args', (), {
+        'key': 'host',
+        'value': ['192.168.1.1']
+    })()
     proxy_manager._cmd_set(args, mock_cli_with_session)
     assert mock_cli_with_session.session.proxy_settings['host'] == '192.168.1.1'
     mock_log_success.assert_called_with("Proxy setting 'host' set for the current session.")
@@ -228,8 +231,12 @@ def test_cmd_set_valid_key(proxy_manager, mock_cli_with_session, mocker):
 def test_cmd_set_invalid_key(proxy_manager, mock_cli_with_session, mocker):
     """Testet den _cmd_set Befehl mit einem ungültigen Schlüssel."""
     mock_log_error = mocker.patch("modules.services.log.error")
-    set_args = ['invalid_key', 'value']
-    args = type('Args', (), {'set_args': set_args})()
+    # Der Parser würde hier dank 'choices' bereits einen Fehler werfen,
+    # aber wir testen die Logik in _cmd_set, falls der Parser umgangen wird.
+    args = type('Args', (), {
+        'key': 'invalid_key',
+        'value': ['value']
+    })()
     proxy_manager._cmd_set(args, mock_cli_with_session)
     mock_log_error.assert_called_with("Invalid key 'invalid_key'.")
     assert 'invalid_key' not in mock_cli_with_session.session.proxy_settings
@@ -237,8 +244,11 @@ def test_cmd_set_invalid_key(proxy_manager, mock_cli_with_session, mocker):
 def test_cmd_set_missing_value(proxy_manager, mock_cli_with_session, mocker):
     """Testet den _cmd_set Befehl, wenn der Wert fehlt."""
     mock_log_error = mocker.patch("modules.services.log.error")
-    set_args = ['host']
-    args = type('Args', (), {'set_args': set_args})()
+    # Der Parser setzt 'value' auf eine leere Liste, wenn nichts angegeben wird.
+    args = type('Args', (), {
+        'key': 'host',
+        'value': []
+    })()
     proxy_manager._cmd_set(args, mock_cli_with_session)
     mock_log_error.assert_called_with("Invalid command. Expected: proxy set <key> <value>")
 
