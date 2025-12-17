@@ -26,6 +26,7 @@
     "REPORTS": "data/reports",
     "WORKFLOWS": "data/workflows",
     "PARSERS": "data/parsers",
+    "RUN": "data/run",
     "HEARTBEATS": "data/heartbeats",
     "REVSHELLS": "etc/revshells.json",
     "EXPORTS": "exports",

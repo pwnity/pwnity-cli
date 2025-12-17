@@ -443,3 +443,45 @@ def test_update_from_url_removes_old_fields(target_manager, monkeypatch):
     assert "query_values" not in data_without_params
     assert data_without_params.get("uri") == "/otherpage"
     assert data_without_params.get("url") == url_without_params
+
+def test_target_copy(target_manager):
+    """Tests copying a target entity."""
+    source_name = "source"
+    dest_name = "destination"
+    target_manager.create(source_name)
+    target_manager.update(source_name, "custom_field", "value123")
+
+    # Perform the copy
+    assert target_manager.copy(source_name, dest_name) is True
+
+    # Verify source still exists and destination is created
+    assert target_manager.exists(source_name) is True
+    assert target_manager.exists(dest_name) is True
+
+    # Verify content of the copied target
+    dest_data = target_manager.load(dest_name)
+    assert dest_data.get("name") == dest_name
+    assert dest_data.get("custom_field") == "value123"
+
+def test_target_export_logic(target_manager, mocker):
+    """Tests the logic of the _cmd_export method for targets."""
+    target_name = "export-test"
+    target_manager.create(target_name)
+    target_manager.update(target_name, "url", "http://test.com")
+    target_manager.update(target_name, "custom", "my_value")
+    target_manager.update(target_name, "whois_info", {"some": "data"}) # This should become a gather command
+
+    mock_cli = mocker.MagicMock()
+    captured_output = []
+    mock_cli.poutput.side_effect = captured_output.append
+
+    target_manager._cmd_export(type('Args', (), {'name': target_name})(), mock_cli)
+    output = "\n".join(captured_output)
+
+    assert "target add export-test" in output
+    assert "target update export-test url http://test.com" in output
+    assert "target gather export-test whois" in output
+    assert "target update export-test custom 'my_value'" in output
+    assert "target update export-test custom my_value" in output
+    assert data_without_params.get("uri") == "/otherpage"
+    assert data_without_params.get("url") == url_without_params

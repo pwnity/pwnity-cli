@@ -1,6 +1,8 @@
 # modules/managers/proxy_manager.py
 from ..services import log, config
 from .base_manager import BaseManager
+import tempfile
+import os
 class ProxyManager(BaseManager):
     def set_enabled(self, session, status: bool):
         """Enables or disables the proxy for a given session."""

@@ -382,6 +382,32 @@ class TestTargetIntegration:
         output_lines = clean_output.splitlines()
         assert "1.2.3.4" in output_lines
 
+    def test_target_copy_command(self, running_pwnity, pwnity_env):
+        """Testet den 'target copy' Befehl auf Integrationsebene."""
+        source_name = "copy_source_target"
+        dest_name = "copy_dest_target"
+        running_pwnity.run_command(f"target add {source_name}")
+        running_pwnity.run_command(f"target update {source_name} url http://source.com")
+
+        # Führe den Kopierbefehl aus
+        copy_output = running_pwnity.run_command(f"target copy {source_name} {dest_name}")
+        assert f"Target '{source_name}' successfully copied to '{dest_name}'" in copy_output
+
+        # Überprüfe, ob beide Dateien existieren
+        targets_dir = pwnity_env["targets_dir"]
+        assert os.path.isfile(os.path.join(targets_dir, f"{source_name}.json"))
+        assert os.path.isfile(os.path.join(targets_dir, f"{dest_name}.json"))
+
+        # Überprüfe den Inhalt der neuen Datei
+        with open(os.path.join(targets_dir, f"{dest_name}.json"), 'r') as f:
+            dest_data = json.load(f)
+        
+        assert dest_data.get('name') == dest_name
+        assert dest_data.get('url') == "http://source.com"
+
+
+
+
 @pytest.mark.integration
 class TestToolIntegration:
     """Gruppiert Integrationstests für das 'tool'-Modul."""
@@ -535,6 +561,28 @@ class TestToolIntegration:
         assert f"tool update {tool_name} sudo true" in clean_output
         # shlex.quote does NOT add quotes for safe strings like '-p-'.
         assert f"tool update {tool_name} scan param -p-" in clean_output
+
+    def test_tool_copy_command(self, running_pwnity, pwnity_env):
+        """Testet den 'tool copy' Befehl auf Integrationsebene."""
+        source_name = "copy_source_tool"
+        dest_name = "copy_dest_tool"
+        running_pwnity.run_command(f"tool add {source_name}")
+        running_pwnity.run_command(f"tool update {source_name} description 'A test tool'")
+        running_pwnity.run_command(f"tool update {source_name} command mycmd")
+
+        # Führe den Kopierbefehl aus
+        copy_output = running_pwnity.run_command(f"tool copy {source_name} {dest_name}")
+        assert f"Tool '{source_name}' successfully copied to '{dest_name}'" in copy_output
+
+        # Ermittle das Tool-Verzeichnis aus der Konfiguration
+        tools_dir_raw = running_pwnity.run_command("config get DIRS.TOOLS")
+        match = re.search(r"config get DIRS.TOOLS\n(.*?)\s*$", running_pwnity._strip_ansi(tools_dir_raw), re.MULTILINE)
+        tools_dir = match.group(1).strip()
+
+        # Überprüfe, ob die neue Datei existiert
+        assert os.path.isfile(os.path.join(tools_dir, f"{dest_name}.json"))
+
+
 
     def test_pwn_bg_creates_job(self, running_pwnity):
         """Testet, ob 'pwn ... bg' einen Hintergrund-Job erstellt."""

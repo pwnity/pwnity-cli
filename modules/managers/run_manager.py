@@ -1,9 +1,11 @@
 # modules/managers/run_manager.py
 import shlex
 import subprocess
+import tempfile
+import os
 
 from .base_manager import BaseManager
-from ..services import log
+from ..services import log, config
 from .. import placeholders
 from rich.panel import Panel
 from rich.text import Text
@@ -100,6 +102,41 @@ class RunManager(BaseManager):
         tool_needs_sudo = tool_data.get('sudo', False)
         proxy_config = cli.proxy_mgr.get_effective_config(cli.session)
 
+        # --- NEW: Job-based temporary proxychains config file ---
+        temp_proxy_conf_path = None
+        if proxy_config and proxy_config.get('wrapper_command') == 'proxychains':
+            proxy_type = proxy_config.get('type')
+            proxy_host = proxy_config.get('host')
+            proxy_port = proxy_config.get('port')
+
+            if proxy_type and proxy_host and proxy_port:
+                # Use a secure, private directory within the application structure
+                run_dir = config.get_parameter("DIRS", "RUN", "data/run")
+                os.makedirs(run_dir, exist_ok=True)
+
+                conf_content = f"[ProxyList]\n{proxy_type} {proxy_host} {proxy_port}\n"
+                
+                try:
+                    # Create a temporary file within our secure run directory
+                    with tempfile.NamedTemporaryFile(
+                        mode='w', delete=False, suffix='.conf', 
+                        prefix='pwnity_proxy_', dir=run_dir
+                    ) as temp_f:
+                        temp_f.write(conf_content)
+                        temp_proxy_conf_path = temp_f.name
+                    
+                    # Prepend the -f option to the wrapper options for this run
+                    current_wrapper_opts = proxy_config.get('wrapper_options', '')
+                    proxy_config['wrapper_options'] = f"-f {temp_proxy_conf_path} {current_wrapper_opts}".strip()
+                    log.debug(f"Created temporary proxychains config at: {temp_proxy_conf_path}")
+
+                except Exception as e:
+                    log.error(f"Failed to create temporary proxychains config: {e}")
+                    # If we can't create the config, we should not proceed with the proxy.
+                    # We can either abort or just disable the proxy for this run.
+                    # For now, we'll let it proceed without the temp file, which might fail later.
+                    proxy_config = None
+
         for cmd in commands_to_run:
             cmd = [placeholders.resolve_placeholders(part, cli.session) for part in cmd]
             current_cmd = cmd
@@ -140,17 +177,26 @@ class RunManager(BaseManager):
         cli.console.print(execution_plan_panel)
 
         if run_bg or run_now:
-            job_id = cli.executor.execute(
-                command_lists=final_commands,
-                session_obj=cli.session,
-                tool_name=tool_name,
-                tool_command_name=command_name,
-                run_now=run_now,
-                run_bg=run_bg,
-                suppress_individual_summaries=is_per_param_execution and run_now
-            )
-            if run_bg and job_id:
-                log.success(f"Job(s) {job_id} started in the background.")
+            try:
+                job_id = cli.executor.execute(
+                    command_lists=final_commands,
+                    session_obj=cli.session,
+                    tool_name=tool_name,
+                    tool_command_name=command_name,
+                    run_now=run_now,
+                    run_bg=run_bg,
+                    suppress_individual_summaries=is_per_param_execution and run_now
+                )
+                if run_bg and job_id:
+                    log.success(f"Job(s) {job_id} started in the background.")
+            finally:
+                # --- NEW: Guaranteed cleanup of the temporary proxy config file ---
+                if temp_proxy_conf_path and os.path.exists(temp_proxy_conf_path):
+                    try:
+                        os.remove(temp_proxy_conf_path)
+                        log.debug(f"Cleaned up temporary proxy config file: {temp_proxy_conf_path}")
+                    except OSError as e:
+                        log.warning(f"Failed to clean up temp proxy config file: {e}")
         else:
             log.prompt("This is a preview. The command has not been executed yet.")
             preview_cmd = f"pwn {command_name or ''} {' '.join(shlex.quote(p) for p in extra_params)}".strip()

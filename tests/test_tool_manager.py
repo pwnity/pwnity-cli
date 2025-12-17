@@ -357,6 +357,49 @@ def test_build_command_with_unresolved_placeholder(tool_manager, mock_session_wi
     expected_command = ["nmap", "$target.nonexistent_field"]
     assert built_commands[0] == expected_command
 
+def test_tool_copy(tool_manager):
+    """Tests copying a tool entity."""
+    source_name = "source_tool"
+    dest_name = "dest_tool"
+    tool_manager.create(source_name)
+    tool_manager.update(source_name, "description", "Original tool")
+    tool_manager.add_command(source_name, "scan")
+
+    # Perform the copy
+    assert tool_manager.copy(source_name, dest_name) is True
+
+    # Verify source and destination
+    assert tool_manager.exists(source_name) is True
+    dest_data = tool_manager.load(dest_name)
+    assert dest_data is not None
+    assert dest_data.get("name") == dest_name
+    assert dest_data.get("description") == "Original tool"
+    assert len(dest_data.get("commands", [])) == 1
+
+def test_tool_export_with_custom_fields(tool_manager, mocker):
+    """Tests that _cmd_export correctly exports custom top-level and command-level fields."""
+    tool_name = "nmap-full"
+    tool_manager.create(tool_name)
+    tool_manager.update(tool_name, "howto", "Run with 'pwn scan now'")
+    tool_manager.add_command(tool_name, "scan")
+    # Simulate 'tool update nmap-full scan description "A full scan"'
+    update_args = type('Args', (), {'name': tool_name, 'update_args': ['scan', 'description', 'A full scan']})()
+    tool_manager._cmd_update(update_args, cli=None)
+
+    mock_cli = mocker.MagicMock()
+    captured_output = []
+    mock_cli.poutput.side_effect = captured_output.append
+
+    tool_manager._cmd_export(type('Args', (), {'name': tool_name})(), mock_cli)
+    output = "\n".join(captured_output)
+
+    assert "tool update nmap-full howto 'Run with \\'pwn scan now\\''" in output
+    # shlex.quote('Run with \'pwn scan now\'') -> "'Run with '\"'\"'pwn scan now'\"'\"''"
+    # We check for the essential parts to make the test less brittle to quoting style changes.
+    assert "tool update nmap-full howto 'Run with " in output
+    assert "pwn scan now" in output
+    assert "tool update nmap-full scan description 'A full scan'" in output
+
 def test_delete_param_by_value(tool_manager):
     """Testet das Löschen eines Parameters anhand seines Werts."""
     tool_name = "nmap"
