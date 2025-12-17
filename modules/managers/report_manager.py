@@ -516,8 +516,7 @@ class ReportManager(JSONManager):
             for note in notes:
                 ts = datetime.fromisoformat(note.get('timestamp', '')).strftime('%Y-%m-%d')
                 target_ctx = note.get('target', 'N/A')
-                lines.append(f"- **[{ts} | Target: {target_ctx}]** {note.get('text', '')}")
-                text = note.get('text', '').replace('|', '\|') # Escape pipe characters for table
+                text = note.get('text', '').replace('|', '\\|') # Escape pipe characters for Markdown table
                 lines.append(f"| {ts} | `{target_ctx}` | {text} |")
             lines.append("")
 
@@ -541,7 +540,7 @@ class ReportManager(JSONManager):
                 lines.append("|---|---|")
                 for item in items:
                     target = item.get('target', 'N/A')
-                    value = item.get('value', '').replace('|', '\|')
+                    value = item.get('value', '').replace('|', '\\|') # Escape pipe characters for Markdown table
                     lines.append(f"| `{target}` | `{value}` |")
                 lines.append("")
             lines.append("")
@@ -572,7 +571,7 @@ class ReportManager(JSONManager):
                 
                 for _, item in unique_items:
                     target = item.get('target', 'N/A')
-                    match = item.get('match', '').replace('|', '\|')
+                    match = item.get('match', '').replace('|', '\\|') # Escape pipe characters for Markdown table
                     log_id = item.get('source_log_id', 'N/A')
                     lines.append(f"| `{target}` | `{match}` | `Log #{log_id}` |")
                 lines.append("")
