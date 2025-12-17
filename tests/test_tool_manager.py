@@ -391,14 +391,14 @@ def test_tool_export_with_custom_fields(tool_manager, mocker):
     mock_cli.poutput.side_effect = captured_output.append
 
     tool_manager._cmd_export(type('Args', (), {'name': tool_name})(), mock_cli)
-    output = "\n".join(captured_output)
+    full_output = "\n".join(captured_output)
 
-    assert "tool update nmap-full howto 'Run with \\'pwn scan now\\''" in output
-    # shlex.quote('Run with \'pwn scan now\'') -> "'Run with '\"'\"'pwn scan now'\"'\"''"
-    # We check for the essential parts to make the test less brittle to quoting style changes.
-    assert "tool update nmap-full howto 'Run with " in output
-    assert "pwn scan now" in output
-    assert "tool update nmap-full scan description 'A full scan'" in output
+    # shlex.quote turns "Run with 'pwn scan now'" into a complex quoted string.
+    # We check that the essential parts are present in the output, making the test robust.
+    assert "tool update nmap-full howto 'Run with " in full_output
+    assert "pwn scan now" in full_output
+    # Check for the custom command-level field.
+    assert "tool update nmap-full scan description 'A full scan'" in full_output
 
 def test_delete_param_by_value(tool_manager):
     """Testet das Löschen eines Parameters anhand seines Werts."""

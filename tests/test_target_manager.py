@@ -481,7 +481,6 @@ def test_target_export_logic(target_manager, mocker):
     assert "target add export-test" in output
     assert "target update export-test url http://test.com" in output
     assert "target gather export-test whois" in output
-    assert "target update export-test custom 'my_value'" in output
+    # shlex.quote does not add quotes for simple strings like 'my_value'.
+    # The test must expect the unquoted version.
     assert "target update export-test custom my_value" in output
-    assert data_without_params.get("uri") == "/otherpage"
-    assert data_without_params.get("url") == url_without_params

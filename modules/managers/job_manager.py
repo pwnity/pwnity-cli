@@ -391,21 +391,39 @@ class JobManager(BaseManager):
         # job.workflow_context = None # Initialize attribute
         
         try:
-            # --- FINAL, ROBUST FIX: Use pty.fork() to spawn the process in a pseudo-terminal ---
-            # This correctly handles interactive prompts (like `read -p`) and stderr merging.
+            # --- FINAL, ROBUST FIX for nonexistent commands ---
+            # Create a pipe to communicate exec() errors from the child process.
+            # The O_CLOEXEC flag ensures the pipe is closed automatically on exec.
+            error_read_fd, error_write_fd = os.pipe2(os.O_CLOEXEC)
+
             pid, master_fd = pty.fork()
             if pid == 0: # This is the child process
+                # Close the read end of the pipe in the child
+                os.close(error_read_fd)
                 # We are in the child. Replace this process with the command.
-                # --- SECURITY FIX: If we used `sh -c`, we must use execvpe with the shell. ---
-                if command_list[0] == '/bin/sh' and command_list[1] == '-c':
-                    # For `sh -c "..."`, the third argument is the command string.
-                    # We pass the shell, its flags, and the command string to execvp.
-                    os.execvp(command_list[0], command_list)
-                else:
-                    os.execvp(command_list[0], command_list)
+                try:
+                    if command_list[0] == '/bin/sh' and command_list[1] == '-c':
+                        os.execvp(command_list[0], command_list)
+                    else:
+                        os.execvp(command_list[0], command_list)
+                except FileNotFoundError as e:
+                    # If execvp fails, write the error to the pipe and exit.
+                    error_msg = f"pwnity: command not found: {command_list[0]}".encode()
+                    os.write(error_write_fd, error_msg)
+                    os.close(error_write_fd)
+                    os._exit(1) # Use _exit to prevent finally blocks from running
+
             else: # This is the parent process
+                # Close the write end of the pipe in the parent
+                os.close(error_write_fd)
                 job.pty_master_fd = master_fd # Store the master fd for I/O
                 job.pid = pid
+                # Read from the error pipe. This will block until the child calls exec()
+                # (which closes the pipe) or writes an error and closes it.
+                error_from_child = os.read(error_read_fd, 1024)
+                os.close(error_read_fd)
+                if error_from_child:
+                    raise FileNotFoundError(error_from_child.decode())
 
 
             job.status = "running"
@@ -421,23 +439,23 @@ class JobManager(BaseManager):
             
             # The CommandExecutor is now responsible for logging the success message.
             return job_id
-        except (OSError, FileNotFoundError) as e:
+        except FileNotFoundError as e:
             # This is the key to fixing the race condition for nonexistent commands.
-            # If execvp() fails in the child, the child exits immediately. The parent's
-            # first attempt to read from the PTY will then raise an OSError (Input/output error).
-            # We catch this specific error (and FileNotFoundError as a fallback), mark the job as failed, and return its ID.
+            # This block is now triggered if the child process fails to exec.
+            # The error message comes directly from the child via the pipe.
             job.status = "failed"
             job.return_code = -1
             job.start_time = time.time()
             job.end_time = time.time()
-            job.output = f"pwnity: command not found: {command_list[0]}\n"
+            job.output = f"{e}\n"
             # Ensure the job is added to the manager's dictionary before returning the ID
             with self._lock:
                 self.jobs[job_id] = job
             log.debug(f"Caught exception on job start, likely a nonexistent command: {e}")
             return job_id
         except Exception as e:
-            log.error(f"Error trying to start job for command '{shlex.join(command_list)}': {e}", exc_info=True)
+            # This block now only catches unexpected errors.
+            log.error(f"An unexpected error occurred while starting job for command '{shlex.join(command_list)}': {e}")
             return None
 
     def send_input(self, job_id, text_to_send):

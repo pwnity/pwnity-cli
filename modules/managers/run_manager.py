@@ -157,32 +157,31 @@ class RunManager(BaseManager):
         command_notes = []
         
         # 1. Resolve placeholders
-        current_cmd = [placeholders.resolve_placeholders(part, cli.session) for part in raw_cmd_list]
+        final_cmd = [placeholders.resolve_placeholders(part, cli.session) for part in raw_cmd_list]
 
-        # 2. Determine if sudo is needed for this specific command
+        # 2. Apply proxy wrapper if configured
+        if proxy_config and proxy_config.get('wrapper_command'):
+            wrapper_cmd_str = proxy_config['wrapper_command']
+            wrapper_opts_str = proxy_config.get('wrapper_options', '')
+            full_wrapper_str = f"{wrapper_cmd_str} {wrapper_opts_str}".strip()
+            wrapper_cmd_list = shlex.split(full_wrapper_str)
+            final_cmd = wrapper_cmd_list + final_cmd
+            # Note: Proxy note is now added in _prepare_proxy_environment
+
+        # 3. Determine if sudo is needed and prepend it to the *entire* command
         use_sudo_for_this_cmd = tool_needs_sudo or (proxy_config and proxy_config.get('wrapper_needs_sudo', False))
         sudo_reason = ""
         if tool_needs_sudo:
             sudo_reason = "Required by tool configuration."
         elif proxy_config and proxy_config.get('wrapper_needs_sudo', False):
             sudo_reason = "Required by proxy wrapper."
-
         if use_sudo_for_this_cmd:
             if not self._ensure_sudo_credentials():
                 return [], [] # Abort if sudo fails
-            current_cmd = ['sudo'] + current_cmd
+            final_cmd = ['sudo'] + final_cmd
             command_notes.append(f"Sudo: Enabled ({sudo_reason})")
 
-        # 3. Apply proxy wrapper if configured
-        if proxy_config and proxy_config.get('wrapper_command'):
-            wrapper_cmd_str = proxy_config['wrapper_command']
-            wrapper_opts_str = proxy_config.get('wrapper_options', '')
-            full_wrapper_str = f"{wrapper_cmd_str} {wrapper_opts_str}".strip()
-            wrapper_cmd_list = shlex.split(full_wrapper_str)
-            current_cmd = wrapper_cmd_list + current_cmd
-            # Note: Proxy note is now added in _prepare_proxy_environment
-
-        return current_cmd, command_notes
+        return final_cmd, command_notes
 
     def do_pwn(self, args, cli):
         """Handles the 'pwn' and 'run' commands."""
