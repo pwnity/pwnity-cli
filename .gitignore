@@ -70,11 +70,12 @@ cover/
 data/.session.json      # Current session state
 data/.pwnity_history    # CLI history file (assuming rename from .pwnity_history)
 data/temp/              # Temporary files
+data/logbook/           # Ignore all content inside the logbook directory recursively
 data/logbook/**         # Ignore all content inside the logbook directory recursively
 data/logbook/*/*
 data/logbook/*/*/*.json
 data/reports/           # Generated reports
-data/runs/              # Workflow run data
+data/runs/              # Run data
 data/targets/           # User-defined targets
 data/wordlists/         # User-defined wordlists
 data/presets/           # User-defined presets
