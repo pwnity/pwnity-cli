@@ -26,5 +26,5 @@
       ]
     }
   ],
-  "description": "The openssl tool to inspect SSL certificates"
+  "description": "Inspects SSL/TLS certificates, ciphers, and secure connections"
 }

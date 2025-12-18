@@ -17,5 +17,6 @@
         "$target.base_url"
       ]
     }
-  ]
+  ],
+  "description": "Identifies web technologies, frameworks, and server components used by a website"
 }

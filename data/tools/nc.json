@@ -13,5 +13,6 @@
       ]
     }
   ],
-  "port": "1337"
+  "port": "1337",
+  "description": "Reads and writes data over TCP or UDP connections, often used for shells and listeners"
 }

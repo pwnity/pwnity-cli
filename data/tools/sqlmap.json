@@ -22,5 +22,6 @@
       ],
       "execute_per_param": false
     }
-  ]
+  ],
+  "description": "Automated SQL injection tool to detect and exploit database vulnerabilities"
 }

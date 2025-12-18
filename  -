@@ -1,0 +1,12 @@
+HTTP/1.1 301 Moved Permanently
+Date: Thu, 18 Dec 2025 08:46:41 GMT
+Server: Apache/2.4.52 (Debian)
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+X-Powered-By: PHP/7.4.27
+X-Redirect-By: WordPress
+Location: https://moonandhoney.de/
+Content-Length: 0
+Content-Type: text/html; charset=UTF-8
+X-Frame-Options: SAMEORIGIN
+Referrer-Policy: same-origin
+

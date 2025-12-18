@@ -26,5 +26,6 @@
       ]
     }
   ],
-  "counter": "4"
+  "counter": "4",
+  "description": "Sends ICMP echo requests to test host reachability and network latency"
 }

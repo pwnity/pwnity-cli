@@ -103,6 +103,22 @@ class ToolManager(JSONManager):
                 self.delete_command(tool_name, potential_cmd_name)
                 return
 
+        # --- NEW: Syntax `... <cmd_name> <field_to_delete>` ---
+        # This handles deleting a field from within a command object.
+        if len(delete_args) == 2:
+            cmd_name, field_to_delete = delete_args
+            cmd_to_update = next((c for c in tool.get("commands", []) if c.get("name") == cmd_name), None)
+
+            if cmd_to_update:
+                if field_to_delete in cmd_to_update:
+                    del cmd_to_update[field_to_delete]
+                    # Save the entire commands list back to the tool
+                    self.update(tool_name, "commands", tool["commands"])
+                    log.success(f"Field '{field_to_delete}' deleted from command '{cmd_name}' in tool '{tool_name}'.")
+                else:
+                    log.error(f"Field '{field_to_delete}' not found in command '{cmd_name}'.")
+                return
+
         # --- Syntax 3 (Fallback): `... <field>` ---
         if len(delete_args) == 1:
             field_to_delete = delete_args[0]
@@ -498,11 +514,16 @@ class ToolManager(JSONManager):
         if "params" not in cmd:
             cmd["params"] = []
 
+        # Normalize the parameter string: replace escaped quotes with actual quotes.
+        # This handles cases where the user explicitly escapes quotes in the input,
+        # ensuring the stored string is compatible with shlex.split(posix=True).
+        normalized_param = param.replace('\\"', '"')
+            
         # Always append new parameters for predictable behavior.
         # The "intelligent" logic of inserting before a target placeholder was
         # causing parameters to be added in reverse order. The user can
         # use 'tool reorder' for fine-tuning the order.
-        cmd["params"].append(param)
+        cmd["params"].append(normalized_param)
             
         self._save_data(tool_name, tool)
         log.info(f"Param '{param}' added to {tool_name} {command_name}.")
@@ -588,12 +609,19 @@ class ToolManager(JSONManager):
                     for p in cmd.get("params", [])
                 ]
 
-                # 2. Split each resolved string into individual arguments.
+                # 2. Split each resolved string into individual arguments. This logic
+                #    is designed to correctly handle three cases:
+                #    a) A single string in JSON that represents multiple shell arguments (e.g., "-o /dev/null").
+                #    b) A single string that should be treated as one argument despite spaces (e.g., "Origin: foo.com").
+                #    c) A single string that should be treated as one argument and *retain* its quotes (e.g., "\"Header: value\"").
+                #    The key is to use `posix=False` in shlex.split.
                 final_params = []
                 for s in resolved_param_strings:
                     # Filter out empty strings that can result from resolving an empty placeholder
                     if s:
-                        final_params.extend(shlex.split(s))
+                        # Use shlex.split with posix=True. This correctly handles quoted strings as single arguments
+                        # and removes the quotes from the resulting tokens.
+                        final_params.extend(shlex.split(s, posix=True))
                 full_cmd = [executable] + final_params
                 
                 # 3. Append temporary extra parameters if present

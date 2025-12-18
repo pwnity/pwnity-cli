@@ -184,8 +184,15 @@ class Completer:
             # Check if the third token is a valid command for the tool
             is_command = any(cmd.get('name') == command_name for cmd in tool_data.get("commands", []))
             if is_command:
+                # Get the specific command object to extract its custom fields
+                command_obj = next((c for c in tool_data.get("commands", []) if c.get("name") == command_name), {})
                 # Suggest actions for a command: add a parameter or update a command-level field
                 suggestions = ['param', 'execute_per_param']
+                
+                # Add any other custom fields defined in the command
+                for key in command_obj.keys():
+                    if key not in ['name', 'params', 'execute_per_param']: # Exclude standard fields
+                        suggestions.append(key)
                 return self._filter_completions(text, suggestions)
 
         # --- NEW: Context-sensitive completion for 'tool delete <name> <command> ...' ---

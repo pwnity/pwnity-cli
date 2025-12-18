@@ -12,5 +12,6 @@
         "--ignore-main-redirect"
       ]
     }
-  ]
+  ],
+  "description": "Scans WordPress installations for vulnerabilities, plugins, themes, and users"
 }

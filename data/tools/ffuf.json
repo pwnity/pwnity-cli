@@ -19,5 +19,6 @@
         "-H 'Host: FUZZ.$target.hostname' -c"
       ]
     }
-  ]
+  ],
+  "description": "Fast web fuzzer for directory, file, parameter, and virtual host discovery"
 }

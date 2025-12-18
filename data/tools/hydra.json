@@ -12,5 +12,6 @@
         "http-post-form '$target.uri:username=^USER^&password=^PASS^:F=Invalid username or password'"
       ]
     }
-  ]
+  ],
+  "description": "Brute-forces login credentials for various network services using wordlists"
 }

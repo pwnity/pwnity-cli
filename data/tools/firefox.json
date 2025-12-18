@@ -9,5 +9,6 @@
         "--url $target.url"
       ]
     }
-  ]
+  ],
+  "description": "Launches the Firefox web browser for manual web application analysis"
 }

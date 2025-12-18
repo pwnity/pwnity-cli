@@ -1,35 +1,44 @@
 {
   "session_name": "default",
-  "target": null,
-  "tool": "python3",
+  "target": "google.com",
+  "tool": "firefox",
   "wordlist": null,
   "report": null,
   "proxy_enabled": false,
   "jobs": [
     {
-      "id": "f4b3c753-bc60-4911-8891-70d25a7b8f48",
-      "command_str": "/usr/bin/python3 -m http.server 8080 -d /home/kali/Downloads",
-      "status": "killed",
-      "duration": "70.10s",
-      "logbook_id": "6044a1ca-a5ed-454d-b8a2-744614e0e93b",
-      "start_time": 1766014228.640587,
-      "output": "Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...\r\n127.0.0.1 - - [18/Dec/2025 00:30:48] code 404, message File not found\r\n127.0.0.1 - - [18/Dec/2025 00:30:48] \"GET / HTTP/1.1\" 404 -\r\n127.0.0.1 - - [18/Dec/2025 00:30:48] code 404, message File not found\r\n127.0.0.1 - - [18/Dec/2025 00:30:48] \"GET /favicon.ico HTTP/1.1\" 404 -\r\n"
+      "id": "4b415884-1dcf-4abd-b113-25c2ff4db603",
+      "command_str": "/usr/bin/firefox --url '$target.url'",
+      "status": "finished",
+      "duration": "7.18s",
+      "logbook_id": "f0545aca-751d-4449-9465-03c8cc31b52a",
+      "start_time": 1766044355.511197,
+      "output": ""
     },
     {
-      "id": "8ea07ed0-6ff0-4ce5-96e9-a00319190a06",
-      "command_str": "/usr/bin/python3 -m http.server 8080 -d /home/kali/checkpoints",
-      "status": "killed",
-      "duration": "20.26s",
-      "logbook_id": "571d6909-54d4-45d7-a0f5-a6b69cb96d5a",
-      "start_time": 1766014309.1670148,
-      "output": "Serving HTTP on 0.0.0.0 port 8080 (http://0.0.0.0:8080/) ...\r\n127.0.0.1 - - [18/Dec/2025 00:31:55] \"GET / HTTP/1.1\" 200 -\r\n"
+      "id": "ce0c54c5-6ddf-470a-964c-dd85fdf64b96",
+      "command_str": "/usr/bin/firefox --url https://www.moonandhoney.de",
+      "status": "finished",
+      "duration": "41.16s",
+      "logbook_id": "ebcb91ee-7a49-4268-86a1-8c524660cfce",
+      "start_time": 1766044369.2600586,
+      "output": ""
+    },
+    {
+      "id": "22e4b162-c799-4916-ac2b-31bb45b1ce3a",
+      "command_str": "/usr/bin/firefox --url 'https://www.google.com/search?q=foobar&oq=foobar&gs_lcrp=EgZjaHJvbWUqDggAEEUYJxg7GIAEGIoFMg4IABBFGCcYOxiABBiKBTINCAEQABiDARixAxiABDINCAIQLhivARjHARiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTE5ODFqMGoxNagCCLACAfEFRbojIswHR0XxBUW6IyLMB0dF&sourceid=chrome&ie=UTF-8'",
+      "status": "finished",
+      "duration": "4.96s",
+      "logbook_id": "08282925-3f46-4544-85b7-cd5a540d2f81",
+      "start_time": 1766044417.8360968,
+      "output": ""
     }
   ],
   "sessions": {
     "default": {
       "name": "default",
-      "target": null,
-      "tool": "python3",
+      "target": "google.com",
+      "tool": "firefox",
       "wordlist": null,
       "report": null
     }

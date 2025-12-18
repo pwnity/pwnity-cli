@@ -14,5 +14,6 @@
       "name": "shell",
       "params": []
     }
-  ]
+  ],
+  "description": "Executes Python scripts, useful for payloads, web servers, and interactive shells"
 }

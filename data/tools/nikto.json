@@ -9,5 +9,6 @@
         "-h $target.base_url"
       ]
     }
-  ]
+  ],
+  "description": "Scans web servers for known vulnerabilities, misconfigurations, and outdated software"
 }

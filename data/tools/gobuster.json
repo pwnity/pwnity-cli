@@ -20,5 +20,6 @@
         "-d $target.domain"
       ]
     }
-  ]
+  ],
+  "description": "Performs directory, DNS, and virtual host brute-forcing against target services"
 }

@@ -11,5 +11,6 @@
       ]
     }
   ],
-  "ovpn_file_path": "/home/kali/v3rm1ll1on.ovpn"
+  "ovpn_file_path": "/home/kali/v3rm1ll1on.ovpn",
+  "description": "Establishes VPN connections using OpenVPN configuration files"
 }
