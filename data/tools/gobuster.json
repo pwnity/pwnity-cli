@@ -8,8 +8,10 @@
       "params": [
         "dir",
         "-w $wordlist.path",
-        "-u $target.base_url"
-      ]
+        "-u $target.base_url",
+        "-t 50"
+      ],
+      "description": "Performs directory and file brute-forcing against a web target"
     },
     {
       "name": "dns",
@@ -17,9 +19,22 @@
         "dns",
         "-w $wordlist.path",
         "--wildcard",
-        "-d $target.domain"
-      ]
+        "-d $target.domain",
+        "-t 50"
+      ],
+      "description": "Performs DNS subdomain brute-forcing against the target domain"
+    },
+    {
+      "name": "vhost",
+      "params": [
+        "vhost",
+        "-u $target.base_url",
+        "-w $wordlist.path",
+        "-t 50"
+      ],
+      "description": "Performs virtual host brute-forcing via HTTP Host header"
     }
   ],
-  "description": "Performs directory, DNS, and virtual host brute-forcing against target services"
+  "description": "Performs directory, DNS, and virtual host brute-forcing against target services",
+  "usage": "Add errorhandling like that: pwn dir -b 403,404 now"
 }

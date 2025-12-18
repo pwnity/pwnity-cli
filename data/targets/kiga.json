@@ -1,0 +1,14 @@
+{
+  "name": "kiga",
+  "protocol": "https",
+  "port": "443",
+  "uri": "/",
+  "url": "https://waldkobolde-weilerswist.de",
+  "hostname": "waldkobolde-weilerswist.de",
+  "ip": "92.205.62.58",
+  "domain": "waldkobolde-weilerswist.de",
+  "domain_name": "waldkobolde-weilerswist",
+  "tld": "de",
+  "subdomains": [],
+  "base_url": "https://waldkobolde-weilerswist.de"
+}

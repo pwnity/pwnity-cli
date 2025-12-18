@@ -8,24 +8,30 @@
       "params": [
         "-c $tool.counter",
         "$target.ip"
-      ]
-    },
-    {
-      "name": "localnet",
-      "params": [
-        "-c",
-        "4",
-        "$target.router"
-      ]
+      ],
+      "description": "Sends a small number of ICMP echo requests to the target host"
     },
     {
       "name": "broadcast",
       "params": [
         "-b",
+        "-c $tool.counter",
         "$target.broadcast"
-      ]
+      ],
+      "description": "Sends ICMP echo requests to the local broadcast address to discover live hosts"
+    },
+    {
+      "name": "size_test",
+      "params": [
+        "-c $tool.counter",
+        "-s 1472",
+        "-M do",
+        "$target.ip"
+      ],
+      "description": "Tests ICMP packet size handling to detect MTU or fragmentation issues"
     }
   ],
+  "description": "Sends ICMP echo requests to test host reachability and network latency",
   "counter": "4",
-  "description": "Sends ICMP echo requests to test host reachability and network latency"
+  "usage": "Use the -6 flag to use IPv6: 'pwn default -6 now'"
 }

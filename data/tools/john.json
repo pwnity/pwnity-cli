@@ -1,0 +1,42 @@
+{
+  "name": "john",
+  "path": "/usr/sbin/john",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "wordlist",
+      "params": [
+        "$tool.hashfile",
+        "--wordlist=$wordlist.path"
+      ],
+      "description": "Cracks password hashes using a wordlist attack"
+    },
+    {
+      "name": "wordlist_rules",
+      "params": [
+        "$tool.hashfile",
+        "--wordlist=$wordlist.path",
+        "--rules"
+      ],
+      "description": "Cracks hashes using a wordlist with default mangling rules"
+    },
+    {
+      "name": "auto",
+      "params": [
+        "$tool.hashfile"
+      ],
+      "description": "Automatically detects hash format and applies optimal cracking methods"
+    },
+    {
+      "name": "show",
+      "params": [
+        "--show",
+        "$tool.hashfile"
+      ],
+      "description": "Displays cracked passwords from the hash file"
+    }
+  ],
+  "description": "Cracks password hashes using various attack modes and formats",
+  "hashfile": "/path/to/your/hashfile",
+  "usage": "update your hash file with command 'tool update john hashfile /PATH/TO/HASHES.txt'"
+}

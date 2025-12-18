@@ -4,15 +4,35 @@
   "name": "nc",
   "commands": [
     {
-      "name": "listen_1337",
+      "name": "listen",
       "params": [
         "-l",
         "-p $tool.port",
         "-v",
         "-n"
-      ]
+      ],
+      "description": "Starts a TCP listener on the configured port"
+    },
+    {
+      "name": "connect",
+      "params": [
+        "$target.host",
+        "$tool.port"
+      ],
+      "description": "Connects to a remote TCP service"
+    },
+    {
+      "name": "udp_listen",
+      "params": [
+        "-l",
+        "-u",
+        "-p $tool.port",
+        "-v",
+        "-n"
+      ],
+      "description": "Starts a UDP listener on the configured port"
     }
   ],
-  "port": "1337",
-  "description": "Reads and writes data over TCP or UDP connections, often used for shells and listeners"
+  "description": "Reads and writes data over TCP or UDP connections, often used for shells and listeners",
+  "port": "1337"
 }

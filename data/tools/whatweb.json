@@ -6,16 +6,28 @@
     {
       "name": "quick",
       "params": [
+        "-a 1",
         "$target.base_url"
-      ]
+      ],
+      "description": "Performs a fast and low-noise technology fingerprinting scan"
     },
     {
       "name": "aggro",
       "params": [
-        "-v",
         "-a 3",
+        "-v",
         "$target.base_url"
-      ]
+      ],
+      "description": "Performs aggressive technology detection using all available plugins (noisy)"
+    },
+    {
+      "name": "verbose",
+      "params": [
+        "-a 2",
+        "-v",
+        "$target.base_url"
+      ],
+      "description": "Performs a detailed technology fingerprinting scan with verbose output"
     }
   ],
   "description": "Identifies web technologies, frameworks, and server components used by a website"

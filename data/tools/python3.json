@@ -7,13 +7,26 @@
       "name": "webserver",
       "params": [
         "-m http.server",
-        "8080"
-      ]
+        "$tool.webport"
+      ],
+      "description": "Starts a simple Python HTTP server for file transfers or payload hosting"
     },
     {
       "name": "shell",
-      "params": []
+      "params": [
+        "-i"
+      ],
+      "description": "Starts an interactive Python REPL"
+    },
+    {
+      "name": "exec",
+      "params": [
+        "-c"
+      ],
+      "description": "Executes a one-line Python command. Usage: 'run exec print('foo') now'"
     }
   ],
-  "description": "Executes Python scripts, useful for payloads, web servers, and interactive shells"
+  "description": "Executes Python scripts, useful for payloads, web servers, and interactive shells",
+  "usage": "Use 'shell' for an interactive Python REPL or execute custom code via python3 directly",
+  "webport": "8080"
 }

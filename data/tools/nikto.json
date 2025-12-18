@@ -6,8 +6,33 @@
     {
       "name": "scan",
       "params": [
+        "-h $target.base_url",
+        "-ssl"
+      ],
+      "description": "Performs a standard HTTPS web server vulnerability scan"
+    },
+    {
+      "name": "scan_tuning",
+      "params": [
+        "-h $target.base_url",
+        "-Tuning 123b"
+      ],
+      "description": "Performs a tuned scan focusing on common and high-impact findings"
+    },
+    {
+      "name": "scan_all",
+      "params": [
+        "-h $target.base_url",
+        "-Tuning x"
+      ],
+      "description": "Performs a full and noisy vulnerability scan"
+    },
+    {
+      "name": "scan_http",
+      "params": [
         "-h $target.base_url"
-      ]
+      ],
+      "description": "Performs a standard web server vulnerability scan"
     }
   ],
   "description": "Scans web servers for known vulnerabilities, misconfigurations, and outdated software"
