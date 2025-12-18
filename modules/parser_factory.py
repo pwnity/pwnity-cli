@@ -886,6 +886,12 @@ class ParserFactory:
         list_parser = subparsers.add_parser("list", help="List all active and saved heartbeats.", formatter_class=self.formatter, add_help=False)
         self._add_custom_help(list_parser, "list")
 
+        destroy_parser = subparsers.add_parser("destroy", help="Delete the data file for a heartbeat.", formatter_class=self.formatter, add_help=False)
+        self._add_custom_help(destroy_parser, "destroy")
+        destroy_parser.add_argument("name", help="The name of the heartbeat data to delete.", choices_provider=heartbeat_completer)
+        destroy_parser.examples = [("heartbeat destroy my-target", "Deletes the saved data for 'my-target' after it has been stopped.")]
+
+
         if self.help_mgr:
             self.help_mgr.add_command_to_category('heartbeat', 'Session & State', "Monitor a target's health.")
 

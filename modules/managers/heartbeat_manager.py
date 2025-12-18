@@ -62,6 +62,10 @@ class HeartbeatManager(BaseManager):
         # Let the parent class handle the actual dispatch to _cmd_* methods
         return super().dispatch(subcommand, args, cli)
 
+    def _cmd_destroy(self, args, cli):
+        """Handles the 'destroy' subcommand by calling the manager's destroy logic."""
+        self.destroy(args.name)
+
     def _get_entity_type(self):
         return "Heartbeat"
 
@@ -174,9 +178,6 @@ class HeartbeatManager(BaseManager):
         if timelimit:
             log.info(f"Monitoring will stop automatically after {timelimit} seconds.")
         log.prompt(f"View live data with 'heartbeat show {target_name}' or stop with 'heartbeat stop {target_name}'.")
-
-    def _cmd_destroy(self, args, cli):
-        self.destroy(args.name)
 
     def _monitor_loop(self, target_name, url, min_delay, max_delay, timelimit, stop_event, proxy_config):
         heartbeat_data = {
@@ -426,14 +427,21 @@ class HeartbeatManager(BaseManager):
         return Panel(Group(latency_panel, bottom_cols), title=Text.from_markup(title_text), border_style="blue", expand=True)
 
     def _cmd_show(self, args, cli):
-        target_name = args.name
-        is_live = target_name in self.active_heartbeats
+        target_name_arg = args.name
+        if not target_name_arg:
+            target_name_arg = cli.session.target
+            if not target_name_arg:
+                log.error("No target specified and no target loaded in the session.")
+                log.prompt("Use 'heartbeat show <name>' or load one with 'heartbeat start'.")
+                return
+
+        is_live = target_name_arg in self.active_heartbeats
 
         if is_live:
             try:
-                with Live(self._generate_show_panel(target_name, cli.console), console=cli.console, screen=True, auto_refresh=False) as live:
-                    while target_name in self.active_heartbeats:
-                        live.update(self._generate_show_panel(target_name, cli.console), refresh=True)
+                with Live(self._generate_show_panel(target_name_arg, cli.console), console=cli.console, screen=True, auto_refresh=False) as live:
+                    while target_name_arg in self.active_heartbeats:
+                        live.update(self._generate_show_panel(target_name_arg, cli.console), refresh=True)
                         time.sleep(1)
             except KeyboardInterrupt:
                 pass # Exit live view gracefully
@@ -442,7 +450,12 @@ class HeartbeatManager(BaseManager):
             cli.console.print(panel)
 
     def _cmd_list(self, args, cli):
-        table = Table(title="Heartbeat Status", show_header=True, header_style="bold blue", expand=True)
+        items = self.list_all()
+        if not items:
+            log.info("No Heartbeats found (running or stopped).")
+            return
+
+        table = Table(box=None, expand=True, show_header=True, header_style="bold blue", padding=(0, 2))
         table.add_column("Target", style="cyan")
         table.add_column("Status", style="green")
         table.add_column("Delay (s)")
@@ -452,7 +465,7 @@ class HeartbeatManager(BaseManager):
         all_targets = self.list_all()
 
         for target_name in all_targets:
-            if target_name in self.active_heartbeats:
+            if target_name in self.active_heartbeats: # Running heartbeats
                 data = self._read_heartbeat_data(target_name)
                 status = "[bold green]Running[/bold green]"
                 interval = f"{data.get('min_delay_seconds', 'N/A')}-{data.get('max_delay_seconds', 'N/A')}" if data else "N/A"
@@ -460,13 +473,20 @@ class HeartbeatManager(BaseManager):
                 table.add_row(target_name, status, interval, points)
             else:
                 data = self._read_heartbeat_data(target_name)
-                if data:
+                if data: # Stopped heartbeats with data files
                     status = "[dim]Stopped[/dim]"
                     interval = f"{data.get('min_delay_seconds', 'N/A')}-{data.get('max_delay_seconds', 'N/A')}"
                     points = str(len(data.get('data_points', [])))
                     table.add_row(target_name, status, interval, points)
         
-        cli.console.print(table)
+        panel = Panel(
+            table,
+            title="[bold]Heartbeat Status[/bold]",
+            border_style="blue",
+            expand=False,
+            subtitle=f"{len(items)} Heartbeats total"
+        )
+        cli.console.print(panel)
 
     def shutdown(self):
         if not self.active_heartbeats:
