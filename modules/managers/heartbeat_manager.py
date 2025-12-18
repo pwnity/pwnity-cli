@@ -446,7 +446,7 @@ class HeartbeatManager(BaseManager):
             except KeyboardInterrupt:
                 pass # Exit live view gracefully
         else:
-            panel = self._generate_show_panel(target_name, cli.console)
+            panel = self._generate_show_panel(target_name_arg, cli.console)
             cli.console.print(panel)
 
     def _cmd_list(self, args, cli):
