@@ -1,0 +1,5 @@
+{
+  "name": "unix_users",
+  "path": "/usr/share/wordlists/metasploit/unix_users.txt",
+  "description": "Common Unix/Linux usernames for authentication attacks"
+}

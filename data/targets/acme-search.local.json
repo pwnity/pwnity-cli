@@ -1,0 +1,89 @@
+{
+  "name": "acme-search.local",
+  "protocol": "https",
+  "hostname": "search.acme-labs.local",
+  "ip": "203.0.113.42",
+  "ipv6_addresses": [
+    "2001:db8:dead:beef::42"
+  ],
+  "domain": "acme-labs.local",
+  "domain_name": "acme-labs",
+  "tld": "local",
+  "subdomains": [
+    "search",
+    "www"
+  ],
+  "port": "443",
+  "base_url": "https://search.acme-labs.local",
+  "uri": "/search",
+  "query_values": {
+    "q": [
+      "demo"
+    ],
+    "source": [
+      "homepage"
+    ],
+    "lang": [
+      "en"
+    ]
+  },
+  "query_params": [
+    "q=demo",
+    "source=homepage",
+    "lang=en"
+  ],
+  "url": "https://search.acme-labs.local/search?q=demo&source=homepage&lang=en",
+  "ptr_record": "edge-fw-01.acme-labs.local",
+  "ssl_info": {
+    "subject": {
+      "commonName": "search.acme-labs.local"
+    },
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Acme Internal CA",
+      "commonName": "Acme-Root-CA"
+    },
+    "valid_from": "Jan 01 00:00:00 2025 GMT",
+    "valid_to": "Jan 01 00:00:00 2030 GMT",
+    "sans": [
+      "search.acme-labs.local",
+      "www.acme-labs.local"
+    ]
+  },
+  "http_headers": {
+    "Server": "nginx/1.24.0",
+    "Content-Type": "text/html; charset=UTF-8",
+    "Cache-Control": "no-store",
+    "X-Frame-Options": "SAMEORIGIN",
+    "X-Content-Type-Options": "nosniff",
+    "X-XSS-Protection": "1; mode=block",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self'; object-src 'none'"
+  },
+  "whois_info": {
+    "domain_name": "ACME-LABS.LOCAL",
+    "registrar": "Internal Demo Registrar",
+    "creation_date": "2020-01-01T00:00:00Z",
+    "expiration_date": "2030-01-01T00:00:00Z",
+    "name_servers": [
+      "ns1.acme-labs.local",
+      "ns2.acme-labs.local"
+    ],
+    "org": "Acme Labs Demo Environment",
+    "country": "N/A",
+    "dnssec": "unsigned"
+  },
+  "geo_intel": {
+    "ip": "203.0.113.42",
+    "city": "Demo City",
+    "country": "Nowhere Land",
+    "isp": "Acme Labs",
+    "as": "AS65000 Acme Labs"
+  },
+  "tags": [
+    "demo",
+    "simulated",
+    "safe",
+    "training-only"
+  ],
+  "disclaimer": "This target is fully simulated. No real infrastructure is involved. Safe for demos and testing."
+}

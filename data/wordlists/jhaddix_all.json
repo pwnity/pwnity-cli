@@ -1,0 +1,5 @@
+{
+  "name": "jhaddix_all",
+  "path": "/usr/share/wordlists/amass/jhaddix_all.txt",
+  "description": "Comprehensive curated subdomain wordlist by Jhaddix"
+}

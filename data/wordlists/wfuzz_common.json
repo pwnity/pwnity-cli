@@ -1,0 +1,5 @@
+{
+  "name": "wfuzz_common",
+  "path": "/usr/share/wordlists/wfuzz/general/common.txt",
+  "description": "Common web paths for fuzzing with wfuzz"
+}

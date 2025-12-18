@@ -1,0 +1,5 @@
+{
+  "name": "dirbuster_medium",
+  "path": "/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt",
+  "description": "Medium-sized DirBuster list balancing speed and coverage"
+}

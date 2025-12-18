@@ -1,4 +1,5 @@
 {
   "name": "rockyou",
-  "path": "/usr/share/wordlists/rockyou.txt"
+  "path": "/usr/share/wordlists/rockyou.txt",
+  "description": "Classic leaked password list used for general password bruteforcing"
 }

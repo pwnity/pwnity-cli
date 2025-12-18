@@ -85,7 +85,7 @@ class WordlistManager(JSONManager):
         table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
         table.add_column("Name", style="magenta", no_wrap=True, min_width=20)
         table.add_column("Path", style="cyan", no_wrap=False, ratio=1)
-        table.add_column("Description", style="dim", no_wrap=False, max_width=40)
+        table.add_column("Description", style="dim", no_wrap=False)
 
         for name in items:
             data = self.load(name)

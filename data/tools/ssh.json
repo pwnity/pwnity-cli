@@ -1,0 +1,33 @@
+{
+  "name": "ssh",
+  "path": "/usr/bin/ssh",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "connect",
+      "params": [
+        "-l $target.username",
+        "-p $target.port",
+        "-i $tool.sshkey",
+        "$target.ip"
+      ],
+      "description": "Quick connect to a remote server"
+    },
+    {
+      "name": "dynamic_proxy",
+      "params": [
+        "-D $tool.dynamic_port",
+        "-N",
+        "-p $target.port",
+        "-i $tool.sshkey",
+        "-l $target.username",
+        "$target.ip"
+      ],
+      "description": "Establishes a SOCKS5 proxy via SSH for traffic pivoting and internal network access"
+    }
+  ],
+  "description": "Secure shell client for authenticated remote access",
+  "usage": "Define a SSH target with the 'target add...' command",
+  "sshkey": "~/.ssh/id_rsa",
+  "dynamic_port": "1080"
+}
