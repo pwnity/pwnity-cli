@@ -111,6 +111,28 @@ except ImportError:
     RichHelpFormatter = argparse.HelpFormatter
 
 class MyCLI(cmd2.Cmd):
+    def completer_pre_parse_matches(self, matches: list) -> list:
+        """
+        A cmd2 hook to post-process completion matches before they are displayed or inserted.
+        This is used to solve the "index (value)" completion problem for tool parameters.
+        We want to display "1 (-s)" but only insert "1".
+        """
+        new_matches = []
+        for match in matches:
+            # Check if the match is in the format "123 (some value)"
+            if isinstance(match, str) and match.endswith(')') and ' (' in match:
+                # Extract just the number, e.g., "1" from "1 (-s)"
+                base_match = match.split(' (', 1)[0]
+
+                # --- FINAL FIX: Add a space for 'reorder' for better usability ---
+                # This allows tabbing through both indices without manual spacing.
+                # We check the raw statement directly, as `self.last_command` might not be updated yet.
+                if self.statement.raw.strip().startswith('tool reorder'):
+                    match = base_match + ' '
+                else:
+                    match = base_match
+            new_matches.append(match)
+        return new_matches
 
     # --- Define empty parsers at the class level so the decorators have a target.
     # The actual configuration happens in __init__ via the ParserFactory.

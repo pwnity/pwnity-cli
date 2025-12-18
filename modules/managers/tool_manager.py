@@ -242,6 +242,7 @@ class ToolManager(JSONManager):
 
             # Subcase: `... param <index> <new_value>`
             if len(param_args) >= 2:
+                # Try to interpret the first argument as an index
                 try:
                     idx = int(param_args[0])
                     new_value = " ".join(param_args[1:])

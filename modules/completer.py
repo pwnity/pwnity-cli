@@ -207,7 +207,49 @@ class Completer:
             is_command = any(cmd.get('name') == command_name for cmd in tool_data.get("commands", []))
             if is_command:
                 # Suggest 'param' to delete a parameter from the command
+                suggestions = ['param']
+                # Also suggest other fields within the command object for deletion
+                command_obj = next((c for c in tool_data.get("commands", []) if c.get("name") == command_name), {})
+                for key in command_obj.keys():
+                    if key not in ['name', 'params']: # Exclude standard fields
+                        suggestions.append(key)
+                return self._filter_completions(text, suggestions)
+            elif command_name == 'command':
+                # This handles `tool delete <tool_name> command <TAB>`
+                command_names = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
+                return self._filter_completions(text, command_names)
+
+        # --- NEW: Context-sensitive completion for 'tool reorder' ---
+        if tokens[1] == 'reorder':
+            # `tool reorder <tool_name> <TAB>` -> suggest command names
+            if num_tokens == 3:
+                tool_name = tokens[2]
+                tool_data = self.cli.tool_mgr.load(tool_name)
+                if not tool_data: return []
+                command_names = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
+                return self._filter_completions(text, command_names)
+
+            # `tool reorder <tool_name> <command_name> <TAB>` -> suggest 'param'
+            if num_tokens == 4:
                 return self._filter_completions(text, ['param'])
+
+            # `tool reorder <tool_name> <command_name> param <TAB>` (old_index)
+            # `tool reorder <tool_name> <command_name> param <old_index> <TAB>` (new_index)
+            if num_tokens >= 5 and tokens[4] == 'param':
+                tool_name = tokens[2]
+                command_name = tokens[3]
+                tool_data = self.cli.tool_mgr.load(tool_name)
+                if not tool_data: return []
+
+                command = next((c for c in tool_data.get("commands", []) if c.get("name") == command_name), None)
+                if not command or not command.get("params"): return []
+
+                # For both old_index and new_index, we suggest the available parameter indices.
+                # We use the same rich completion item as for 'tool update' for a consistent user experience.
+                suggestions = [CompletionItem(f"{i} ({(param_value[:75] + '...') if len(param_value) > 75 else param_value})")
+                               for i, param_value in enumerate(command.get("params", []), 1)]
+
+                return self._filter_completions(text, suggestions)
 
         # 5. --- NEW: Suggest parameter indices for 'tool update <name> <cmd> param <TAB>' ---
         if num_tokens == 5 and tokens[1] == 'update' and tokens[4] == 'param':
@@ -223,10 +265,11 @@ class Completer:
 
             # Create CompletionItem suggestions for each parameter index.
             # The completion value is the index (1-based), and the description is the parameter's value.
-            # --- FIX: Directly format the string for display, as CompletionItem description is not always shown. ---
-            # This ensures the value is visible in the completion suggestions.
-            suggestions = [f"{i} ({(param_value[:75] + '...') if len(param_value) > 75 else param_value})"
+            # We create a formatted string that will be parsed by `completer_pre_parse_matches` in the main CLI class
+            # to separate the display text from the completion value.
+            suggestions = [CompletionItem(f"{i} ({(param_value[:75] + '...') if len(param_value) > 75 else param_value})")
                            for i, param_value in enumerate(command.get("params", []), 1)]
+
             return self._filter_completions(text, suggestions)
 
         # 6. --- NEW: Suggest parameter indices for 'tool delete <name> <cmd> param <TAB>' ---
@@ -241,10 +284,21 @@ class Completer:
             if not command or not command.get("params"):
                 return []
 
-            # --- FIX: Use direct string formatting for consistency with 'update' completion. ---
-            suggestions = [f"{i} ({(param_value[:75] + '...') if len(param_value) > 75 else param_value})"
+            # Use the same logic as in the 'update' completer for consistency.
+            suggestions = [CompletionItem(f"{i} ({(param_value[:75] + '...') if len(param_value) > 75 else param_value})")
                            for i, param_value in enumerate(command.get("params", []), 1)]
+
             return self._filter_completions(text, suggestions)
+
+        # 7. --- NEW: Placeholder completion for parameter values ---
+        # This handles `tool update <name> <cmd> param <index> <value_part...$entity.>`
+        if num_tokens >= 5 and tokens[1] == 'update' and 'param' in tokens:
+            # Check if the text to be completed looks like a placeholder
+            if text.startswith('$'):
+                # Get all available placeholders from the utility manager
+                placeholders = self.cli.utility_mgr.get_all_placeholders(self.cli.session)
+                # Filter and return suggestions
+                return [p for p in placeholders if p.startswith(text)]
 
         return []
 
