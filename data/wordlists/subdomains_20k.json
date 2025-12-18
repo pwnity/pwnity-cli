@@ -1,0 +1,5 @@
+{
+  "name": "subdomains_20k",
+  "path": "/usr/share/wordlists/amass/subdomains-top1mil-20000.txt",
+  "description": "Extended subdomain list for deeper DNS enumeration"
+}

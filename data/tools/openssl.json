@@ -1,0 +1,46 @@
+{
+  "name": "openssl",
+  "path": "/usr/bin/openssl",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "get-cert",
+      "params": [
+        "s_client",
+        "-connect",
+        "$target.hostname:$target.port",
+        "-servername",
+        "$target.hostname",
+        "-showcerts"
+      ],
+      "description": "Retrieves and displays the full TLS certificate chain from the target"
+    },
+    {
+      "name": "check-cipher",
+      "params": [
+        "s_client",
+        "-connect",
+        "$target.hostname:$target.port",
+        "-servername",
+        "$target.hostname",
+        "-cipher $tool.cipher"
+      ],
+      "description": "Tests whether a specific TLS cipher is accepted by the target"
+    },
+    {
+      "name": "force_tls_version",
+      "params": [
+        "s_client",
+        "-connect",
+        "$target.hostname:$target.port",
+        "-servername",
+        "$target.hostname",
+        "-$tool.tls_version"
+      ],
+      "description": "Forces a specific TLS protocol version to test server support"
+    }
+  ],
+  "description": "Inspects SSL/TLS certificates, ciphers, and secure connections",
+  "cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+  "tls_version": "tls1_2"
+}

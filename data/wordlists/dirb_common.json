@@ -1,0 +1,5 @@
+{
+  "name": "dirb_common",
+  "path": "/usr/share/wordlists/dirb/common.txt",
+  "description": "Common directories and files for web enumeration"
+}

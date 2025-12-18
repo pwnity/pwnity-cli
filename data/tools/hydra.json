@@ -1,0 +1,30 @@
+{
+  "path": "/usr/bin/hydra",
+  "sudo": false,
+  "name": "hydra",
+  "commands": [
+    {
+      "name": "http_post_form",
+      "params": [
+        "-L $tool.userlist",
+        "-P $wordlist.path",
+        "$target.host",
+        "http-post-form \\\"$target.uri:$auth.post_data:F=$auth.fail_string\\\""
+      ],
+      "description": "Brute-forces HTTP POST authentication forms using user and password lists"
+    },
+    {
+      "name": "http_get",
+      "params": [
+        "-L $tool.userlist",
+        "-P $wordlist.path",
+        "$target.host",
+        "http-get"
+      ],
+      "description": "Brute-forces HTTP Basic Authentication"
+    }
+  ],
+  "description": "Brute-forces login credentials for various network services using wordlists",
+  "userlist": "/path/to/your/userlist",
+  "usage": "update your custom user list with command 'tool update hydra userlist /YOUR/PATH/TO/USERFILE.txt'"
+}

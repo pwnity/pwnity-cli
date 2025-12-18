@@ -1,0 +1,74 @@
+{
+  "path": "/usr/bin/curl",
+  "sudo": false,
+  "name": "curl",
+  "commands": [
+    {
+      "name": "head",
+      "params": [
+        "-I",
+        "-s",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Performs an HTTP HEAD request to retrieve response headers"
+    },
+    {
+      "name": "get",
+      "params": [
+        "-s",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Performs a basic HTTP GET request and returns the response body"
+    },
+    {
+      "name": "headers",
+      "params": [
+        "-s",
+        "-D -",
+        "-o /dev/null",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Retrieves full HTTP response headers"
+    },
+    {
+      "name": "cors_check",
+      "params": [
+        "-s",
+        "-H",
+        "\"Origin: https://evil.com\"",
+        "-D -",
+        "-o /dev/null",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Checks CORS configuration using a custom Origin header"
+    },
+    {
+      "name": "follow_redirects",
+      "params": [
+        "-s",
+        "-L",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Performs an HTTP GET request and follows redirects"
+    },
+    {
+      "name": "options",
+      "params": [
+        "-s",
+        "-X OPTIONS",
+        "-D -",
+        "-o /dev/null",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Queries allowed HTTP methods via an OPTIONS request"
+    }
+  ],
+  "description": "Transfers data to or from a server using various network protocols (HTTP, HTTPS, FTP, etc.)",
+  "usage": "Use adhoc parameters like: 'pwn get -k now'"
+}

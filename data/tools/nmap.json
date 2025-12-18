@@ -1,0 +1,58 @@
+{
+  "path": "/usr/bin/nmap",
+  "sudo": false,
+  "name": "nmap",
+  "commands": [
+    {
+      "name": "quick",
+      "params": [
+        "-T4",
+        "-F",
+        "$target.ip"
+      ],
+      "description": "Performs a fast top-ports scan to quickly identify common open services"
+    },
+    {
+      "name": "full",
+      "params": [
+        "-p-",
+        "-T4",
+        "--min-rate=1000",
+        "-v",
+        "$target.ip"
+      ],
+      "description": "Performs a full TCP port scan on all ports (noisy and potentially detectable)"
+    },
+    {
+      "name": "service",
+      "params": [
+        "-sV",
+        "-sC",
+        "-T4",
+        "$target.ip"
+      ],
+      "description": "Enumerates services and versions on open ports using default scripts"
+    },
+    {
+      "name": "udp",
+      "params": [
+        "-sU",
+        "--top-ports=100",
+        "-v",
+        "$target.ip"
+      ],
+      "description": "Scans common UDP ports to identify exposed UDP services (slow and unreliable by nature)"
+    },
+    {
+      "name": "aggressive",
+      "params": [
+        "-A",
+        "-T4",
+        "$target.ip"
+      ],
+      "description": "Runs an aggressive scan enabling OS detection, version detection, scripts, and traceroute"
+    }
+  ],
+  "description": "Scans hosts or networks with the nmap scanner tool",
+  "usage": "Update the target IP and run a scan against it."
+}

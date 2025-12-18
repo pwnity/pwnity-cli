@@ -1,0 +1,5 @@
+{
+  "name": "dirb_big",
+  "path": "/usr/share/wordlists/dirb/big.txt",
+  "description": "Large directory brute-force list for deeper web enumeration"
+}

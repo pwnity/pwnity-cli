@@ -1,0 +1,18 @@
+{
+  "name": "openvpn",
+  "path": "/usr/sbin/openvpn",
+  "sudo": true,
+  "commands": [
+    {
+      "name": "connect_tryhackme",
+      "params": [
+        "--config",
+        "$tool.ovpn_file_path"
+      ],
+      "description": "Connects to the TryHackMe VPN using the configured OpenVPN profile"
+    }
+  ],
+  "description": "Establishes VPN connections using OpenVPN configuration files",
+  "usage": "Start with 'pwn connect_tryhackme bg' to start the connection in background to avoid a blocked terminal",
+  "ovpn_file_path": "/path/to/your/vpnfile.ovpn"
+}

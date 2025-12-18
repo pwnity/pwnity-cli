@@ -1,0 +1,78 @@
+{
+  "path": "/usr/bin/sqlmap",
+  "sudo": false,
+  "name": "sqlmap",
+  "commands": [
+    {
+      "name": "detect",
+      "params": [
+        "-u $target.url",
+        "--batch",
+        "--level=$tool.level",
+        "--risk=$tool.risk",
+        "--timeout=10",
+        "--retries=1"
+      ],
+      "description": "Tests the target URL for basic SQL injection vulnerabilities"
+    },
+    {
+      "name": "list_dbs",
+      "params": [
+        "-u $target.url",
+        "--dbs",
+        "--batch"
+      ],
+      "description": "Enumerates available database names"
+    },
+    {
+      "name": "list_tables",
+      "params": [
+        "-u $target.url",
+        "-D $tool.db",
+        "--tables",
+        "--batch"
+      ],
+      "description": "Lists tables of a specific database"
+    },
+    {
+      "name": "list_columns",
+      "params": [
+        "-u $target.url",
+        "-D $tool.db",
+        "-T $tool.table",
+        "--columns",
+        "--batch"
+      ],
+      "description": "Lists columns of a specific table"
+    },
+    {
+      "name": "dump_table",
+      "params": [
+        "-u $target.url",
+        "-D $tool.db",
+        "-T $tool.table",
+        "--dump",
+        "--batch",
+        "--threads=$tool.threads"
+      ],
+      "description": "Dumps data from a specific table"
+    },
+    {
+      "name": "dump_db",
+      "params": [
+        "-u $target.url",
+        "-D $tool.db",
+        "--dump",
+        "--batch",
+        "--threads=$tool.threads"
+      ],
+      "description": "Dumps all tables of a database (noisy, high impact)"
+    }
+  ],
+  "description": "Automated SQL injection tool to detect and exploit database vulnerabilities",
+  "level": "1",
+  "risk": "1",
+  "threads": "1",
+  "db": "",
+  "table": ""
+}

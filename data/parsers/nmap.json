@@ -1,0 +1,130 @@
+{
+  "name": "Nmap Scan Artifacts",
+  "description": "This is my parser",
+  "rules": [
+    {
+      "name": "ipv4",
+      "regex": "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b",
+      "exclude_patterns": [
+        "^0\\.0\\.0\\.0$",
+        "^127\\.0\\.0\\.1$",
+        "^255\\.255\\.255\\.255$"
+      ]
+    },
+    {
+      "name": "hostname",
+      "regex": "\\b(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}\\b",
+      "exclude_patterns": [
+        "localhost"
+      ]
+    },
+    {
+      "name": "tcp_port",
+      "regex": "\\b(\\d{1,5})/tcp\\b"
+    },
+    {
+      "name": "udp_port",
+      "regex": "\\b(\\d{1,5})/udp\\b"
+    },
+    {
+      "name": "service_name",
+      "regex": "^\\d{1,5}/(?:tcp|udp)\\s+open\\s+([a-zA-Z0-9\\-_]+)"
+    },
+    {
+      "name": "service_version",
+      "regex": "^\\d{1,5}/(?:tcp|udp)\\s+open\\s+[a-zA-Z0-9\\-_]+\\s+([\\S ].+)$"
+    },
+    {
+      "name": "service_state",
+      "regex": "^\\d{1,5}/(?:tcp|udp)\\s+(open|closed|filtered)"
+    },
+    {
+      "name": "ssh_hostkey",
+      "regex": "^\\|\\s*(\\d+)\\s+([0-9a-f:]+)\\s*\\((RSA|ECDSA|ED25519)\\)$"
+    },
+    {
+      "name": "openssh_version",
+      "regex": "OpenSSH\\s+([\\d\\.p]+)"
+    },
+    {
+      "name": "openssh_distribution",
+      "regex": "OpenSSH [\\d\\.p]+ ([^\\(]+)"
+    },
+    {
+      "name": "http_server_header",
+      "regex": "http-server-header:\\s*(.+)"
+    },
+    {
+      "name": "http_title",
+      "regex": "http-title:\\s*(.+)"
+    },
+    {
+      "name": "http_generator",
+      "regex": "http-generator:\\s*(.+)"
+    },
+    {
+      "name": "http_redirect",
+      "regex": "Did not follow redirect to\\s*(https?://\\S+)"
+    },
+    {
+      "name": "apache_version",
+      "regex": "Apache(?: httpd)?\\s*([\\d\\.]+)"
+    },
+    {
+      "name": "apache_distribution",
+      "regex": "Apache(?: httpd)? [\\d\\.]+ \\(([^)]+)\\)"
+    },
+    {
+      "name": "nginx_version",
+      "regex": "nginx/([\\d\\.]+)"
+    },
+    {
+      "name": "php_version",
+      "regex": "PHP/([\\d\\.]+)"
+    },
+    {
+      "name": "cms",
+      "regex": "(WordPress|Joomla|Drupal|Magento|Typo3|Ghost|Shopware)\\s*([\\d\\.]+)?"
+    },
+    {
+      "name": "cms_plugin",
+      "regex": "(Elementor|WooCommerce|Yoast|Jetpack|WPForms|ContactForm7|AdvancedCustomFields)\\s*([\\d\\.]+)?"
+    },
+    {
+      "name": "ssl_cert_subject",
+      "regex": "^\\| ssl-cert: Subject: commonName=(.+)$"
+    },
+    {
+      "name": "ssl_cert_san",
+      "regex": "^\\| Subject Alternative Name: (.+)$"
+    },
+    {
+      "name": "ssl_cert_valid_from",
+      "regex": "^\\| Not valid before: (.+)$"
+    },
+    {
+      "name": "ssl_cert_valid_to",
+      "regex": "^\\|_Not valid after:\\s+(.+)$"
+    },
+    {
+      "name": "tls_alpn_protocol",
+      "regex": "^\\|?_?\\s*(http/\\d\\.\\d)$"
+    },
+    {
+      "name": "tls_randomness_warning",
+      "regex": "TLS randomness does not represent time"
+    },
+    {
+      "name": "host_down",
+      "regex": "Host seems down."
+    },
+    {
+      "name": "filtered_ports",
+      "regex": "^\\d{1,5}/(?:tcp|udp)\\s+filtered"
+    },
+    {
+      "name": "closed_ports",
+      "regex": "Not shown: (\\d+) closed tcp ports"
+    }
+  ]
+}

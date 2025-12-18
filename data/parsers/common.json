@@ -1,0 +1,129 @@
+{
+  "name": "Common Artifacts",
+  "description": "A refined collection of general-purpose regex patterns for finding common artifacts like IPs, hostnames, credentials, and secrets with a focus on reducing noise.",
+  "rules": [
+    {
+      "name": "ipv4",
+      "regex": "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b",
+      "exclude_patterns": [
+        "^0\\.0\\.0\\.0$",
+        "^127\\.0\\.0\\.1$",
+        "^255\\.255\\.255\\.255$",
+        "^192\\.168\\.",
+        "^10\\.",
+        "^172\\.(1[6-9]|2[0-9]|3[0-1])\\."
+      ]
+    },
+    {
+      "name": "ipv6",
+      "regex": "\\b(?:(?:[a-fA-F0-9]{1,4}:){2,7}[a-fA-F0-9]{1,4}|(?:[a-fA-F0-9]{1,4}:){1,7}:|:(?::[a-fA-F0-9]{1,4}){1,7})\\b",
+      "exclude_patterns": [
+        "^::1$",
+        "^\\d{1,2}:\\d{2}:\\d{2}$"
+      ]
+    },
+    {
+      "name": "cidr",
+      "regex": "\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}\\b"
+    },
+    {
+      "name": "mac_address",
+      "regex": "\\b(?:[0-9a-fA-F]{2}[:-]){5}(?:[0-9a-fA-F]{2})\\b"
+    },
+    {
+      "name": "hostname",
+      "regex": "\\b(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}\\b",
+      "exclude_patterns": [
+        "localhost",
+        "w3\\.org",
+        "schema\\.org",
+        "xml\\.org",
+        "oasis-open\\.org"
+      ]
+    },
+    {
+      "name": "url",
+      "regex": "https?://(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}(?::\\d+)?(?:/[^\\s]*)?",
+      "exclude_patterns": [
+        "localhost",
+        "127\\.0\\.0\\.1",
+        "\\.(jpg|jpeg|png|gif|svg|css|js|woff|woff2|ico|map)$"
+      ]
+    },
+    {
+      "name": "s3_bucket",
+      "regex": "(?i)\\b[a-z0-9.-]+\\.s3\\.(?:[a-z0-9-]+.)?amazonaws\\.com\\b"
+    },
+    {
+      "name": "email",
+      "regex": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+    },
+    {
+      "name": "user_pass_combo",
+      "regex": "\\b[a-zA-Z0-9._-]{3,20}:[a-zA-Z0-9._-]{4,}\\b",
+      "exclude_patterns": [
+        "^(?:[0-9a-fA-F]{2}[:-]){5}(?:[0-9a-fA-F]{2})",
+        "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}"
+      ]
+    },
+    {
+      "name": "aws_access_key",
+      "regex": "AKIA[0-9A-Z]{16}"
+    },
+    {
+      "name": "generic_secret",
+      "regex": "(?i)(?:secret|token|password|key|auth|bearer)[\\s=\\\"':]+\\s*([a-zA-Z0-9\\-_=+/]{20,})"
+    },
+    {
+      "name": "jwt_token",
+      "regex": "eyJ[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+"
+    },
+    {
+      "name": "private_key_header",
+      "regex": "-----(?:BEGIN (?:RSA|DSA|EC|OPENSSH) PRIVATE KEY)-----"
+    },
+    {
+      "name": "md5",
+      "regex": "\\b[a-fA-F0-9]{32}\\b"
+    },
+    {
+      "name": "sha1",
+      "regex": "\\b[a-fA-F0-9]{40}\\b"
+    },
+    {
+      "name": "sha256",
+      "regex": "\\b[a-fA-F0-9]{64}\\b"
+    },
+    {
+      "name": "uuid",
+      "regex": "\\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\\b"
+    },
+    {
+      "name": "linux_path",
+      "regex": "/(?:[a-zA-Z0-9_.-]+/)+[a-zA-Z0-9_.-]+"
+    },
+    {
+      "name": "windows_path",
+      "regex": "[a-zA-Z]:\\\\[^\\\\:*?\"<>|\\r\\n\\s]+"
+    },
+    {
+      "name": "sensitive_files",
+      "regex": "(?i)\\b(config|settings|credentials|password|secret|key|backup|dump)\\.(json|xml|yml|yaml|conf|ini|txt|bak|sql)\\b"
+    },
+    {
+      "name": "debug_pages",
+      "regex": "(?i)\\b(debug|trace|test|staging|dev|phpinfo|status|info)\\b",
+      "exclude_patterns": [
+        "status_code"
+      ]
+    },
+    {
+      "name": "directory_listing",
+      "regex": "(?i)Index of /"
+    },
+    {
+      "name": "error_messages",
+      "regex": "(?i)(SQLSTATE|syntax error|mysql_fetch|ORA-[0-9]{5,}|Unclosed quotation mark|Warning: include|Fatal error:)"
+    }
+  ]
+}

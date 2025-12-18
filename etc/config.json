@@ -1,0 +1,73 @@
+{
+  "GLOBAL": {
+    "DEBUG_LEVEL": "WARNING",
+    "HISTORY_FILE": "data/.pwnity_history",
+    "ALIASES_FILE": "etc/aliases.txt",
+    "LOOT_TYPES": [
+      "credential",
+      "key",
+      "flag",
+      "token",
+      "hash",
+      "note"
+    ]
+  },
+  "LIBRARY": {
+    "CATEGORIES": "Reference, Cheatsheet, Tool, Academy, Writeup, Binaries, Exploits",
+    "URL_CHECK_REFRESH_DAYS": 7
+  },
+  "DIRS": {
+    "PRESETS": "data/presets",
+    "TARGETS": "data/targets",
+    "WORDLISTS": "data/wordlists",
+    "TOOLS": "data/tools",
+    "LIBRARY": "data/library",
+    "LOGBOOK": "data/logbook",
+    "REPORTS": "data/reports",
+    "WORKFLOWS": "data/workflows",
+    "PARSERS": "data/parsers",
+    "PROXY_TEMPLATES": "data/proxy_templates",
+    "RUN": "data/run",
+    "HEARTBEATS": "data/heartbeats",
+    "REVSHELLS": "etc/revshells.json",
+    "EXPORTS": "exports",
+    "MANUALS": "docs/manual",
+    "PROFILE_FILE": "etc/profile.json"
+  },
+  "HEARTBEAT": {
+    "MIN_DELAY_SECONDS": 1.0,
+    "MAX_DELAY_SECONDS": 3.0
+  },
+  "PROXY": {
+    "ENABLED": false,
+    "TYPE": "socks5",
+    "HOST": "localhost",
+    "PORT": 9050,
+    "USERNAME": "",
+    "PASSWORD": "",
+    "WRAPPER_COMMAND": "proxychains",
+    "WRAPPER_OPTIONS": "-q",
+    "WRAPPER_NEEDS_SUDO": true,
+    "WRAPPER_TEMPLATE": "proxychains.tmpl"
+  },
+  "COLORS": {
+    "GREY": "\u001b[90m",
+    "GREEN": "\u001b[92m",
+    "YELLOW": "\u001b[93m",
+    "RED": "\u001b[91m",
+    "MAGENTA": "\u001b[95m",
+    "BLUE": "\u001b[94m",
+    "CYAN": "\u001b[96m",
+    "WHITE": "\u001b[97m",
+    "BLACK": "\u001b[30m",
+    "RED_BG": "\u001b[41m",
+    "GREEN_BG": "\u001b[42m",
+    "YELLOW_BG": "\u001b[43m",
+    "BLUE_BG": "\u001b[44m",
+    "MAGENTA_BG": "\u001b[45m",
+    "CYAN_BG": "\u001b[46m",
+    "WHITE_BG": "\u001b[47m",
+    "GREY_BG": "\u001b[100m",
+    "RESET": "\u001b[0m"
+  }
+}

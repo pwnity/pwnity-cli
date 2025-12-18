@@ -1,0 +1,42 @@
+{
+  "name": "wpscan",
+  "path": "/usr/bin/wpscan",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "default",
+      "params": [
+        "--url $target.base_url",
+        "--random-user-agent",
+        "--ignore-main-redirect",
+        "$tool.api_token"
+      ],
+      "description": "Detects WordPress version and basic setup (low noise)"
+    },
+    {
+      "name": "enum_plugins",
+      "params": [
+        "--url $target.base_url",
+        "--enumerate vp",
+        "--random-user-agent",
+        "--ignore-main-redirect",
+        "$tool.api_token"
+      ],
+      "description": "Enumerates vulnerable plugins (noisy)"
+    },
+    {
+      "name": "full",
+      "params": [
+        "--url $target.base_url",
+        "--enumerate vp,vt,u",
+        "--random-user-agent",
+        "--ignore-main-redirect",
+        "$tool.api_token"
+      ],
+      "description": "Full WordPress enumeration (plugins, themes, users)"
+    }
+  ],
+  "description": "Scans WordPress installations for vulnerabilities, plugins, themes, and users",
+  "usage": "To activate an API Token, use 'tool update wpscan api_token --api-token YOURAPITOKEN'",
+  "api_token": ""
+}

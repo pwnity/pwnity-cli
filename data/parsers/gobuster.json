@@ -1,0 +1,26 @@
+{
+  "name": "Gobuster Dir Scan Artifacts",
+  "description": "Regex patterns for parsing gobuster dir scan outputs.",
+  "rules": [
+    {
+      "name": "directory",
+      "regex": "(/[^ ]+)\\s+\\(Status:\\s*(?:1\\d{2}|2\\d{2}|3\\d{2})\\)"
+    },
+    {
+      "name": "status_code",
+      "regex": "\\(Status:\\s*(\\d{3})\\)"
+    },
+    {
+      "name": "size",
+      "regex": "\\[Size:\\s*(\\d+)\\]"
+    },
+    {
+      "name": "content_type",
+      "regex": "\\[Content-Type:\\s*([\\w/-]+)\\]"
+    },
+    {
+      "name": "redirect",
+      "regex": "\\[-->\\s*(\\S+)\\]"
+    }
+  ]
+}

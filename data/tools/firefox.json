@@ -1,0 +1,23 @@
+{
+  "name": "firefox",
+  "path": "/usr/bin/firefox",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "open",
+      "params": [
+        "--url $target.url"
+      ],
+      "description": "Opens the target URL in Firefox"
+    },
+    {
+      "name": "private_session",
+      "params": [
+        "--private-window",
+        "$target.url"
+      ],
+      "description": "Opens the target URL in a private browsing window"
+    }
+  ],
+  "description": "Launches the Firefox web browser for manual web application analysis"
+}

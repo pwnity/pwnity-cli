@@ -1,0 +1,5 @@
+{
+  "name": "ssh_defaults",
+  "path": "/usr/share/wordlists/legion/ssh-betterdefaultpasslist.txt",
+  "description": "Common default SSH credentials"
+}

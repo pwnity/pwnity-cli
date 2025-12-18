@@ -1,0 +1,5 @@
+{
+  "name": "tomcat_defaults",
+  "path": "/usr/share/wordlists/metasploit/tomcat_mgr_default_userpass.txt",
+  "description": "Default credentials for Apache Tomcat Manager"
+}

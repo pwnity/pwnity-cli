@@ -1,0 +1,5 @@
+{
+  "name": "mysql_defaults",
+  "path": "/usr/share/wordlists/legion/mysql-betterdefaultpasslist.txt",
+  "description": "Common default MySQL credentials"
+}

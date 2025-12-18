@@ -1,0 +1,5 @@
+{
+  "name": "john",
+  "path": "/usr/share/wordlists/john.lst",
+  "description": "Default John the Ripper wordlist for password cracking"
+}

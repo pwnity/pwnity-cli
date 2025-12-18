@@ -1,0 +1,5 @@
+{
+  "name": "subdomains_5k",
+  "path": "/usr/share/wordlists/amass/subdomains-top1mil-5000.txt",
+  "description": "Top 5k most common subdomains for fast enumeration"
+}

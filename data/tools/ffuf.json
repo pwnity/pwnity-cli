@@ -1,0 +1,50 @@
+{
+  "path": "/usr/bin/ffuf",
+  "sudo": false,
+  "name": "ffuf",
+  "commands": [
+    {
+      "name": "dir_scan",
+      "params": [
+        "-u $target.base_url/FUZZ",
+        "-w $wordlist.path",
+        "-t 100",
+        "-H \"User-Agent: $profile.useragent\""
+      ],
+      "description": "Performs directory and file brute-forcing"
+    },
+    {
+      "name": "vhost",
+      "params": [
+        "-u $target.base_url",
+        "-w $wordlist.path",
+        "-H \\\"Host: FUZZ.$target.hostname\\\"",
+        "-H \"User-Agent: $profile.useragent\""
+      ],
+      "description": "Performs virtual host brute-forcing"
+    },
+    {
+      "name": "parameter",
+      "params": [
+        "-u $target.base_url/?FUZZ=test",
+        "-w $wordlist.path",
+        "-t 100",
+        "-H \"User-Agent: $profile.useragent\""
+      ],
+      "description": "Fuzzes GET parameters for hidden or undocumented inputs"
+    },
+    {
+      "name": "post",
+      "params": [
+        "-u $target.base_url",
+        "-X POST",
+        "-d FUZZ=test",
+        "-w $wordlist.path",
+        "-H \"Content-Type: application/x-www-form-urlencoded\"",
+        "-H \"User-Agent: $profile.useragent\""
+      ],
+      "description": "Fuzzes POST parameters using form-encoded request data"
+    }
+  ],
+  "description": "Fast web fuzzer for directory, file, parameter, and virtual host discovery"
+}

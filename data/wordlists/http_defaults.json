@@ -1,0 +1,5 @@
+{
+  "name": "http_defaults",
+  "path": "/usr/share/wordlists/metasploit/http_default_userpass.txt",
+  "description": "Default HTTP authentication credentials for common services"
+}
