@@ -1,7 +1,0 @@
-{
-  "name": "mytutorial_preset",
-  "target": "moonandhoney.de",
-  "tool": "gobuster",
-  "wordlist": "dns_5000",
-  "report": "mytutorial"
-}
