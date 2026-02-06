@@ -151,13 +151,17 @@ class CommandExecutor:
         output = output_buffer.getvalue().decode('utf-8', errors='replace')
         
         # --- Logbook and Report Integration ---
+        # Generate a virtual job ID for foreground execution so it has a reference
+        import uuid
+        virtual_job_id = str(uuid.uuid4())
+
         logbook_id = self.logbook_mgr.create_entry(
             command_str=cmd_str,
             output=output,
             return_code=return_code,
             duration=duration,
             session_obj=session_obj,
-            source_job_id=None)
+            source_job_id=virtual_job_id)
         if session_obj.report:
             self.report_mgr.add_history_entry(session_obj.report, cmd_str, logbook_id, tool_name, tool_command_name)
 

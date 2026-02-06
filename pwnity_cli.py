@@ -202,7 +202,8 @@ class MyCLI(cmd2.Cmd):
         self.console.print(banner)
 
     # INIT 
-    def __init__(self):
+    def __init__(self, shared_job_mgr=None):
+        self._shared_job_mgr = shared_job_mgr  # Store for use in _init_managers
         self._setup_paths()
         # Determine if we are running in an internal mode (Web UI PTY or Headless API)
         web_ui_mode = '--web-ui-mode' in sys.argv
@@ -292,7 +293,13 @@ class MyCLI(cmd2.Cmd):
         self.revshell_mgr = RevshellManager()
         self.library_mgr = LibraryManager()
         self.workflow_mgr = WorkflowManager()
-        self.job_mgr = JobManager(self, self.logbook_mgr, self.report_mgr)
+        
+        # Use shared job manager if provided, otherwise create new instance
+        if self._shared_job_mgr:
+            self.job_mgr = self._shared_job_mgr
+        else:
+            self.job_mgr = JobManager(self, self.logbook_mgr, self.report_mgr)
+        
         self.config_mgr = ConfigManager()
         self.utility_mgr = UtilityManager(self)
         self.run_mgr = RunManager()
