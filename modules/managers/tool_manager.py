@@ -134,55 +134,37 @@ class ToolManager(JSONManager):
         log.prompt("Use 'tool -h' for help.")
 
     def reorder_param(self, tool_name, command_name, old_index, new_index):
+        """
+        Reorders a parameter. CLI uses 1-based indices. 
+        Leverages the generic JSONManager.reorder for atomicity.
+        """
+        cmd_idx = self._get_command_index(tool_name, command_name)
+        if cmd_idx == -1: return
+
+        # JSONManager.reorder uses 0-based index for the path segment
+        target_path = f"commands.{cmd_idx}.params.{old_index - 1}"
+        # and 0-based new_index
+        if self.reorder(tool_name, target_path, new_index - 1):
+            log.success(f"Parameter in '{tool_name} {command_name}' moved from position {old_index} to {new_index}.")
+
+    def _get_command_index(self, tool_name, command_name):
+        """Helper to find the index of a command by name."""
         tool = self.load(tool_name)
-        if not tool: return
-
-        cmd = next((c for c in tool.get("commands", []) if c.get("name") == command_name), None)
-        if not cmd:
-            log.error(f"Command '{command_name}' not found in tool '{tool_name}'.")
-            return
-
-        params = cmd.get("params", [])
-        
-        # Convert 1-based user index to 0-based list index
-        old_idx_0 = old_index - 1
-        new_idx_0 = new_index - 1
-
-        if not (0 <= old_idx_0 < len(params)):
-            log.error(f"Invalid old index {old_index}. There are only {len(params)} parameters (index 1 to {len(params)}).")
-            return
-
-        if not (0 <= new_idx_0 < len(params)):
-            log.error(f"Invalid new index {new_index}. Must be between 1 and {len(params)}).")
-            return
-
-        param_to_move = params.pop(old_idx_0)
-        params.insert(new_idx_0, param_to_move)
-
-        self.update(tool_name, "commands", tool["commands"])
-        log.success(f"Parameter in '{tool_name} {command_name}' moved from position {old_index} to {new_index}.")
+        if not tool: return -1
+        for i, cmd in enumerate(tool.get("commands", [])):
+            if cmd.get("name") == command_name:
+                return i
+        log.error(f"Command '{command_name}' not found in tool '{tool_name}'.")
+        return -1
 
     def update_param(self, tool_name, command_name, index, new_value):
-        """Updates a parameter at a specific index."""
-        tool = self.load(tool_name)
-        if not tool: return
+        """Updates a parameter at a specific index using generic update logic."""
+        cmd_idx = self._get_command_index(tool_name, command_name)
+        if cmd_idx == -1: return
 
-        cmd = next((c for c in tool.get("commands", []) if c.get("name") == command_name), None)
-        if not cmd:
-            log.error(f"Command '{command_name}' not found in tool '{tool_name}'.")
-            return
-
-        params = cmd.get("params", [])
-        # User index is 1-based, list index is 0-based
-        real_index = index - 1
-
-        if 0 <= real_index < len(params):
-            old_value = params[real_index]
-            params[real_index] = new_value
-            self.update(tool_name, "commands", tool["commands"])
-            log.success(f"Parameter {index} in '{tool_name} {command_name}' updated: '{old_value}' -> '{new_value}'")
-        else:
-            log.error(f"Invalid index {index}. There are only {len(params)} parameters (index 1 to {len(params)}).")
+        path = f"commands.{cmd_idx}.params.{index - 1}"
+        if self.update(tool_name, path, new_value):
+            log.success(f"Parameter {index} in '{tool_name} {command_name}' updated.")
 
     def delete_param_by_index(self, tool_name, command_name, index):
         """Deletes a parameter at a specific index."""
@@ -501,34 +483,25 @@ class ToolManager(JSONManager):
         return tool
 
     def add_param(self, tool_name, command_name, param):
+        """
+        Adds a parameter.
+        Uses the improved JSONManager.update with list-appending support.
+        """
+        cmd_idx = self._get_command_index(tool_name, command_name)
+        if cmd_idx == -1: return None
+
         tool = self.load(tool_name)
-        if not tool:
-            log.error(f"Tool '{tool_name}' not found.")
-            return None
+        p_idx = len(tool["commands"][cmd_idx].get("params", []))
         
-        cmd = next((c for c in tool["commands"] if c["name"] == command_name), None)
-        if not cmd:
-            log.error(f"Command '{command_name}' not found in {tool_name}.")
-            return None
-
-        # Ensure the 'params' list exists.
-        if "params" not in cmd:
-            cmd["params"] = []
-
-        # Normalize the parameter string: replace escaped quotes with actual quotes.
-        # This handles cases where the user explicitly escapes quotes in the input,
-        # ensuring the stored string is compatible with shlex.split(posix=True).
+        # Always append using the next index
+        path = f"commands.{cmd_idx}.params.{p_idx}"
         normalized_param = param.replace('\\"', '"')
-            
-        # Always append new parameters for predictable behavior.
-        # The "intelligent" logic of inserting before a target placeholder was
-        # causing parameters to be added in reverse order. The user can
-        # use 'tool reorder' for fine-tuning the order.
-        cmd["params"].append(normalized_param)
-            
-        self._save_data(tool_name, tool)
-        log.info(f"Param '{param}' added to {tool_name} {command_name}.")
-        return cmd
+        
+        updated = self.update(tool_name, path, normalized_param)
+        if updated:
+            log.info(f"Param '{param}' added to {tool_name} {command_name}.")
+            return updated["commands"][cmd_idx]
+        return None
 
     def _cmd_destroy(self, args, cli):
         """

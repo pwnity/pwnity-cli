@@ -138,6 +138,8 @@ class CLISessionManager(BaseManager):
             commands.append(f"tool load {session.tool}")
         if session.wordlist:
             commands.append(f"wordlist load {session.wordlist}")
+        if session.report:
+            commands.append(f"report load {session.report}")
 
         log.header(f"Export for current session '{session.name}'")
         if commands:

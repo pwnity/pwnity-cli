@@ -28,4 +28,5 @@ from .revshell_manager import RevshellManager
 from .heartbeat_manager import HeartbeatManager
 from .command_executor import CommandExecutor
 from .library_manager import LibraryManager 
+from .job_manager import JobManager
 from .workflow_manager import WorkflowManager

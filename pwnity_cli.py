@@ -512,9 +512,46 @@ class MyCLI(cmd2.Cmd):
             log.error(f"Error loading aliases from '{self.aliases_file}': {e}")
 
     def precmd(self, statement: cmd2.Statement) -> cmd2.Statement:
-        """Hook that runs before each command. Saves the state of the aliases."""
+        """Hook that runs before each command. Saves the state of the aliases and reloads session if changed externally."""
         # Save a copy of the aliases to detect changes after command execution.
         self._old_aliases = self.aliases.copy()
+        
+        # CRITICAL: Reload session state from file if it was modified externally
+        # This allows the PTY CLI to see changes made by the headless API
+        if self.web_ui_mode:
+            try:
+                from modules.services import config
+                import json
+                
+                session_file = config.get_parameter("GLOBAL", "SESSION_STATE_FILE", "data/.session.json")
+                
+                # Check if file exists and was modified
+                if os.path.exists(session_file):
+                    # Read the file
+                    with open(session_file, 'r') as f:
+                        state = json.load(f)
+                    
+                    # Update our session object with the file's state
+                    # Only update if values are different to avoid unnecessary changes
+                    if state.get('target') != self.session.target:
+                        self.session.target = state.get('target')
+                        log.debug(f"[Session Sync] Reloaded target: {self.session.target}")
+                    
+                    if state.get('tool') != self.session.tool:
+                        self.session.tool = state.get('tool')
+                        log.debug(f"[Session Sync] Reloaded tool: {self.session.tool}")
+                    
+                    if state.get('wordlist') != self.session.wordlist:
+                        self.session.wordlist = state.get('wordlist')
+                        log.debug(f"[Session Sync] Reloaded wordlist: {self.session.wordlist}")
+                    
+                    if state.get('report') != self.session.report:
+                        self.session.report = state.get('report')
+                        log.debug(f"[Session Sync] Reloaded report: {self.session.report}")
+                        
+            except Exception as e:
+                log.debug(f"[Session Sync] Error reloading session: {e}")
+        
         return statement
 
     def postcmd(self, stop: bool, statement: cmd2.Statement) -> bool:

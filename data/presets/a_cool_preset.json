@@ -1,0 +1,7 @@
+{
+  "name": "a_cool_preset",
+  "target": "acme-search.local",
+  "tool": "curl",
+  "wordlist": "dirb_common",
+  "report": null
+}

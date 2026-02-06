@@ -104,35 +104,11 @@ class TargetManager(JSONManager):
             return
 
         field, value_str = args.update_args[0], " ".join(args.update_args[1:])
-        value = value_str # Default to string
-
-        # Priority 1: Handle nested updates first to prevent 'name.foo' from triggering a rename.
-        if '.' in field:
-            # --- FIX: Prevent nested updates on the 'name' field itself ---
-            # This stops 'target update mytarget name.foo bar' from corrupting the name.
-            if field.lower().startswith('name.'):
-                log.error("Cannot perform a nested update on the 'name' field.")
-                log.prompt("To rename the target, use: 'target rename <old_name> <new_name>' or 'target update <old_name> name <new_name>'.")
-                return
-            data = self.load(args.name)
-            if not data: return
-
-            keys = field.split('.')
-            current_level = data
-            # Traverse/create path until the last key
-            for key in keys[:-1]:
-                if key not in current_level or not isinstance(current_level[key], dict):
-                    current_level[key] = {} # Create a dict if it doesn't exist
-                current_level = current_level[key]
-            
-            # Set the value at the final key
-            current_level[keys[-1]] = value
-            self._save_data(args.name, data)
-            log.success(f"Target '{args.name}' nested field '{field}' updated -> {value}")
-        # Priority 2: Handle special 'url' field
-        elif field.lower() == 'url':
+        
+        # Priority 1: Handle special 'url' field
+        if field.lower() == 'url':
             self._parse_and_update_from_url(args.name, value_str, cli)
-        # Priority 3: Fallback to default manager behavior for simple fields like 'name'
+        # Priority 2: Fallback to default manager behavior (handles nesting + renames)
         else:
             super()._cmd_update(args, cli)
 

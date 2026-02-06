@@ -16,6 +16,14 @@ dist/
 MANIFEST
 wheels/
 wheelhouse/ # Specific to pwnity's wheelhouse directory
+plugins/
+data/wheelhouse/**
+data/logbook/**
+data/heartbeats/**
+data/targets/**
+data/reports/**
+data/workflows/**
+pro-web-ui/**
 
 # --- Virtual Environment ---
 venv/

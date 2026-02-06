@@ -13,6 +13,14 @@ python-whois
 dnspython
 tldextract
 PySocks
+psutil
+requests
+nvidia-ml-py
+
+# Web UI (Pro Feature)
+flask
+flask-socketio
+ptyprocess
 
 # Testing
 pytest

@@ -284,34 +284,164 @@ class JSONManager(BaseManager):
         return sorted(names)
 
     def update(self, name, key, value):
-        """Adds or changes a key/value pair in an existing JSON object."""
-        # Load the object. This uses the cache or loads from the file.
+        """
+        Adds or changes a key/value pair in an existing JSON object.
+        Supports nested keys and list indices using dot notation (e.g., 'params.0').
+        """
         data = self.load(name)
         if not data:
             log.error(f"Cannot update '{name}', as it could not be loaded.")
             return None
 
-        data[key] = value
+        keys = key.split('.')
+        curr = data
+        for i, k in enumerate(keys[:-1]):
+            # Check if next key is an integer (list index)
+            next_is_idx = False
+            try:
+                int(keys[i+1])
+                next_is_idx = True
+            except: pass
+
+            if isinstance(curr, dict):
+                if k not in curr:
+                    curr[k] = [] if next_is_idx else {}
+                curr = curr[k]
+            elif isinstance(curr, list):
+                try:
+                    idx = int(k)
+                    # If index is exactly len(curr), we want to append or create placeholder?
+                    # Usually better to ensure it exists.
+                    while len(curr) <= idx:
+                        curr.append([] if next_is_idx else {})
+                    curr = curr[idx]
+                except (ValueError, IndexError):
+                    return None
+            else: return None
+
+        last_key = keys[-1]
+        if isinstance(curr, dict):
+            curr[last_key] = value
+        elif isinstance(curr, list):
+            try:
+                idx = int(last_key)
+                if idx == len(curr):
+                    curr.append(value)
+                elif 0 <= idx < len(curr):
+                    curr[idx] = value
+                else: return None
+            except: return None
+        else: return None
+
         if self._save_data(name, data):
             return data
         return None
 
+    def rename_key(self, name, old_key, new_key):
+        """Renames a key (supports dot notation) for an existing JSON object."""
+        data = self.load(name)
+        if not data:
+            return None
+
+        def get_and_del(obj, path):
+            keys = path.split('.')
+            curr = obj
+            for k in keys[:-1]:
+                if k not in curr or not isinstance(curr[k], dict): return None, False
+                curr = curr[k]
+            if keys[-1] in curr:
+                val = curr.pop(keys[-1])
+                return val, True
+            return None, False
+
+        def set_nested(obj, path, val):
+            keys = path.split('.')
+            curr = obj
+            for k in keys[:-1]:
+                if k not in curr or not isinstance(curr[k], dict):
+                    curr[k] = {}
+                curr = curr[k]
+            curr[keys[-1]] = val
+
+        value, found = get_and_del(data, old_key)
+        if found:
+            set_nested(data, new_key, value)
+            if self._save_data(name, data):
+                return data
+        return None
     def delete(self, name, key, silent=False):
         """Deletes a key from the JSON object."""
-        # Load the object. This uses the cache or loads from the file.
         data = self.load(name)
         if not data:
             if not silent: log.error(f"Cannot delete from '{name}', as it could not be loaded.")
             return None
 
-        if key in data:
+        # Handle nested deletion
+        if '.' in key:
+            keys = key.split('.')
+            curr = data
+            for k in keys[:-1]:
+                if k not in curr or not isinstance(curr[k], dict): return data
+                curr = curr[k]
+            if keys[-1] in curr:
+                del curr[keys[-1]]
+        elif key in data:
             del data[key]
-            if self._save_data(name, data):
-                return data
-            return None # Indicates save failure
         else:
             if not silent: log.warning(f"Key '{key}' not found in {name}.")
             return data
+
+        if self._save_data(name, data):
+            return data
+        return None
+
+    def reorder(self, name, target_path, new_index):
+        """
+        Reorders a key in a dict or an item in a list.
+        Supports dot notation (e.g., 'subdomains.0' or 'ssl_info.subject').
+        """
+        data = self.load(name)
+        if not data: return None
+
+        keys = target_path.split('.')
+        
+        # Traverse to the parent container
+        parent = data
+        container_path = keys[:-1]
+        for k in container_path:
+            if isinstance(parent, dict) and k in parent:
+                parent = parent[k]
+            elif isinstance(parent, list):
+                try: parent = parent[int(k)]
+                except: return None
+            else: return None
+
+        last_key = keys[-1]
+
+        if isinstance(parent, dict):
+            if last_key not in parent: return None
+            items = list(parent.items())
+            idx = next((i for i, (k, v) in enumerate(items) if k == last_key), -1)
+            if idx == -1: return None
+            item = items.pop(idx)
+            new_index = max(0, min(new_index, len(items)))
+            items.insert(new_index, item)
+            # Replace dict in parent
+            parent.clear()
+            parent.update(dict(items))
+        elif isinstance(parent, list):
+            try:
+                idx = int(last_key)
+                if idx < 0 or idx >= len(parent): return None
+                item = parent.pop(idx)
+                new_index = max(0, min(new_index, len(parent)))
+                parent.insert(new_index, item)
+            except: return None
+        else: return None
+
+        if self._save_data(name, data):
+            return data
+        return None
 
     def destroy(self, name):
         """Completely deletes the JSON file of an object."""
