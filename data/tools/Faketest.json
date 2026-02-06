@@ -1,0 +1,15 @@
+{
+  "name": "Faketest",
+  "path": "/home/kali/fake_test.sh",
+  "description": "Just a test",
+  "usage": "Just run it",
+  "commands": [
+    {
+      "name": "default",
+      "params": [
+        "20"
+      ]
+    }
+  ],
+  "sudo": true
+}

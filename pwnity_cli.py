@@ -204,15 +204,42 @@ class MyCLI(cmd2.Cmd):
     # INIT 
     def __init__(self):
         self._setup_paths()
-        super().__init__(persistent_history_file=self.history_file)
+        # Determine if we are running in an internal mode (Web UI PTY or Headless API)
+        web_ui_mode = '--web-ui-mode' in sys.argv
+        headless_mode = os.environ.get('PWNITY_HEADLESS') == '1'
+        
+        # Only disable CLI args (commands at startup) if we are in internal modes
+        # to prevent cmd2 from complaining about internal flags like --web-ui-mode
+        super().__init__(persistent_history_file=self.history_file, allow_cli_args=not (web_ui_mode or headless_mode))
 
-        self.web_ui_mode = '--web-ui-mode' in sys.argv
+        self.web_ui_mode = web_ui_mode
+        self.headless_mode = headless_mode
         self.console = RichConsole()
 
         # Bind logger to the cmd2 instance
         log.set_cli_instance(self)
         # Enable cmd2's own debugging if the log level is low
         self.debug = log.log_value <= log.LEVEL["DEBUG"]
+
+        self._init_managers()
+        self._init_placeholders()
+        self._original_stty_settings = None # Initialize attribute
+        self._init_parsers()
+
+        # Handle command line arguments for initial state
+        import argparse
+        parser = argparse.ArgumentParser(add_help=False)
+        parser.add_argument('--session', type=str)
+        parser.add_argument('--execute', type=str)
+        args, _ = parser.parse_known_args()
+
+        if args.session:
+            if args.session in self.session_mgr.sessions:
+                self.session = self.session_mgr.switch(args.session)
+            else:
+                log.warning(f"Session '{args.session}' not found during startup.")
+
+        self._initial_command = args.execute
 
         # Set self.aliases_file so that 'alias save' writes to the correct file
         self._load_aliases_from_file()
@@ -233,10 +260,6 @@ class MyCLI(cmd2.Cmd):
                 log.info("Running in CLI Mode.")
 
         self.last_command = None
-        self._init_managers()
-        self._init_placeholders()
-        self._original_stty_settings = None # Initialize attribute
-        self._init_parsers()
         self._start_background_threads()
 
     def _setup_paths(self):
@@ -292,8 +315,15 @@ class MyCLI(cmd2.Cmd):
         placeholders.register_manager("REPORT", self.report_mgr)
         placeholders.register_manager("LOGBOOK", self.logbook_mgr)
 
+    # --- Parser Initialization Flag ---
+    # Since parsers are class-level attributes, they should only be populated once.
+    _parsers_loaded = False
+
     def _init_parsers(self):
         """Creates and populates all argparse parsers using the factory."""
+        if MyCLI._parsers_loaded:
+            return
+
         parser_factory = ParserFactory(
             self.target_mgr, self.tool_mgr, self.wordlist_mgr, self.preset_mgr, self.session_mgr, self.job_mgr,
             self.profile_mgr, self.help_mgr, self.manual_mgr, self.parser_mgr, self.logbook_mgr, self.report_mgr,
@@ -316,6 +346,8 @@ class MyCLI(cmd2.Cmd):
             # pwn parser is special, it doesn't have a custom help panel.
             if name != 'pwn':
                 parser.add_argument('-h', '--help', action=RichCommandHelpAction, command_name=name, help=f'Show help for the {name} command.')
+
+        MyCLI._parsers_loaded = True
 
     def _start_background_threads(self):
         """Starts background threads for UI syncing and library checks."""
@@ -431,22 +463,24 @@ class MyCLI(cmd2.Cmd):
                 # This is crucial for correctly identifying jobs that have just finished.
                 self.job_mgr.check_job_status(job)
                 
-                # --- FIX: Truncate large job outputs to keep the state file small and syncs fast ---
+                # --- FIX: Truncate large job outputs and mask sensitive inputs ---
                 # The full output is still available in the logbook. The live view only needs recent output.
-                output_data = job.output or ""
-                if len(output_data) > 4096: # Limit to a reasonable size (e.g., last 4KB)
-                    output_data = "[... Output truncated ...]\n" + output_data[-4096:]
+                output_data = job.get_masked_output(limit=4096)
 
                 status = job.status
                 duration = job.duration
                 logbook_id = job.logbook_id
                 start_time = job.start_time
                 command_str = job.command_str
+                tool_name = job.tool_name
+                pid = job.pid
                 
             jobs_data.append({
                 'id': job.id, 'command_str': command_str, 'status': status,
                 'duration': f"{duration:.2f}s", 'logbook_id': logbook_id,
                 'start_time': start_time, 'output': output_data,
+                'tool_name': tool_name, 'pid': pid,
+                'needs_input': getattr(job, 'needs_input', False)
             })
         
         all_sessions_data = {
@@ -481,8 +515,21 @@ class MyCLI(cmd2.Cmd):
         This is the primary mechanism for keeping the CLI and Web UI in sync.
         """
         self._write_state_to_file()
+        
+        # --- NEW: Direct Socket.IO Signalling ---
+        # In headless mode, we can't rely on the PTY stdout reader.
+        # If a socketio_emitter is provided, we use it to push updates directly.
+        if hasattr(self, 'socketio_emitter') and self.socketio_emitter:
+            try:
+                from plugins.web_ui.utils import get_current_session_state
+                state = get_current_session_state()
+                self.socketio_emitter('state_update', state)
+                if signal_command_completion:
+                    self.socketio_emitter('command_executed', {})
+            except Exception as e:
+                log.debug(f"[Direct Sync] Error emitting state update: {e}")
 
-        # Signal the UI backend that an update is ready.
+        # Signal the UI backend that an update is ready via stdout (for PTY reader).
         if signal_command_completion:
             # This signal tells the UI to refresh the whole view
             print('\x1e', end='', flush=True)
@@ -628,6 +675,16 @@ class MyCLI(cmd2.Cmd):
         Hook that runs once before the command loop starts.
         Used here to apply terminal compatibility fixes after cmd2 has initialized.
         """
+        if self._initial_command:
+            log.info(f"Executing initial command: {self._initial_command}")
+            # We use onecmd_plus_hooks but wait a tiny bit to make sure everything is ready.
+            # We split by ' ; ' to allow multiple commands for the Launchpad context reconstruction.
+            def run_initial():
+                for cmd in self._initial_command.split(' ; '):
+                    if cmd.strip():
+                        self.onecmd_plus_hooks(cmd.strip())
+            threading.Timer(0.1, run_initial).start()
+
         # --- FIX: Save original terminal settings before modification ---
         # This ensures we can restore them in postloop() to prevent breaking
         # the user's shell after exiting pwnity.

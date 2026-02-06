@@ -484,6 +484,14 @@ class ParserFactory:
         self._add_custom_help(switch_parser, "switch")
         switch_parser.add_argument("name", help="The name of the session to switch to.", choices_provider=completer)
         switch_parser.examples = [("session switch default", "Switches back to the default session.")]
+        
+        fork_parser = subparsers.add_parser("fork",
+                                            help="Create a new session as a copy of the current one.",
+                                            description="Creates a new session that is an exact copy of the currently active session's state (loaded targets, tools, wordlists, etc.).",
+                                            formatter_class=self.formatter, add_help=False)
+        self._add_custom_help(fork_parser, "fork")
+        fork_parser.add_argument("name", help="The name for the new session.")
+        fork_parser.examples = [("session fork active-task-1", "Copies current session to 'active-task-1'.")]
 
         list_parser = subparsers.add_parser("list",
                                             help="List all sessions.",
@@ -552,6 +560,7 @@ class ParserFactory:
                                              description="Sends a line of text to the standard input of a running job. Useful for interacting with prompts.",
                                              formatter_class=self.formatter, add_help=False)
         self._add_custom_help(input_parser, "input")
+        input_parser.add_argument("-s", "--stealth", action="store_true", help="Mark input as sensitive (hidden from output).")
         input_parser.add_argument("id", type=str, help="The ID of the job to send input to.")
         input_parser.add_argument("text", nargs=argparse.REMAINDER, help="The text to send to the job.")
         input_parser.examples = [("jobs input 1 \"some text\"", "Sends 'some text' to job #1.")]

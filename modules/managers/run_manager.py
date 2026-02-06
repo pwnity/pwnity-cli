@@ -34,14 +34,25 @@ class RunManager(BaseManager):
     def _get_entity_type(self):
         return "Run"
 
-    def _ensure_sudo_credentials(self) -> bool:
+    def _ensure_sudo_credentials(self, cli, run_bg=False) -> bool:
         """
-        Checks if sudo credentials are valid. If not, it prompts the user interactively.
-        Returns True if credentials are valid or become valid, False otherwise.
+        Checks if sudo credentials are valid. If not, it prompts the user interactively,
+        unless running in a non-interactive environment (Web UI, Background).
+        Returns True if credentials are valid or become valid (or if we skip the check), False otherwise.
         """
         check_process = subprocess.run(['sudo', '-n', 'true'], capture_output=True)
         if check_process.returncode == 0:
             log.debug("Sudo credentials are valid (cached).")
+            return True
+
+        # Determine if we are in a headless/non-interactive context
+        is_headless = getattr(cli, 'headless_mode', False) or getattr(cli, 'web_ui_mode', False)
+        
+        if run_bg or is_headless:
+            # We cannot prompt interactively here.
+            # We return True anyway, assuming the user will handle the sudo prompt
+            # in the job's PTY/output screen via 'jobs input'.
+            log.info("Sudo credentials required. Prepending sudo and allowing process to prompt for password in its PTY.")
             return True
 
         log.prompt("Sudo credentials required. Please enter your password.")
@@ -140,7 +151,7 @@ class RunManager(BaseManager):
 
         return processed_proxy_config, temp_proxy_conf_content
 
-    def _build_single_final_command(self, raw_cmd_list: list[str], tool_name: str, tool_needs_sudo: bool, proxy_config: dict | None, temp_proxy_conf_path: str | None, cli) -> tuple[list[str], list[str]]:
+    def _build_single_final_command(self, raw_cmd_list: list[str], tool_name: str, tool_needs_sudo: bool, proxy_config: dict | None, temp_proxy_conf_path: str | None, cli, run_bg=False) -> tuple[list[str], list[str]]:
         """
         Resolves placeholders, applies proxy wrappers and sudo to a single command list.
         Returns (final_command_list, command_notes).
@@ -167,7 +178,7 @@ class RunManager(BaseManager):
         elif proxy_config and proxy_config.get('wrapper_needs_sudo', False):
             sudo_reason = "Required by proxy wrapper."
         if use_sudo_for_this_cmd:
-            if not self._ensure_sudo_credentials():
+            if not self._ensure_sudo_credentials(cli, run_bg=run_bg):
                 return [], [] # Abort if sudo fails
             final_cmd = ['sudo'] + final_cmd
             command_notes.append(f"Sudo: Enabled ({sudo_reason})")
@@ -244,7 +255,7 @@ class RunManager(BaseManager):
 
         for raw_cmd_list in commands_to_run:
             final_cmd_list, cmd_notes = self._build_single_final_command(
-                raw_cmd_list, tool_name, tool_needs_sudo, processed_proxy_config, temp_proxy_conf_path, cli
+                raw_cmd_list, tool_name, tool_needs_sudo, processed_proxy_config, temp_proxy_conf_path, cli, run_bg=run_bg
             )
             if not final_cmd_list: # Sudo credentials failed
                 return

@@ -23,7 +23,7 @@ data/heartbeats/**
 data/targets/**
 data/reports/**
 data/workflows/**
-pro-web-ui/**
+pro-web-ui/
 
 # --- Virtual Environment ---
 venv/

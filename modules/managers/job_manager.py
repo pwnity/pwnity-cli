@@ -95,6 +95,10 @@ class Job:
         self.executor_instance = None
         # --- FIX: Store path to temp proxy config for cleanup ---
         self.temp_proxy_conf_path = temp_proxy_conf_path
+        # --- NEW: Store sensitive inputs to mask them in the output ---
+        self.sensitive_inputs = []
+        # --- NEW: Flag to indicate the job is waiting for user input (e.g. sudo) ---
+        self.needs_input = False
 
     @property
     def duration(self):
@@ -120,8 +124,21 @@ class Job:
                 "return_code": self.return_code,
                 "logbook_id": self.logbook_id,
                 "additional_info": self.additional_info,
+                "needs_input": self.needs_input,
                 # We don't include the full output here to keep the payload small.
             }
+
+    def get_masked_output(self, limit=None):
+        """Returns the job output with sensitive inputs masked."""
+        with self.lock:
+            out = self.output
+            if limit and len(out) > limit:
+                out = "[... Output truncated ...]\n" + out[-limit:]
+            
+            for secret in self.sensitive_inputs:
+                if secret and len(secret) > 3: # Only mask secrets longer than 3 chars to avoid over-masking
+                    out = out.replace(secret, "********")
+            return out
 
 class JobManager(BaseManager):
     """Manages all background jobs."""
@@ -170,8 +187,9 @@ class JobManager(BaseManager):
         # Resolve any functions (like b64decode) in the input string before sending it.
         # We pass the cli.session object to provide context for the resolver,
         # even though it's not strictly needed for b64decode.
+        is_stealth = getattr(args, 'stealth', False)
         resolved_input = placeholders.resolve_placeholders(text_to_send, cli.session)
-        self.send_input(str(args.id), resolved_input)
+        self.send_input(str(args.id), resolved_input, is_sensitive=is_stealth)
 
     def _get_entity_type(self):
         """Required by BaseManager, though not used for display in JobManager."""
@@ -207,6 +225,11 @@ class JobManager(BaseManager):
                         char = output_bytes.decode('utf-8', errors='replace')
                         with job.lock:
                             job.output += char
+                            # --- NEW: Sudo Password Detection ---
+                            # If we see a sudo prompt, flag the job as needing input.
+                            if "password for" in char.lower() and "[sudo]" in char.lower():
+                                job.needs_input = True
+                        
                         # --- NEW: Emit live output update if an executor is attached ---
                         if self.executor:
                             self.executor._emit_job_output_update(job.id, char)
@@ -474,13 +497,18 @@ class JobManager(BaseManager):
             log.error(f"An unexpected error occurred while starting job for command '{shlex.join(command_list)}': {e}")
             return None
 
-    def send_input(self, job_id, text_to_send):
+    def send_input(self, job_id, text_to_send, is_sensitive=False):
         """Sends a line of text to a running job's stdin."""
         job = self.get_job(str(job_id))
         if not job:
             log.error(f"Job {job_id} not found.")
             return False
         
+        if is_sensitive:
+            job.sensitive_inputs.append(text_to_send.strip())
+            # If the user sends a sensitive input (likely a password), clear the flag
+            job.needs_input = False
+
         with job.lock:
             if job.status != "running" or not job.pty_master_fd:
                 return False
@@ -603,8 +631,8 @@ class JobManager(BaseManager):
                 # --- FIX: job.to_dict() excludes the output. We must add it back manually. ---
                 # This is critical for workflows that need the job's output as their input.
                 job_data = job.to_dict()
-                # Add the output field, which is intentionally excluded from the base to_dict()
-                job_data['output'] = job.output
+                # Use masked output for the UI to protect sensitive inputs
+                job_data['output'] = job.get_masked_output()
                 return job_data
 
         # 2. If not active, search the logbook for a matching entry
@@ -627,7 +655,7 @@ class JobManager(BaseManager):
                     "status": "finished" if log_data.get("execution", {}).get("return_code") == 0 else "failed",
                     "output": log_data.get("output", ""),
                     "return_code": log_data.get("execution", {}).get("return_code"),
-                    "duration": log_data.get("execution", {}).get("duration_seconds"),
+                    "duration": f"{log_data.get('execution', {}).get('duration_seconds', 0.0):.2f}s",
                     "start_time": log_data.get("timestamp"),
                     "logbook_id": logbook_id_for_job,
                 }

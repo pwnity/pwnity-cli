@@ -78,6 +78,18 @@ class CLISessionManager(BaseManager):
         log.info(f"Session '{name}' created and set active.")
         return self.active
 
+    def fork(self, new_name):
+        if not self.active:
+            return self._error("No active session to fork.")
+        if new_name in self.sessions:
+            return self._error(f"Session '{new_name}' already exists.")
+        
+        new_session = CLISession(new_name)
+        new_session._data = copy.deepcopy(self.active._data)
+        self.sessions[new_name] = new_session
+        log.info(f"Session '{self.active.name}' forked into '{new_name}'.")
+        return new_session
+
     def switch(self, name):
         if name not in self.sessions:
             return self._error(f"Session '{name}' not found.")
@@ -104,6 +116,10 @@ class CLISessionManager(BaseManager):
     def _cmd_switch(self, args, cli):
         """Handles 'session switch'."""
         cli.session = self.switch(args.name)
+
+    def _cmd_fork(self, args, cli):
+        """Handles 'session fork'."""
+        cli.session = self.fork(args.name)
 
     def _cmd_list(self, args, cli):
         """Handles 'session list'."""
