@@ -300,6 +300,7 @@ class JobManager(BaseManager):
                         except (OSError, ChildProcessError):
                             job.return_code = -1 # Fallback if process is already gone or reaped
                     job.end_time = time.time()
+                    job.needs_input = False # Ensure flag is cleared on exit
                     if job.killed_by_user:
                         job.status = "killed"
                     else:

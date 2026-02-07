@@ -1,0 +1,47 @@
+{
+  "session_name": "default",
+  "target": null,
+  "tool": "Faketest",
+  "wordlist": null,
+  "report": null,
+  "proxy_enabled": false,
+  "jobs": [
+    {
+      "id": "3425a9a9-059d-43c4-a1ac-6cdb2ae15b39",
+      "command_str": "sudo /home/kali/fake_test.sh 20",
+      "status": "killed",
+      "duration": "78.17s",
+      "logbook_id": "45018eac-c14f-4f4d-9dbf-fffa37b35b63",
+      "start_time": 1770504623.0982897,
+      "output": "[sudo] password for ********: \r\nUsername (default: guest): (no username \u2014 using: guest)\r\nPassword: ",
+      "tool_name": "Faketest",
+      "pid": 27407,
+      "needs_input": false
+    },
+    {
+      "id": "cb48450e-0ba1-4cd6-bb18-ddd2aa443085",
+      "command_str": "sudo /home/kali/fake_test.sh 20",
+      "status": "finished",
+      "duration": "84.13s",
+      "logbook_id": "c3fad02a-2234-47f9-809e-3fb1841bf535",
+      "start_time": 1770504813.7716508,
+      "output": "[sudo] password for ********: \r\nUsername (default: guest): (no username \u2014 using: guest)\r\nPassword: \r\n\r\n(no password \u2014 using fallback)\r\nLogin FAILED (invalid password)\r\n[guest] working (1/20)...\r\n[guest] working (2/20)...\r\n[guest] working (3/20)...\r\n[guest] working (4/20)...\r\n[guest] working (5/20)...\r\n[guest] working (6/20)...\r\n[guest] working (7/20)...\r\n[guest] working (8/20)...\r\n[guest] working (9/20)...\r\n[guest] working (10/20)...\r\n[guest] working (11/20)...\r\n[guest] working (12/20)...\r\n[guest] working (13/20)...\r\n[guest] working (14/20)...\r\n[guest] working (15/20)...\r\n[guest] working (16/20)...\r\n[guest] working (17/20)...\r\n[guest] working (18/20)...\r\n[guest] working (19/20)...\r\n[guest] working (20/20)...\r\nSession ended.\r\n",
+      "tool_name": "Faketest",
+      "pid": 28709,
+      "needs_input": false
+    }
+  ],
+  "sessions": {
+    "default": {
+      "name": "default",
+      "target": null,
+      "tool": "Faketest",
+      "wordlist": null,
+      "report": null
+    }
+  },
+  "monitoring_status": {
+    "proxy_enabled": false,
+    "heartbeat_target": null
+  }
+}
