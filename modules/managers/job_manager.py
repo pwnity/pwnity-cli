@@ -68,13 +68,29 @@ class Job:
             self.command_str = shlex.join(command_list)
 
         # --- FIX: Handle session-less execution for workflows ---
-        # --- NEW: Store PID directly instead of a Popen object ---
         if session_obj:
-            self.session_name = session_obj.name
-            self.tool_name = tool_name or session_obj.tool
+            # For CLI jobs, session_obj is a CLISession object.
+            # For workflows, it might be a dict or Namespace.
+            if hasattr(session_obj, 'name'):
+                self.session_name = session_obj.name
+                self.tool_name = tool_name or getattr(session_obj, 'tool', None)
+                self.target = getattr(session_obj, 'target', None)
+                self.wordlist = getattr(session_obj, 'wordlist', None)
+            elif isinstance(session_obj, dict):
+                self.session_name = session_obj.get("session", "workflow")
+                self.tool_name = tool_name or session_obj.get("tool")
+                self.target = session_obj.get("target")
+                self.wordlist = session_obj.get("wordlist")
+            else:
+                self.session_name = "workflow"
+                self.tool_name = tool_name
+                self.target = getattr(session_obj, 'target', None)
+                self.wordlist = getattr(session_obj, 'wordlist', None)
         else:
             self.session_name = "workflow"
             self.tool_name = tool_name
+            self.target = None
+            self.wordlist = None
 
         self.tool_command_name = tool_command_name
         self.pid = None
@@ -117,6 +133,8 @@ class Job:
                 "session_name": self.session_name,
                 "tool_name": self.tool_name,
                 "tool_command_name": self.tool_command_name,
+                "target": getattr(self, 'target', None),
+                "wordlist": getattr(self, 'wordlist', None),
                 "status": self.status,
                 "start_time": self.start_time,
                 "end_time": self.end_time,
@@ -658,6 +676,9 @@ class JobManager(BaseManager):
                     "duration": f"{log_data.get('execution', {}).get('duration_seconds', 0.0):.2f}s",
                     "start_time": log_data.get("timestamp"),
                     "logbook_id": logbook_id_for_job,
+                    "target": log_data.get("context", {}).get("target"),
+                    "wordlist": log_data.get("context", {}).get("wordlist"),
+                    "tool_name": log_data.get("context", {}).get("tool"),
                 }
 
         return None

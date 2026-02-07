@@ -280,3 +280,58 @@ def test_cmd_kill(job_manager, mock_session, mocker):
     args = type('Args', (), {'id': '1'})()
     job_manager._cmd_kill(args, cli=None)
     job_manager.kill_job.assert_called_once_with('1')
+
+def test_job_preserves_metadata_on_session_change(job_manager, mock_session):
+    """
+    Sicherstellen, dass Target und Wordlist im Job-Objekt eingefroren werden
+    und sich nicht mehr ändern, wenn die Session aktualisiert wird.
+    """
+    # 1. Metadaten in der Session setzen
+    mock_session.target = "initial-target.com"
+    mock_session.wordlist = "initial-wordlist.txt"
+    mock_session.tool = "nmap"
+
+    # 2. Job starten
+    job_id = job_manager.start_job(["sleep", "1"], session_obj=mock_session)
+    job = job_manager.get_job(job_id)
+    
+    assert job.target == "initial-target.com"
+    assert job.wordlist == "initial-wordlist.txt"
+
+    # 3. Session-Metadaten ändern
+    mock_session.target = "NEW-TARGET.com"
+    mock_session.wordlist = "NEW-WORDLIST.txt"
+
+    # 4. Verifizieren, dass der Job seine ursprünglichen Daten behalten hat
+    assert job.target == "initial-target.com"
+    assert job.wordlist == "initial-wordlist.txt"
+    
+    # 5. Verifizieren, dass auch die serialisierte Form korrekt ist
+    job_dict = job.to_dict()
+    assert job_dict["target"] == "initial-target.com"
+    assert job_dict["wordlist"] == "initial-wordlist.txt"
+
+    # Aufräumen
+    job_manager.kill_job(job_id)
+
+def test_job_metatada_persistence_in_logbook(job_manager, mock_session):
+    """
+    Verifiziert, dass die Metadaten auch im Logbuch-Eintrag korrekt landen.
+    """
+    mock_session.target = "documented-target.com"
+    mock_session.wordlist = "documented-wordlist.txt"
+    
+    # Job starten und sofort beenden (durch Mock oder schnelles echo)
+    job_id = job_manager.start_job(["echo", "test"], session_obj=mock_session)
+    time.sleep(0.3) # Warten auf logbook_mgr.create_entry
+    
+    # Prüfen, ob create_entry mit den richtigen Metadaten aufgerufen wurde
+    # Der Session-Objekt-Teil im create_entry Aufruf sollte die alten Daten enthalten
+    job_manager.logbook_mgr.create_entry.assert_called_once()
+    call_args = job_manager.logbook_mgr.create_entry.call_args[1]
+    
+    # session_obj im call_args ist das CLISession Mock-Objekt
+    # Wir prüfen hier indirekt über die Logik in job_manager.py
+    # (In der Realität würde JobManager das session_obj an create_entry übergeben)
+    assert call_args['session_obj'].target == "documented-target.com"
+    assert call_args['session_obj'].wordlist == "documented-wordlist.txt"

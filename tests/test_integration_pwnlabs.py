@@ -1276,6 +1276,56 @@ class TestJobManagerIntegration:
         clear_output = running_pwnity.run_command("jobs clear")
         assert "1 finished jobs removed" in clear_output
 
+    def test_job_persistence_and_metadata_isolation(self, running_pwnity, pwnity_env):
+        """
+        Verifiziert, dass Jobs ihre Metadaten behalten, auch wenn die Session
+        nachträglich geändert wird. (End-to-End Test über das Logbook).
+        """
+        target_name = "original-target"
+        wordlist_name = "original-wordlist"
+        running_pwnity.run_command(f"target add {target_name}")
+        running_pwnity.run_command(f"wordlist add {wordlist_name}")
+        running_pwnity.run_command(f"target load {target_name}")
+        running_pwnity.run_command(f"wordlist load {wordlist_name}")
+
+        # Echo-Tool für schnellen Erfolg
+        running_pwnity.run_command("tool add persist-test")
+        running_pwnity.run_command("tool update persist-test path /bin/echo")
+        running_pwnity.run_command("tool update persist-test command check")
+        running_pwnity.run_command("tool update persist-test check param 'Checking $target.name'")
+        running_pwnity.run_command("tool load persist-test")
+
+        # 1. Job starten
+        pwn_output = running_pwnity.run_command("pwn check now")
+        match = re.search(r"Logbook ID\s+([0-9a-fA-F\-]+)", running_pwnity._strip_ansi(pwn_output))
+        assert match, "Konnte Logbook-ID nicht finden"
+        log_id = match.group(1)
+
+        # 2. Session SOFORT ändern
+        running_pwnity.run_command("target add NEW-TARGET")
+        running_pwnity.run_command("target load NEW-TARGET")
+
+        # 3. Logbook-Eintrag auf Disk prüfen
+        # Wir müssen den Pfad zum Logbook-Verzeichnis aus der Konfiguration holen
+        logbook_dir = running_pwnity.run_command("config get DIRS.LOGBOOK")
+        match_dir = re.search(r"config get DIRS.LOGBOOK\n(.*?)\s*$", running_pwnity._strip_ansi(logbook_dir), re.MULTILINE)
+        log_dir_path = match_dir.group(1).strip()
+        
+        # --- FIX: Logbook uses nested structure (e.g., '2/f/UUID.json') ---
+        log_path = os.path.join(log_dir_path, log_id[0], log_id[1], f"{log_id}.json")
+        
+        import time; time.sleep(1.2) # Zeit zum Speichern geben (Subprozesse in venv können langsamer sein)
+        assert os.path.exists(log_path), f"Logbook entry not found at {log_path}"
+        
+        with open(log_path, 'r') as f:
+            log_data = json.load(f)
+        
+        # Verifizieren, dass der Logbook-Eintrag die ORIGINALEN Daten hat
+        assert log_data["context"]["target"] == target_name
+        assert log_data["context"]["wordlist"] == wordlist_name
+        assert target_name in log_data["command"]
+        assert "original-target" in log_data["output"]
+
 @pytest.mark.integration
 class TestProxyIntegration:
     """Gruppiert Integrationstests für das 'proxy'-Modul."""

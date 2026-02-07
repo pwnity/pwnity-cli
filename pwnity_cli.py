@@ -684,13 +684,14 @@ class MyCLI(cmd2.Cmd):
         """
         if self._initial_command:
             log.info(f"Executing initial command: {self._initial_command}")
-            # We use onecmd_plus_hooks but wait a tiny bit to make sure everything is ready.
-            # We split by ' ; ' to allow multiple commands for the Launchpad context reconstruction.
-            def run_initial():
-                for cmd in self._initial_command.split(' ; '):
-                    if cmd.strip():
-                        self.onecmd_plus_hooks(cmd.strip())
-            threading.Timer(0.1, run_initial).start()
+            # Execute synchronously to avoid dual-access to the TTY during interactive jobs
+            for cmd in self._initial_command.split(' ; '):
+                if cmd.strip():
+                    self.onecmd_plus_hooks(cmd.strip())
+            
+            # Exit after execution of initial commands to keep the terminal process clean
+            # and prevent unwanted CLI prompts in separate Web UI terminal tabs.
+            sys.exit(0)
 
         # --- FIX: Save original terminal settings before modification ---
         # This ensures we can restore them in postloop() to prevent breaking

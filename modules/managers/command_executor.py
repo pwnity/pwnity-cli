@@ -107,44 +107,49 @@ class CommandExecutor:
         output_buffer = io.BytesIO()
 
         try:
-            process = subprocess.Popen(
-                cmd_list,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                bufsize=0 # Unbuffered binary stream
-            )
+            import pty
+            import sys
 
             if show_summary:
                 self.console.rule(style="dim yellow")
 
-            with process.stdout:
-                for byte in iter(lambda: process.stdout.read(1), b''):
-                    output_buffer.write(byte)
-                    char = byte.decode('utf-8', errors='replace')
-                    self.console.file.write(char)
-                    self.console.file.flush()
+            def master_read(fd):
+                data = os.read(fd, 1024)
+                if data:
+                    output_buffer.write(data)
+                return data
 
-            process.wait()
-            return_code = process.returncode
+            # Execute via pty.spawn to provide a TTY and allow interactivity.
+            # This is synchronous and will block until the process finishes.
+            # The master_read callback captures the output for the logbook.
+            try:
+                status = pty.spawn(cmd_list, master_read)
+                return_code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else (status if status >= 0 else 1)
+            except Exception as e:
+                self.console.print(f"[bold red]An error occurred during interactive execution: {e}[/bold red]")
+                return -1
 
             if return_code == 0:
                 status_text = "Success"
                 status_style = "bold green"
+            elif return_code == 130:
+                status_text = "Interrupted"
+                status_style = "bold yellow"
+            else:
+                status_text = "Failed"
+                status_style = "bold red"
 
         except KeyboardInterrupt:
             self.console.print()
             log.warning("Command interrupted by user.")
-            if process:
-                process.terminate()
-                process.wait()
             return_code = 130
             status_text = "Interrupted"
             status_style = "bold yellow"
         except FileNotFoundError:
-            self.console.print(f"[bold red]Error: Command '{cmd_list[0]}' not found. Is the tool installed and in your PATH?[/bold red]")
+            self.console.print(f"[bold red]Error: Command '{cmd_list[0]}' not found.[/bold red]")
             return -1
         except Exception as e:
-            self.console.print(f"[bold red]An unexpected error occurred during execution: {e}[/bold red]")
+            self.console.print(f"[bold red]Unexpected error: {e}[/bold red]")
             return -1
 
         duration = time.monotonic() - start_time
