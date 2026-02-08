@@ -7,7 +7,17 @@
     {
       "name": "default",
       "params": [
-        "20"
+        "20",
+        "$target.foo.bar",
+        "-u $target.ip",
+        "$target"
+      ]
+    },
+    {
+      "name": "Foo",
+      "description": "Bar",
+      "params": [
+        "test"
       ]
     }
   ],
