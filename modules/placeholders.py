@@ -29,6 +29,9 @@ import json
 # Pattern for the innermost function call, e.g., func(arg) where arg has no parentheses
 FUNC_PATTERN = re.compile(r'(\w+)\(([^()]*)\)')
 
+# Matches: {{ key }} or ${ key }
+BRACED_PLACEHOLDER_PATTERN = re.compile(r"(?:\{\{\s*(.*?)\s*\}\})|(?:\$\{\s*(.*?)\s*\})")
+
 # --- FIX: Allow hyphens in attribute paths ---
 # The character set for the attribute path was missing the hyphen '-'.
 # This prevented placeholders like '$target.http_headers.Cache-Control' from being resolved.
@@ -127,7 +130,12 @@ def _resolve_simple_placeholders(text: str, session=None, tool_name: str = None,
     # The previous implementation would only perform one pass.
     current_text = text
     while True:
-        resolved_text = SIMPLE_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_match(m, session, tool_name, command_name), current_text)
+        # 1. Resolve braced patterns {{}} and ${}
+        text_with_braced = BRACED_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_braced_match(m, session, tool_name, command_name), current_text)
+        
+        # 2. Resolve $ patterns using existing logic
+        resolved_text = SIMPLE_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_match(m, session, tool_name, command_name), text_with_braced)
+        
         if resolved_text == current_text: # No more placeholders were found and replaced
             return resolved_text
         current_text = resolved_text
@@ -159,24 +167,55 @@ def _resolve_functions(text: str, session=None, tool_name: str = None, command_n
     return current_text
 
 
+def _resolve_braced_match(match, session, tool_name: str = None, command_name: str = None) -> str:
+    """Callback for braced placeholders like {{target.ip}} or ${target.ip}."""
+    original_placeholder = match.group(0)
+    # Group 1 is {{...}}, Group 2 is ${...}
+    content = match.group(1) or match.group(2)
+    
+    if not content:
+        return original_placeholder
+        
+    content = content.strip()
+    
+    # Split content into entity and attribute path
+    if '.' in content:
+        parts = content.split('.', 1)
+        entity_type = parts[0]
+        attr_path = parts[1]
+    else:
+        entity_type = content
+        attr_path = None
+        
+    return _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name, command_name)
+
 def _resolve_match(match, session, tool_name: str = None, command_name: str = None) -> str:
     """Callback function for re.sub to resolve a single placeholder match."""
-    original_placeholder = match.group(0)
+    original_placeholder = match.group(0) # e.g. $target.ip
 
+    # The new regex has 3 groups. e.g., for '$target.ip', groups are ('target', '.ip', 'ip')
+    # For '$target', groups are ('target', None, None)
+    entity_type, _, attr_path = match.groups()
+    
+    return _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name, command_name)
+
+def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name=None, command_name=None) -> str:
+    """Shared logic for resolving placeholders given parsed components."""
+    
     # --- FINAL, ROBUST FIX ---
-    # Handle special cases for '$report' first, as they have unique logic
-    # that differs from the standard entity.attribute model.
-
-    if original_placeholder.lower().startswith('$report.file.'):
-        # Manually parse: $report.file.<sanitized_filename>.<rest.of.path>
-        path_parts = original_placeholder.split('.')[2:]
+    # Handle special cases for '$report' keys first (or report.file...)
+    # We check if the KEY indicates a report file access.
+    # Construct a key to check against 'report.file.'
+    full_key = f"{entity_type}.{attr_path}" if attr_path else entity_type
+    
+    if full_key.lower().startswith('report.file.'):
+        # Manually parse: report.file.<sanitized_filename>.<rest.of.path>
+        path_parts = full_key.split('.')[2:]
         if not path_parts:
             return original_placeholder
 
         file_name_sanitized = path_parts[0]
-        # Correctly desanitize the filename. Only the last underscore before the
-        # extension part should be a dot. Example: 'report_xml' -> 'report.xml',
-        # but 'nmap_scan_json' -> 'nmap_scan.json'.
+        # Correctly desanitize the filename.
         if '_' in file_name_sanitized:
             parts = file_name_sanitized.rsplit('_', 1)
             file_name = '.'.join(parts)
@@ -210,22 +249,27 @@ def _resolve_match(match, session, tool_name: str = None, command_name: str = No
         except Exception as e:
             log.error(f"Error parsing or traversing file for placeholder '{original_placeholder}': {e}")
             return original_placeholder
-    # --- End of $report.file.* special handling ---
+    # --- End of report.file.* special handling ---
 
     # The new regex has 3 groups. e.g., for '$target.ip', groups are ('target', '.ip', 'ip')
     # For '$target', groups are ('target', None, None)
-    entity_type, _, attr_path = match.groups()
+    # entity_type, _, attr_path = match.groups() # This is now passed in
 
-    # Case 1: Handle flat dictionaries (e.g., from old workflow overrides or simple dicts)
-    if isinstance(session, dict): # For backward compatibility
+    # Case 1: Handle dictionaries (e.g., from workflow overrides or simple dicts)
+    if isinstance(session, dict):
         # Check for a full key match first (e.g., "target.ip").
         full_key = f"{entity_type}.{attr_path}" if attr_path else entity_type
         if full_key in session:
-            return str(session[full_key])
-        # Fallback to check for a simple key (e.g., "custom_key").
-        if entity_type in session and not attr_path:
-            return str(session[entity_type])
-        # If not found in the workflow dict, do not fall through to managers.
+            val = session[full_key]
+            return json.dumps(val, indent=2) if isinstance(val, (dict, list)) else str(val)
+
+        # Handle nested traversal for entities provided as dicts
+        if entity_type in session:
+            obj = session[entity_type]
+            if attr_path:
+                return _traverse_object(obj, attr_path, original_placeholder, f"Workflow Data '{entity_type}'")
+            return json.dumps(obj, indent=2) if isinstance(obj, (dict, list)) else str(obj)
+
         log.warning(f"Workflow placeholder '{original_placeholder}' not found in provided data.")
         return original_placeholder
 
@@ -452,3 +496,44 @@ def _resolve_report_default_path(session, tool_name, command_name):
     os.makedirs(report_dir, exist_ok=True)
     filename = f"{tool_name}-{command_name}.txt"
     return os.path.join(report_dir, filename)
+
+def get_entity_data(entity, session):
+    """
+    Retrieves the full data dictionary for a specific entity type, 
+    matching the logic used in the REST API.
+    """
+    if not session:
+        return {}
+    data = None
+    manager_key = entity.upper()
+    mgr = _manager_registry.get(manager_key)
+
+    if mgr and entity != 'proxy':
+        # Use a safe fallback for items that aren't stored as direct attributes in the session
+        # (e.g., 'profile' is global)
+        item_name = None
+        if entity in ['target', 'tool', 'wordlist', 'report']:
+            item_name = getattr(session, entity, None)
+        
+        data = mgr.load(item_name)
+    elif entity == 'proxy':
+        proxy_mgr = _manager_registry.get('PROXY')
+        if proxy_mgr:
+            data = proxy_mgr.get_placeholder_config(session)
+    
+    # Manually add $report.path if a report is loaded and the entity is 'report'
+    if entity == 'report' and getattr(session, 'report', None) and data:
+        data['path'] = resolve_placeholders('$report.path', session)
+
+        # Dynamically add placeholders from files within the report
+        try:
+            report_mgr = _manager_registry.get('REPORT')
+            file_data_for_placeholders = get_parsed_report_file_data(
+                report_mgr, session.report
+            )
+            if file_data_for_placeholders:
+                data['file'] = file_data_for_placeholders
+        except Exception as e:
+            log.error(f"Failed to parse report files for autocomplete: {e}")
+
+    return data if data is not None else {}

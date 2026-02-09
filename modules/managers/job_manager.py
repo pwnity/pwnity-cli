@@ -55,7 +55,7 @@ def strip_ansi(text: str) -> str:
 
 class Job:
     """Represents a single background process."""
-    def __init__(self, job_id, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None):
+    def __init__(self, job_id, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None, sensitive_inputs=None, sudo_password=None):
         self.id = job_id
         self.command = command_list
         self.session_obj = session_obj
@@ -112,7 +112,8 @@ class Job:
         # --- FIX: Store path to temp proxy config for cleanup ---
         self.temp_proxy_conf_path = temp_proxy_conf_path
         # --- NEW: Store sensitive inputs to mask them in the output ---
-        self.sensitive_inputs = []
+        self.sensitive_inputs = sensitive_inputs or []
+        self.sudo_password = sudo_password
         # --- NEW: Flag to indicate the job is waiting for user input (e.g. sudo) ---
         self.needs_input = False
 
@@ -241,12 +242,33 @@ class JobManager(BaseManager):
                     output_bytes = os.read(master_fd, 1024)
                     if output_bytes:
                         char = output_bytes.decode('utf-8', errors='replace')
+                        
+                        # Check for custom prompt before locking/writing
+                        found_custom_prompt = "PWNITY_SUDO_PROMPT: " in char
+                        
+                        # Remove the internal prompt so it doesn't show in UI/logs
+                        if found_custom_prompt:
+                            char = char.replace("PWNITY_SUDO_PROMPT: ", "")
+
                         with job.lock:
                             job.output += char
-                            # --- NEW: Sudo Password Detection ---
-                            # If we see a sudo prompt, flag the job as needing input.
-                            if "password for" in char.lower() and "[sudo]" in char.lower():
-                                job.needs_input = True
+                            # --- NEW: Sudo Password Detection & Auto-Entry ---
+                            # If we saw our custom prompt (or standard one), check for password.
+                            if ("password for" in char.lower() and "[sudo]" in char.lower()) or found_custom_prompt:
+                                if job.sudo_password:
+                                    # Auto-send password
+                                    try:
+                                        full_input = job.sudo_password + '\n'
+                                        os.write(job.pty_master_fd, full_input.encode('utf-8'))
+                                        # Clear it to prevent re-sending loops (though sudo usually asks once)
+                                        # But keep it in sensitive_inputs for masking if it DOES echo.
+                                        job.sudo_password = None 
+                                        log.debug(f"[Job {job.id}] Auto-sent sudo password.")
+                                    except OSError:
+                                        pass
+                                else:
+                                    # Flag for user intervention
+                                    job.needs_input = True
                         
                         # --- NEW: Emit live output update if an executor is attached ---
                         if self.executor:
@@ -377,7 +399,7 @@ class JobManager(BaseManager):
                             job.tool_name, job.tool_command_name
                     ) # type: ignore
 
-    def add_job(self, tool_name, command_name, session, workflow_placeholder_overrides=None, additional_info=None):
+    def add_job(self, tool_name, command_name, session, workflow_placeholder_overrides=None, additional_info=None, sudo_password=None):
         """
         Builds a command and starts it as a job. This is the main entry point.
         It can resolve placeholders from a session or from workflow override data.
@@ -388,7 +410,10 @@ class JobManager(BaseManager):
         # --- NEW: Sudo handling for workflows ---
         tool_data = self.cli.tool_mgr.load(tool_name)
         needs_sudo = tool_data.get('sudo', False)
-        sudo_password = self.executor.sudo_password if self.executor else None
+        
+        # Priority: explicit argument -> executor attribute
+        if sudo_password is None:
+            sudo_password = self.executor.sudo_password if self.executor else None
 
         try:
             # Build the command template from the tool definition
@@ -423,10 +448,14 @@ class JobManager(BaseManager):
 
             if is_workflow_job and needs_sudo:
                 if sudo_password:
-                    # The command that will be executed, with the password piped to sudo.
-                    # The '-S' flag tells sudo to read the password from stdin.
-                    # The '-p ""' part prevents sudo from printing its own prompt.
-                    command_to_execute = ['/bin/sh', '-c', f"echo '{sudo_password}' | sudo -S -p '' {' '.join(shlex.quote(arg) for arg in resolved_command)}"]
+                    # IMPROVED STRATEGY: Run sudo directly in the PTY.
+                    # This preserves the TTY for the actual tool and avoids pipe issues.
+                    # We use a custom prompt to detect when to send the password.
+                    # We use '-S' to ensure it reads from stdin (connected to PTY slave).
+                    # Actually, since we have a PTY, standard sudo works, but -S ensures
+                    # we can feed it cleanly without relying on TTY echo mechanics for the password prompt.
+                    command_to_execute = ['sudo', '-S', '-p', 'PWNITY_SUDO_PROMPT: '] + resolved_command
+                    
                     # The command that will be displayed in logs and the UI (without the password).
                     command_for_display = ['sudo'] + resolved_command
                 else:
@@ -434,19 +463,28 @@ class JobManager(BaseManager):
                     log.error(f"Tool '{tool_name}' requires sudo, but no password was provided for the workflow.")
                     return None
 
-            return self.start_job(command_to_execute, session, tool_name, command_name, additional_info=additional_info, display_command=command_for_display)
+            sensitive_inputs = []
+            if sudo_password:
+                sensitive_inputs.append(sudo_password)
+
+            return self.start_job(
+                command_to_execute, session, tool_name, command_name, 
+                additional_info=additional_info, 
+                display_command=command_for_display,
+                sensitive_inputs=sensitive_inputs,
+                sudo_password=sudo_password # Pass password to job for auto-entry
+            )
 
         except Exception as e:
             log.error(f"Failed to add job for {tool_name}/{command_name}: {e}")
             return None
 
-    def start_job(self, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None):
+    def start_job(self, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None, sensitive_inputs=None, sudo_password=None):
         """Starts a new command as a background job."""
         job_id = str(uuid.uuid4())
-        job = Job(job_id, command_list, session_obj, tool_name=tool_name, tool_command_name=tool_command_name, additional_info=additional_info, display_command=display_command, temp_proxy_conf_path=temp_proxy_conf_path)
+        job = Job(job_id, command_list, session_obj, tool_name=tool_name, tool_command_name=tool_command_name, additional_info=additional_info, display_command=display_command, temp_proxy_conf_path=temp_proxy_conf_path, sensitive_inputs=sensitive_inputs, sudo_password=sudo_password)
         # --- FIX: Attach the manager's executor instance (if any) to the job object ---
         job.executor_instance = self.executor
-        # job.workflow_context = None # Initialize attribute
         
         try:
             # --- FINAL, ROBUST FIX for nonexistent commands ---
@@ -513,7 +551,7 @@ class JobManager(BaseManager):
             return job_id
         except Exception as e:
             # This block now only catches unexpected errors.
-            log.error(f"An unexpected error occurred while starting job for command '{shlex.join(command_list)}': {e}")
+            log.error(f"An unexpected error occurred while starting job for command '{job.command_str}': {e}")
             return None
 
     def send_input(self, job_id, text_to_send, is_sensitive=False):

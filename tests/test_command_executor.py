@@ -78,12 +78,18 @@ def test_execute_foreground_job_success(executor, mock_managers, mock_session, m
     Tests a successful foreground execution, verifying that output is processed
     and the correct managers are called for logging and display.
     """
-    # Mock subprocess.Popen
-    mock_process = mocker.MagicMock()
-    mock_process.returncode = 0
-    # Simulate stdout providing some bytes
-    mock_process.stdout.read.side_effect = [b"Port 80 is open\n", b""]
-    mocker.patch("subprocess.Popen", return_value=mock_process)
+    # Mock pty.spawn to return 0 (success)
+    def mock_spawn(cmd, read_callback):
+        # Simulate pty.spawn calling the read_callback
+        read_callback(999) # Dummy FD
+        return 0
+        
+    mocker.patch("pty.spawn", side_effect=mock_spawn)
+    # Mock os.read to return output and then empty bytes (to end loop)
+    mocker.patch("os.read", side_effect=[b"Port 80 is open\n", b""])
+    # Mock os status helpers
+    mocker.patch("os.WIFEXITED", return_value=True)
+    mocker.patch("os.WEXITSTATUS", return_value=0)
 
     command_list = ["nmap", "-sV", "localhost"]
     executor.execute(
@@ -107,10 +113,15 @@ def test_execute_foreground_job_failure(executor, mock_managers, mock_session, m
     """
     Tests a failed foreground execution.
     """
-    mock_process = mocker.MagicMock()
-    mock_process.returncode = 1
-    mock_process.stdout.read.side_effect = [b"Error: Host not found\n", b""]
-    mocker.patch("subprocess.Popen", return_value=mock_process)
+    # Mock pty.spawn to return a failure code (e.g. 1)
+    def mock_spawn(cmd, read_callback):
+        read_callback(999)
+        return 256 # 1 << 8, which WEXITSTATUS converts to 1
+        
+    mocker.patch("pty.spawn", side_effect=mock_spawn)
+    mocker.patch("os.read", side_effect=[b"Error: Host not found\n", b""])
+    mocker.patch("os.WIFEXITED", return_value=True)
+    mocker.patch("os.WEXITSTATUS", return_value=1)
 
     command_list = ["nmap", "nonexistent.host"]
     executor.execute(
@@ -130,7 +141,9 @@ def test_execute_foreground_job_failure(executor, mock_managers, mock_session, m
 
 def test_execute_command_not_found(executor, mock_managers, mock_session, mocker):
     """Tests that a FileNotFoundError is handled gracefully."""
-    mocker.patch("subprocess.Popen", side_effect=FileNotFoundError)
+    # In the pty-based implementation, FileNotFoundError might be raised by pty.spawn
+    # or caught within _run_foreground.
+    mocker.patch("pty.spawn", side_effect=FileNotFoundError)
     
     # The execute method should catch the error and not crash.
     # It should return -1 to indicate the failure.
@@ -145,12 +158,15 @@ def test_execute_multiple_commands_with_suppressed_summary(executor, mock_manage
     Tests that when multiple commands are run with `suppress_individual_summaries=True`,
     only one final summary is displayed.
     """
-    # Mock subprocess.Popen to simulate successful execution for all commands
-    mock_process = mocker.MagicMock()
-    mock_process.returncode = 0
-    # Provide enough side effects for two separate Popen calls
-    mock_process.stdout.read.side_effect = [b"output 1\n", b"", b"output 2\n", b""]
-    mocker.patch("subprocess.Popen", return_value=mock_process)
+    def mock_spawn(cmd, read_callback):
+        read_callback(999)
+        return 0
+        
+    mocker.patch("pty.spawn", side_effect=mock_spawn)
+    # Provide side effects for two separate os.read sequences
+    mocker.patch("os.read", side_effect=[b"output 1\n", b"", b"output 2\n", b""])
+    mocker.patch("os.WIFEXITED", return_value=True)
+    mocker.patch("os.WEXITSTATUS", return_value=0)
 
     command_lists = [
         ["echo", "check 1"],
@@ -164,29 +180,19 @@ def test_execute_multiple_commands_with_suppressed_summary(executor, mock_manage
         tool_command_name="checklist",
         run_now=True,
         run_bg=False,
-        suppress_individual_summaries=True # The key flag to test
+        suppress_individual_summaries=True
     )
 
-    # Logbook should be called for each command
     assert mock_managers["logbook_mgr"].create_entry.call_count == 2
-    
-    # Display manager should be called only ONCE for the overall summary
     mock_managers["display_mgr"].display_execution_summary.assert_called_once()
     call_kwargs = mock_managers["display_mgr"].display_execution_summary.call_args.kwargs
     assert call_kwargs["title"] == "[bold]Overall Summary[/bold]"
 
 def test_execute_foreground_job_interrupted(executor, mock_managers, mock_session, mocker):
     """
-    Tests that a KeyboardInterrupt during a foreground job is handled gracefully,
-    terminating the process and showing the correct summary.
+    Tests that a KeyboardInterrupt during a foreground job is handled gracefully.
     """
-    # Mock subprocess.Popen
-    mock_process = mocker.MagicMock()
-    # Simulate that the process is still running when the interrupt happens
-    mock_process.poll.return_value = None
-    # Raise KeyboardInterrupt when stdout is read, simulating Ctrl+C
-    mock_process.stdout.read.side_effect = KeyboardInterrupt
-    mocker.patch("subprocess.Popen", return_value=mock_process)
+    mocker.patch("pty.spawn", side_effect=KeyboardInterrupt)
 
     command_list = ["sleep", "10"]
     executor.execute(
@@ -198,10 +204,8 @@ def test_execute_foreground_job_interrupted(executor, mock_managers, mock_sessio
         run_bg=False
     )
 
-    # Verify that the process was terminated
-    mock_process.terminate.assert_called_once()
     # Verify that the summary was displayed with an "Interrupted" status
     mock_managers["display_mgr"].display_execution_summary.assert_called_once()
     call_kwargs = mock_managers["display_mgr"].display_execution_summary.call_args.kwargs
     assert call_kwargs["status_text"] == "Interrupted"
-    assert call_kwargs["return_code"] == 130 # Standard exit code for Ctrl+C
+    assert call_kwargs["return_code"] == 130

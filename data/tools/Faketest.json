@@ -7,7 +7,7 @@
     {
       "name": "default",
       "params": [
-        "20",
+        "3",
         "$target.foo.bar",
         "-u $target.ip",
         "$target"

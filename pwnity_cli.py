@@ -506,7 +506,8 @@ class MyCLI(cmd2.Cmd):
         }
 
         state_file_path = config.get_parameter("GLOBAL", "SESSION_STATE_FILE", "data/.session.json")
-        temp_file_path = state_file_path + ".tmp"
+        # Use a unique temp file to avoid race conditions between PTY and Headless CLI
+        temp_file_path = f"{state_file_path}.{os.getpid()}.{threading.get_ident()}.tmp"
         try:
             with open(temp_file_path, "w") as f:
                 json.dump(state, f, indent=2)
