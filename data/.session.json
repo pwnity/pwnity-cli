@@ -1,0 +1,107 @@
+{
+  "session_name": null,
+  "target": null,
+  "tool": null,
+  "wordlist": null,
+  "report": null,
+  "proxy_enabled": false,
+  "jobs": [
+    {
+      "id": "d88140ad-a4a4-489b-99bf-62243dc0ccac",
+      "command_str": "/usr/bin/nmap -T4 -F 127.0.0.1",
+      "status": "finished",
+      "duration": "0.21s",
+      "logbook_id": "bf5bdc39-dd17-4a60-aad7-13e9426d3987",
+      "start_time": 1770675063.7575808,
+      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:11 CET\r\nNmap scan report for localhost (127.0.0.1)\r\nHost is up (0.0000080s latency).\r\nNot shown: 99 closed tcp ports (reset)\r\nPORT     STATE SERVICE\r\n5000/tcp open  upnp\r\n\r\nNmap done: 1 IP address (1 host up) scanned in 0.18 seconds\r\n",
+      "tool_name": "nmap",
+      "pid": 27101,
+      "needs_input": false
+    },
+    {
+      "id": "217332b1-6311-479b-a391-a9d99da73dea",
+      "command_str": "/usr/bin/nmap -T4 -F 127.0.0.1",
+      "status": "finished",
+      "duration": "0.20s",
+      "logbook_id": "1007c9fa-45e6-4083-8e35-05e6b9907d4c",
+      "start_time": 1770675087.5485592,
+      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:11 CET\r\nNmap scan report for localhost (127.0.0.1)\r\nHost is up (0.0000080s latency).\r\nNot shown: 99 closed tcp ports (reset)\r\nPORT     STATE SERVICE\r\n5000/tcp open  upnp\r\n\r\nNmap done: 1 IP address (1 host up) scanned in 0.18 seconds\r\n",
+      "tool_name": "nmap",
+      "pid": 27216,
+      "needs_input": false
+    },
+    {
+      "id": "5e27c07e-fde2-4eb7-b985-5b5d9b130f97",
+      "command_str": "/usr/bin/nmap -A -T4 127.0.0.1",
+      "status": "finished",
+      "duration": "11.10s",
+      "logbook_id": "130c7c5f-2b5d-4f4a-b4be-de3a4ffa0aa2",
+      "start_time": 1770675110.9374886,
+      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:11 CET\r\nNmap scan report for localhost (127.0.0.1)\r\nHost is up (0.000049s latency).\r\nNot shown: 999 closed tcp ports (reset)\r\nPORT     STATE SERVICE VERSION\r\n5000/tcp open  http    Werkzeug httpd 3.1.5 (Python 3.13.7)\r\n|_http-server-header: Werkzeug/3.1.5 Python/3.13.7\r\n|_http-title: Pwnity PRO // Web UI\r\nAggressive OS guesses: Linux 4.15 - 5.19 (95%), OpenWrt 21.02 (Linux 5.4) (95%), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3) (95%), Linux 6.0 (94%), Linux 4.19 (93%), Linux 5.0 - 5.14 (92%), Linux 5.4 - 5.10 (91%), Linux 2.6.32 (91%), Linux 3.2 - 4.14 (91%), Linux 4.15 (91%)\r\nNo exact OS matches for host (test conditions non-ideal).\r\nNetwork Distance: 1 hop\r\n\r\nTRACEROUTE (using port 143/tcp)\r\nHOP RTT     ADDRESS\r\n1   0.04 ms localhost (127.0.0.1)\r\n\r\nOS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .\r\nNmap done: 1 IP address (1 host up) scanned in 11.07 seconds\r\n",
+      "tool_name": "nmap",
+      "pid": 27358,
+      "needs_input": false
+    },
+    {
+      "id": "16334954-61af-462b-8e10-8574114dea3b",
+      "command_str": "/usr/bin/nmap -A -T4 192.168.178.1",
+      "status": "finished",
+      "duration": "23.78s",
+      "logbook_id": "ddc2608d-f8e9-468e-a4fc-886c029ca0c2",
+      "start_time": 1770675144.952906,
+      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:12 CET\r\nNmap scan report for fritz.box (192.168.178.1)\r\nHost is up (0.0011s latency).\r\nAll 1000 scanned ports on fritz.box (192.168.178.1) are in ignored states.\r\nNot shown: 1000 filtered tcp ports (no-response)\r\nMAC Address: 98:9B:CB:77:46:65 (AVM Audiovisuelles Marketing und Computersysteme GmbH)\r\nToo many fingerprints match this host to give specific OS details\r\nNetwork Distance: 1 hop\r\n\r\nTRACEROUTE\r\nHOP RTT     ADDRESS\r\n1   1.15 ms fritz.box (192.168.178.1)\r\n\r\nOS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .\r\nNmap done: 1 IP address (1 host up) scanned in 23.72 seconds\r\n",
+      "tool_name": "nmap",
+      "pid": 27608,
+      "needs_input": false
+    },
+    {
+      "id": "a1ba3fa9-c747-4051-97f9-c04bd284bb97",
+      "command_str": "/usr/bin/nmap -A -T4 '$target.ip'",
+      "status": "finished",
+      "duration": "0.29s",
+      "logbook_id": "f3fe3fb2-ec39-4624-a802-c211508c556b",
+      "start_time": 1770675338.7663627,
+      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:15 CET\r\nFailed to resolve \"$target.ip\".\r\nWARNING: No targets were specified, so 0 hosts scanned.\r\nNmap done: 0 IP addresses (0 hosts up) scanned in 0.25 seconds\r\n",
+      "tool_name": "nmap",
+      "pid": 28401,
+      "needs_input": false
+    },
+    {
+      "id": "541ad18d-0ccc-4bcd-aba7-8f35c89a0b25",
+      "command_str": "/usr/bin/nmap -A -T4 '$target.ip'",
+      "status": "finished",
+      "duration": "0.22s",
+      "logbook_id": "659de5c5-0afa-48c9-8980-6907a24e49d1",
+      "start_time": 1770675344.428137,
+      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:15 CET\r\nFailed to resolve \"$target.ip\".\r\nWARNING: No targets were specified, so 0 hosts scanned.\r\nNmap done: 0 IP addresses (0 hosts up) scanned in 0.18 seconds\r\n",
+      "tool_name": "nmap",
+      "pid": 28448,
+      "needs_input": false
+    },
+    {
+      "id": "ec9c476e-e192-4d75-8b09-cde463820af3",
+      "command_str": "/usr/bin/nmap -A -T4 192.168.178.76",
+      "status": "finished",
+      "duration": "14.79s",
+      "logbook_id": "337a011e-4998-465a-aba3-8d38f06baab4",
+      "start_time": 1770675373.3946946,
+      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:16 CET\r\nNmap scan report for 192.168.178.76\r\nHost is up (0.000047s latency).\r\nAll 1000 scanned ports on 192.168.178.76 are in ignored states.\r\nNot shown: 1000 closed tcp ports (reset)\r\nToo many fingerprints match this host to give specific OS details\r\nNetwork Distance: 0 hops\r\n\r\nOS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .\r\nNmap done: 1 IP address (1 host up) scanned in 14.76 seconds\r\n",
+      "tool_name": "nmap",
+      "pid": 28599,
+      "needs_input": false
+    }
+  ],
+  "sessions": {
+    "default": {
+      "name": "default",
+      "target": null,
+      "tool": null,
+      "wordlist": null,
+      "report": null
+    }
+  },
+  "monitoring_status": {
+    "proxy_enabled": false,
+    "heartbeat_target": null
+  }
+}

@@ -30,8 +30,8 @@ Always use the `NodeTemplate` as the root element.
       <!-- Inputs (Left aligned) -->
       <div class="port-group inputs">
         <div class="port trigger">
-          <Handle type="target" :position="Position.Left" class="pwn-handle handle-trigger" id="trigger#execute" />
-          <span class="port-label">execute</span>
+          <Handle type="target" :position="Position.Left" class="pwn-handle handle-trigger" id="trigger#on_start" />
+          <span class="port-label">on_start</span>
         </div>
         <!-- Add more input ports here -->
       </div>
@@ -41,6 +41,10 @@ Always use the `NodeTemplate` as the root element.
         <div class="port trigger">
           <span class="port-label">on_finish</span>
           <Handle type="source" :position="Position.Right" class="pwn-handle handle-trigger" id="trigger#on_finish" />
+        </div>
+        <div class="port trigger">
+          <span class="port-label">on_abort</span>
+          <Handle type="source" :position="Position.Right" class="pwn-handle handle-trigger" id="trigger#on_abort" />
         </div>
         <!-- Add more output ports here -->
       </div>
