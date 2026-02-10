@@ -92,10 +92,12 @@ def get_parsed_report_file_data(report_mgr, report_name: str) -> dict:
             log.debug(f"Skipping file '{file_name}' during parsing for placeholders: {e}")
     return file_data
 
-def resolve_placeholders(text: str, session=None, tool_name: str = None, command_name: str = None) -> str:
+def resolve_placeholders(text: str, session=None, tool_name: str = None, command_name: str = None, strict: bool = False) -> str:
     """
     Resolves both simple placeholders ($entity.key) and function-based placeholders (func(...))
     in a given string. Works from the inside out to handle nesting.
+    
+    If strict=True, it will raise a ValueError if any placeholder cannot be resolved.
     """
     if not isinstance(text, str) or not session:
         return text
@@ -107,7 +109,7 @@ def resolve_placeholders(text: str, session=None, tool_name: str = None, command
     # This correctly handles cases like $tool.input -> $target.auth_b64 -> b64encode($target.username:$target.password) -> final_string
     while True:
         # First, resolve all simple placeholders ($entity.key)
-        resolved_simple = _resolve_simple_placeholders(current_text, session, tool_name, command_name)
+        resolved_simple = _resolve_simple_placeholders(current_text, session, tool_name, command_name, strict=strict)
         # Then, resolve any function calls that might have been exposed
         resolved_functions = _resolve_functions(resolved_simple, session, tool_name, command_name)
         if resolved_functions == current_text:
@@ -120,7 +122,7 @@ def register_manager(key, manager):
     """Registers a manager with a given prefix for placeholder resolution."""
     _manager_registry[key.upper()] = manager
 
-def _resolve_simple_placeholders(text: str, session=None, tool_name: str = None, command_name: str = None) -> str:
+def _resolve_simple_placeholders(text: str, session=None, tool_name: str = None, command_name: str = None, strict: bool = False) -> str:
     """Resolves only the simple $entity.key placeholders."""
     if not isinstance(text, str) or not session:
         return text
@@ -131,10 +133,10 @@ def _resolve_simple_placeholders(text: str, session=None, tool_name: str = None,
     current_text = text
     while True:
         # 1. Resolve braced patterns {{}} and ${}
-        text_with_braced = BRACED_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_braced_match(m, session, tool_name, command_name), current_text)
+        text_with_braced = BRACED_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_braced_match(m, session, tool_name, command_name, strict=strict), current_text)
         
         # 2. Resolve $ patterns using existing logic
-        resolved_text = SIMPLE_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_match(m, session, tool_name, command_name), text_with_braced)
+        resolved_text = SIMPLE_PLACEHOLDER_PATTERN.sub(lambda m: _resolve_match(m, session, tool_name, command_name, strict=strict), text_with_braced)
         
         if resolved_text == current_text: # No more placeholders were found and replaced
             return resolved_text
@@ -167,7 +169,7 @@ def _resolve_functions(text: str, session=None, tool_name: str = None, command_n
     return current_text
 
 
-def _resolve_braced_match(match, session, tool_name: str = None, command_name: str = None) -> str:
+def _resolve_braced_match(match, session, tool_name: str = None, command_name: str = None, strict: bool = False) -> str:
     """Callback for braced placeholders like {{target.ip}} or ${target.ip}."""
     original_placeholder = match.group(0)
     # Group 1 is {{...}}, Group 2 is ${...}
@@ -187,9 +189,9 @@ def _resolve_braced_match(match, session, tool_name: str = None, command_name: s
         entity_type = content
         attr_path = None
         
-    return _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name, command_name)
+    return _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name, command_name, strict=strict)
 
-def _resolve_match(match, session, tool_name: str = None, command_name: str = None) -> str:
+def _resolve_match(match, session, tool_name: str = None, command_name: str = None, strict: bool = False) -> str:
     """Callback function for re.sub to resolve a single placeholder match."""
     original_placeholder = match.group(0) # e.g. $target.ip
 
@@ -197,9 +199,9 @@ def _resolve_match(match, session, tool_name: str = None, command_name: str = No
     # For '$target', groups are ('target', None, None)
     entity_type, _, attr_path = match.groups()
     
-    return _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name, command_name)
+    return _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name, command_name, strict=strict)
 
-def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name=None, command_name=None) -> str:
+def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, tool_name=None, command_name=None, strict: bool = False) -> str:
     """Shared logic for resolving placeholders given parsed components."""
     
     # --- FINAL, ROBUST FIX ---
@@ -245,8 +247,9 @@ def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, t
             else:
                 return original_placeholder
 
-            return _traverse_object(parsed_data, remaining_path, original_placeholder, f"File '{file_name}'")
+            return _traverse_object(parsed_data, remaining_path, original_placeholder, f"File '{file_name}'", strict=strict)
         except Exception as e:
+            if strict: raise
             log.error(f"Error parsing or traversing file for placeholder '{original_placeholder}': {e}")
             return original_placeholder
     # --- End of report.file.* special handling ---
@@ -270,6 +273,8 @@ def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, t
                 return _traverse_object(obj, attr_path, original_placeholder, f"Workflow Data '{entity_type}'")
             return json.dumps(obj, indent=2) if isinstance(obj, (dict, list)) else str(obj)
 
+        if strict:
+            raise ValueError(f"Required placeholder '{original_placeholder}' not found.")
         log.warning(f"Workflow placeholder '{original_placeholder}' not found in provided data.")
         return original_placeholder
 
@@ -282,6 +287,8 @@ def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, t
             if hasattr(current_obj, part):
                 current_obj = getattr(current_obj, part)
             else:
+                if strict:
+                    raise ValueError(f"Required placeholder '{original_placeholder}' not found in WorkflowContext at path '{part}'.")
                 log.debug(f"Placeholder '{original_placeholder}' not found in WorkflowContext at path '{part}'.")
                 return original_placeholder
         
@@ -317,6 +324,8 @@ def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, t
                 if entity_type == 'report':
                     return _resolve_report_default_path(session, tool_name, command_name)
                 return str(value)
+        if strict:
+            raise ValueError(f"Required placeholder '{original_placeholder}' not found.")
         return original_placeholder # If no default can be determined
 
     # --- Standard entity.attribute resolution ---
@@ -433,10 +442,14 @@ def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, t
     # If the final resolved value is a complex type, format it as JSON for readability.
     if isinstance(resolved_value, (dict, list)):
         return json.dumps(resolved_value, indent=2)
+    
+    if resolved_value is None and strict:
+         raise ValueError(f"Resolved value for '{original_placeholder}' is None.")
+
     # This will correctly convert None to "None", "" to "", etc.
     return str(resolved_value)
 
-def _traverse_object(obj, path_str, original_placeholder, obj_name_for_log):
+def _traverse_object(obj, path_str, original_placeholder, obj_name_for_log, strict: bool = False):
     """Helper to traverse a nested object (dict/list) using a dot-separated path."""
     if not path_str:
         return json.dumps(obj, indent=2) if isinstance(obj, (dict, list)) else str(obj)
@@ -460,6 +473,8 @@ def _traverse_object(obj, path_str, original_placeholder, obj_name_for_log):
                 log.warning(f"Invalid or out-of-bounds index '{part}' for sub-path '{current_path_str}' in placeholder '{original_placeholder}'.")
                 return original_placeholder
         else:
+            if strict:
+                raise ValueError(f"Cannot fully resolve attribute path '{path_str}'. '{current_path_str}' is not an object or list.")
             log.warning(f"Cannot fully resolve attribute path '{path_str}'. '{current_path_str}' is not an object or list. Placeholder '{original_placeholder}' will not be replaced.")
             return original_placeholder
     

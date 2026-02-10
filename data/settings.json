@@ -1,0 +1,27 @@
+{
+    "notifications": {
+        "enableDesktop": false,
+        "enableThreading": true,
+        "timeout": 5000
+    },
+    "terminal": {
+        "copyOnSelect": true,
+        "cursorBlink": true,
+        "fontFamily": "JetBrains Mono, monospace",
+        "fontSize": 14,
+        "scrollback": 5000,
+        "startupBehavior": "docked",
+        "theme": "dracula"
+    },
+    "cli": {
+        "autoConnect": true,
+        "autoSaveInterval": 30,
+        "defaultThreads": 10,
+        "defaultWordlist": "",
+        "historyLimit": 1000
+    },
+    "ui": {
+        "highContrast": false,
+        "reducedMotion": false
+    }
+}

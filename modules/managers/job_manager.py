@@ -354,9 +354,14 @@ class JobManager(BaseManager):
                                 "status": job.status,
                                 "return_code": job.return_code,
                             }
-                            job_output['on_finish'] = job_output.copy()
+                            # --- FIX: Distinguish between finished and failed triggers ---
+                            if job.status == "finished":
+                                job_output['on_finish'] = job_output.copy()
+                            else:
+                                job_output['on_abort'] = job_output.copy()
+
                             job.executor_instance.on_node_finished(node_id_for_job, job.status, job_output)
-                            log.debug(f"[JobManager] Notified executor about completion of job {job.id} for node {node_id_for_job}.")
+                            log.debug(f"[JobManager] Notified executor about completion of job {job.id} for node {node_id_for_job} (Status: {job.status}).")
 
                     self.notifications.append(job.id)
 
@@ -548,7 +553,15 @@ class JobManager(BaseManager):
             with self._lock:
                 self.jobs[job_id] = job
             log.debug(f"Caught exception on job start, likely a nonexistent command: {e}")
-            return job_id
+
+            # --- NEW: Notify executor immediately since no thread will be started ---
+            # NOTE: At this point, monitor_job hasn't been called yet, so the job_monitor 
+            # won't have the node_id->job_id mapping yet. This is handled by ToolNode
+            # catching the exception if returned value is None, but here we return a job_id.
+            # However, if we return job_id, ToolNode will proceed to call monitor_job.
+            # If we call on_node_finished now with None, it's not helpful.
+            # Best approach: Return None here so ToolNode's own exception handler triggers.
+            return None 
         except Exception as e:
             # This block now only catches unexpected errors.
             log.error(f"An unexpected error occurred while starting job for command '{job.command_str}': {e}")
