@@ -1,36 +1,11 @@
 {
-  "session_name": null,
+  "session_name": "default",
   "target": null,
   "tool": null,
   "wordlist": null,
   "report": null,
   "proxy_enabled": false,
-  "jobs": [
-    {
-      "id": "0bb7b947-e3ce-4f25-a00a-4ac7a0085955",
-      "command_str": "/usr/bin/nmap -A -T4 127.0.0.1",
-      "status": "finished",
-      "duration": "12.51s",
-      "logbook_id": "e9a91312-9ac7-49dc-a6d5-526fcf92f68a",
-      "start_time": 1770676474.1813524,
-      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:34 CET\r\nNmap scan report for localhost (127.0.0.1)\r\nHost is up (0.000045s latency).\r\nNot shown: 999 closed tcp ports (reset)\r\nPORT     STATE SERVICE VERSION\r\n5000/tcp open  http    Werkzeug httpd 3.1.5 (Python 3.13.7)\r\n|_http-title: Pwnity PRO // Web UI\r\n|_http-server-header: Werkzeug/3.1.5 Python/3.13.7\r\nAggressive OS guesses: Linux 4.15 - 5.19 (95%), OpenWrt 21.02 (Linux 5.4) (95%), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3) (94%), Linux 4.19 (93%), Linux 6.0 (93%), Linux 5.0 - 5.14 (92%), Linux 2.6.32 (91%), Linux 3.2 - 4.14 (91%), Linux 3.3 (91%), Linux 2.6.32 - 3.10 (91%)\r\nNo exact OS matches for host (test conditions non-ideal).\r\nNetwork Distance: 1 hop\r\n\r\nTRACEROUTE (using port 995/tcp)\r\nHOP RTT     ADDRESS\r\n1   0.05 ms localhost (127.0.0.1)\r\n\r\nOS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .\r\nNmap done: 1 IP address (1 host up) scanned in 12.46 seconds\r\n",
-      "tool_name": "nmap",
-      "pid": 1415,
-      "needs_input": false
-    },
-    {
-      "id": "994cd035-ee5d-49d1-bde4-87a392665428",
-      "command_str": "/usr/bin/nmap -A -T4 127.0.0.1",
-      "status": "finished",
-      "duration": "12.56s",
-      "logbook_id": "a851f7fb-e48f-4529-97b1-05362103e9cd",
-      "start_time": 1770676665.1328237,
-      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-09 23:37 CET\r\nNmap scan report for localhost (127.0.0.1)\r\nHost is up (0.000043s latency).\r\nNot shown: 999 closed tcp ports (reset)\r\nPORT     STATE SERVICE VERSION\r\n5000/tcp open  http    Werkzeug httpd 3.1.5 (Python 3.13.7)\r\n|_http-title: Pwnity PRO // Web UI\r\n|_http-server-header: Werkzeug/3.1.5 Python/3.13.7\r\nAggressive OS guesses: Linux 4.15 - 5.19 (95%), OpenWrt 21.02 (Linux 5.4) (95%), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3) (95%), Linux 6.0 (94%), Linux 4.19 (93%), Linux 5.0 - 5.14 (92%), Linux 5.4 - 5.10 (91%), Linux 2.6.32 (91%), Linux 3.2 - 4.14 (91%), Linux 3.3 (91%)\r\nNo exact OS matches for host (test conditions non-ideal).\r\nNetwork Distance: 1 hop\r\n\r\nTRACEROUTE (using port 256/tcp)\r\nHOP RTT     ADDRESS\r\n1   0.04 ms localhost (127.0.0.1)\r\n\r\nOS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .\r\nNmap done: 1 IP address (1 host up) scanned in 12.51 seconds\r\n",
-      "tool_name": "nmap",
-      "pid": 2404,
-      "needs_input": false
-    }
-  ],
+  "jobs": [],
   "sessions": {
     "default": {
       "name": "default",

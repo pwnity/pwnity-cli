@@ -21,11 +21,6 @@
       "name": "GoBusterFiles",
       "regex": "/\\w+\\s+\\(\\w+:\\s+\\w+\\)",
       "exclude_patterns": []
-    },
-    {
-      "name": "server_header",
-      "regex": "\\w+:\\s+\\w+/\\w+\\.\\w+\\.\\w+\\s+\\(\\w+\\)",
-      "exclude_patterns": []
     }
   ]
 }

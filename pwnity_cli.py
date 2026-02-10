@@ -263,6 +263,10 @@ class MyCLI(cmd2.Cmd):
         self.last_command = None
         self._start_background_threads()
 
+        # Force an initial state sync so the Web UI has session data immediately
+        if self.web_ui_mode or self.headless_mode:
+            self._sync_session_state_for_ui()
+    
     def _setup_paths(self):
         """Sets up paths for history and alias files from config."""
         self.history_file = config.get_parameter("GLOBAL", "HISTORY_FILE", "data/.pwnity_history")

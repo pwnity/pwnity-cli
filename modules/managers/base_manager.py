@@ -380,11 +380,29 @@ class JSONManager(BaseManager):
         if '.' in key:
             keys = key.split('.')
             curr = data
-            for k in keys[:-1]:
-                if k not in curr or not isinstance(curr[k], dict): return data
-                curr = curr[k]
-            if keys[-1] in curr:
-                del curr[keys[-1]]
+            for i, k in enumerate(keys[:-1]):
+                if isinstance(curr, dict):
+                    if k not in curr: return data
+                    curr = curr[k]
+                elif isinstance(curr, list):
+                    try:
+                        idx = int(k)
+                        if 0 <= idx < len(curr):
+                            curr = curr[idx]
+                        else: return data
+                    except ValueError: return data
+                else: return data
+            
+            last_key = keys[-1]
+            if isinstance(curr, dict):
+                if last_key in curr:
+                    del curr[last_key]
+            elif isinstance(curr, list):
+                try:
+                    idx = int(last_key)
+                    if 0 <= idx < len(curr):
+                        curr.pop(idx)
+                except ValueError: pass
         elif key in data:
             del data[key]
         else:

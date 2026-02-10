@@ -14,5 +14,5 @@
   ],
   "description": "Establishes VPN connections using OpenVPN configuration files",
   "usage": "Start with 'pwn connect_tryhackme bg' to start the connection in background to avoid a blocked terminal",
-  "ovpn_file_path": "/path/to/your/vpnfile.ovpn"
+  "ovpn_file_path": "/home/kali/v3rm1ll1on.ovpn"
 }
