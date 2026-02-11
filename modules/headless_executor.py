@@ -33,6 +33,10 @@ class HeadlessCommandExecutor:
         self.running = False
         self._lock = threading.Lock()
         
+        # Attach this executor to the CLI's JobManager to enable live output updates
+        if hasattr(self.cli, 'job_mgr'):
+            self.cli.job_mgr.executor = self
+        
     def start(self):
         """Start the background worker thread."""
         if self.running:
@@ -104,6 +108,7 @@ class HeadlessCommandExecutor:
                         }
                     
                     self.socketio.emit('state_update', state)
+                    self.socketio.emit('command_executed', {"command": command})
                 except Exception as e:
                     print(f"[Headless] State update error: {e}")
             
@@ -170,6 +175,14 @@ class HeadlessCommandExecutor:
                 'error': error,
                 'command': command
             }
+
+    def _emit_job_output_update(self, job_id: str, new_output_delta: str):
+        """Emits a partial output update for a specific job via Socket.IO."""
+        if self.socketio:
+            self.socketio.emit('job_output_update', {
+                'job_id': job_id,
+                'output_delta': new_output_delta
+            })
 
 
 # Global executor instance (initialized by web UI)

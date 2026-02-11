@@ -1,53 +1,15 @@
 {
   "session_name": "default",
   "target": null,
-  "tool": null,
+  "tool": "Faketest",
   "wordlist": null,
   "report": null,
   "proxy_enabled": false,
-  "jobs": [
-    {
-      "id": "d66af45a-9dab-4707-9dc9-e959098f4f86",
-      "command_str": "/usr/bin/nmap -T4 -F 192.168.178.1",
-      "status": "finished",
-      "duration": "0.35s",
-      "logbook_id": "af565a55-6085-4ffa-bf87-d5fc4844d455",
-      "start_time": 1770804744.4383867,
-      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-11 11:12 CET\r\nNmap scan report for fritz.box (192.168.178.1)\r\nHost is up (0.0058s latency).\r\nNot shown: 96 closed tcp ports (reset)\r\nPORT     STATE SERVICE\r\n53/tcp   open  domain\r\n80/tcp   open  http\r\n443/tcp  open  https\r\n5060/tcp open  sip\r\nMAC Address: 98:9B:CB:77:46:65 (AVM Audiovisuelles Marketing und Computersysteme GmbH)\r\n\r\nNmap done: 1 IP address (1 host up) scanned in 0.29 seconds\r\n",
-      "tool_name": "nmap",
-      "pid": 26388,
-      "needs_input": false
-    },
-    {
-      "id": "9cc74e54-f715-4f29-a0d3-55f143d814e6",
-      "command_str": "/usr/bin/nmap -T4 -F 192.168.178.26",
-      "status": "finished",
-      "duration": "1.57s",
-      "logbook_id": "ff11a351-3528-4f52-9ee7-67bca4f39a94",
-      "start_time": 1770804749.9514992,
-      "output": "Starting Nmap 7.95 ( https://nmap.org ) at 2026-02-11 11:12 CET\r\nNote: Host seems down. If it is really up, but blocking our ping probes, try -Pn\r\nNmap done: 1 IP address (0 hosts up) scanned in 1.53 seconds\r\n",
-      "tool_name": "nmap",
-      "pid": 26432,
-      "needs_input": false
-    },
-    {
-      "id": "48237358-7f44-49dd-b6cd-584d6b8c8a35",
-      "command_str": "sudo /home/kali/fake_test.sh 3",
-      "status": "finished",
-      "duration": "63.15s",
-      "logbook_id": "4809ca65-23b2-43ea-bd41-886481538683",
-      "start_time": 1770804751.9629216,
-      "output": "\r\nUsername (default: guest): (no username \u2014 using: guest)\r\nPassword: \r\n\r\n(no password \u2014 using fallback)\r\nLogin FAILED (invalid password)\r\n[guest] working (1/3)...\r\n[guest] working (2/3)...\r\n[guest] working (3/3)...\r\nSession ended.\r\n",
-      "tool_name": "Faketest",
-      "pid": 26470,
-      "needs_input": false
-    }
-  ],
   "sessions": {
     "default": {
       "name": "default",
       "target": null,
-      "tool": null,
+      "tool": "Faketest",
       "wordlist": null,
       "report": null
     }

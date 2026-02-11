@@ -2,23 +2,46 @@
     "notifications": {
         "enableDesktop": false,
         "enableThreading": true,
+        "mutePopups": false,
         "timeout": 5000
     },
     "terminal": {
+        "fontSize": 14,
+        "fontFamily": "JetBrains Mono, monospace",
+        "theme": "dracula",
         "copyOnSelect": true,
         "cursorBlink": true,
-        "fontFamily": "JetBrains Mono, monospace",
-        "fontSize": 14,
         "scrollback": 5000,
-        "startupBehavior": "closed",
-        "theme": "dracula"
+        "startupBehavior": "docked",
+        "shells": [
+            {
+                "name": "BASH",
+                "path": "/bin/bash"
+            },
+            {
+                "name": "ZSH",
+                "path": "/bin/zsh"
+            },
+            {
+                "name": "SH",
+                "path": "/bin/sh"
+            },
+            {
+                "name": "PYTHON",
+                "path": "/usr/bin/python3"
+            },
+            {
+                "name": "PHP",
+                "path": "/usr/bin/php -a"
+            }
+        ]
     },
     "cli": {
-        "autoConnect": true,
         "autoSaveInterval": 30,
-        "defaultThreads": 10,
         "defaultWordlist": "",
-        "historyLimit": 1000
+        "defaultThreads": 10,
+        "historyLimit": 1000,
+        "autoConnect": true
     },
     "ui": {
         "highContrast": false,

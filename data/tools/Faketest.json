@@ -8,12 +8,14 @@
       "name": "default",
       "params": [
         "3"
-      ]
+      ],
+      "description": "This is my total great an cool command for nothing. Its just a fake test"
     },
     {
       "name": "Foo",
       "description": "Bar",
       "params": [
+        "test123",
         "test"
       ]
     }

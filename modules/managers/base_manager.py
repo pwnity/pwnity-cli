@@ -256,6 +256,7 @@ class JSONManager(BaseManager):
         path = self._get_entity_path(name)
         if self.exists(name):
             try:
+                log.trace(f"[Manager] Loading '{name}' from {path}")
                 with open(path) as f:
                     # Handle empty files that would cause a JSONDecodeError
                     if os.fstat(f.fileno()).st_size == 0:
