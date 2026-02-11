@@ -1,6 +1,6 @@
 {
   "GLOBAL": {
-    "DEBUG_LEVEL": "WARNING",
+    "DEBUG_LEVEL": "DEBUG",
     "HISTORY_FILE": "data/.pwnity_history",
     "ALIASES_FILE": "etc/aliases.txt",
     "LOOT_TYPES": [

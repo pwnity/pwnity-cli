@@ -10,7 +10,7 @@
         "fontFamily": "JetBrains Mono, monospace",
         "fontSize": 14,
         "scrollback": 5000,
-        "startupBehavior": "docked",
+        "startupBehavior": "closed",
         "theme": "dracula"
     },
     "cli": {
