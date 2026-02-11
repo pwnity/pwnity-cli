@@ -221,11 +221,21 @@ class MyCLI(cmd2.Cmd):
         log.set_cli_instance(self)
         # Enable cmd2's own debugging if the log level is low
         self.debug = log.log_value <= log.LEVEL["DEBUG"]
-
         self._init_managers()
         self._init_placeholders()
         self._original_stty_settings = None # Initialize attribute
         self._init_parsers()
+        self._web_ui_extension_loaded = False
+
+        # If running in UI or headless mode, try to load the web_ui extension
+        if self.web_ui_mode or self.headless_mode:
+            try:
+                from plugins.web_ui.backend.cli_extension import setup_ui_extension
+                setup_ui_extension(self)
+                self._web_ui_extension_loaded = True
+            except ImportError:
+                # Plugin not found, continue in standard CLI mode
+                pass
 
         # Handle command line arguments for initial state
         import argparse
@@ -262,34 +272,13 @@ class MyCLI(cmd2.Cmd):
 
         self.last_command = None
         self._start_background_threads()
-
-        # Force an initial state sync so the Web UI has session data immediately
-        if self.web_ui_mode or self.headless_mode:
-            self._sync_session_state_for_ui()
-            
-        # Register exit handler to clean up process-specific job file
-        import atexit
-        atexit.register(self._cleanup_state_files)
-
+        
         # --- NEW: IPC attributes ---
         self._ipc_socket_path = None
     
     def _cleanup_state_files(self):
-        """Removes the process-specific jobs file and IPC socket upon exit."""
-        state_file_path = config.get_parameter("GLOBAL", "SESSION_STATE_FILE", "data/.session.json")
-        jobs_file_path = f"{state_file_path}.{os.getpid()}.jobs"
-        if os.path.exists(jobs_file_path):
-            try:
-                os.remove(jobs_file_path)
-            except:
-                pass
-        
-        # Cleanup IPC socket
-        if hasattr(self, '_ipc_socket_path') and self._ipc_socket_path and os.path.exists(self._ipc_socket_path):
-            try:
-                os.remove(self._ipc_socket_path)
-            except:
-                pass
+        """Removes the process-specific jobs file and IPC socket upon exit. (Overwritten by UI extension)"""
+        pass
     
     def _setup_paths(self):
         """Sets up paths for history and alias files from config."""
@@ -385,18 +374,21 @@ class MyCLI(cmd2.Cmd):
         MyCLI._parsers_loaded = True
 
     def _start_background_threads(self):
-        """Starts background threads for UI syncing, library checks, and IPC."""
-        self.last_running_job_ids = set()
-        self.stop_sync_thread = threading.Event()
-        self.sync_thread = threading.Thread(target=self._background_state_syncer, daemon=True)
-        self.sync_thread.start()
+        """Starts background threads for library checks and (if extended) UI syncing."""
+        # 1. UI Syncing & IPC (if injected by extension)
+        if self._web_ui_extension_loaded:
+            self.last_running_job_ids = set()
+            self.stop_sync_thread = threading.Event()
+            
+            if hasattr(self, '_background_state_syncer'):
+                self.sync_thread = threading.Thread(target=self._background_state_syncer, daemon=True)
+                self.sync_thread.start()
 
-        # --- NEW: IPC Server for silent UI interaction ---
-        if self.web_ui_mode or self.headless_mode:
-            self.ipc_thread = threading.Thread(target=self._ipc_server, daemon=True)
-            self.ipc_thread.start()
+            if hasattr(self, '_ipc_server'):
+                self.ipc_thread = threading.Thread(target=self._ipc_server, daemon=True)
+                self.ipc_thread.start()
 
-        # Start library URL check in the background on startup
+        # 2. Library check (Core CLI)
         is_reloader_process = os.environ.get('WERKZEUG_RUN_MAIN') == 'true'
         if not self.web_ui_mode or is_reloader_process:
             self.library_check_thread = threading.Thread(target=self.library_mgr.check_all_entries_on_startup, daemon=True)
@@ -452,136 +444,16 @@ class MyCLI(cmd2.Cmd):
         return f"\n{line1}\n{line2}"
 
     def _background_state_syncer(self):
-        """A background thread that periodically syncs state if jobs are running."""
-        while not self.stop_sync_thread.is_set():
-            try:
-                if not hasattr(self, 'job_mgr') or not hasattr(self, 'heartbeat_mgr'):
-                    time.sleep(0.5) # Wait for managers to be initialized
-                    continue
-
-                current_running_job_ids = {j.id for j in self.job_mgr.list_jobs() if j.status in ['running', 'killing']}
-                
-                # Check if a heartbeat is active for the currently loaded target.
-                # This is necessary because a heartbeat is a background thread, not a "job".
-                is_heartbeat_running = False
-                if self.session and self.session.target:
-                    if self._is_heartbeat_active(self.session.target):
-                        is_heartbeat_running = True
-
-                # We sync if there are currently running jobs, OR if there were running
-                # jobs in the last cycle, OR if a heartbeat is active.
-                if current_running_job_ids or self.last_running_job_ids or is_heartbeat_running:
-                    self._sync_session_state_for_ui()
-
-                # Update the state for the next cycle.
-                self.last_running_job_ids = current_running_job_ids
-            except Exception as e:
-                # Prevent thread from crashing on unexpected errors during sync
-                log.error(f"Error in background state syncer: {e}")
-            
-            # Sleep for a reasonable interval to avoid excessive CPU usage.
-            time.sleep(0.5)
+        """Polls for state changes. (Implemented by UI Extension)"""
+        pass
 
     def _write_state_to_file(self):
-        """Gathers the current state and writes it to the session and jobs JSON files."""
-        if not self.session:
-            return
-
-        # --- Determine Heartbeat Status ---
-        loaded_target = self.session.target
-        active_heartbeat_target = None
-        if loaded_target and self._is_heartbeat_active(loaded_target):
-            active_heartbeat_target = loaded_target
-
-        proxy_config = self.proxy_mgr.get_effective_config(self.session)
-        
-        # 1. Gather Jobs (Process-Specific)
-        jobs_list = self.job_mgr.list_jobs()
-        jobs_data = []
-        for job in jobs_list:
-            with job.lock:
-                self.job_mgr.check_job_status(job)
-                output_data = job.get_masked_output(limit=4096)
-                
-                jobs_data.append({
-                    'id': job.id, 'command_str': job.command_str, 'status': job.status,
-                    'duration': f"{job.duration:.2f}s", 'logbook_id': job.logbook_id,
-                    'start_time': job.start_time, 'output': output_data,
-                    'tool_name': job.tool_name, 'pid': job.pid,
-                    'needs_input': getattr(job, 'needs_input', False)
-                })
-        
-        # 2. Gather Global Session State
-        all_sessions_data = {
-            name: {"name": name, "target": s.target, "tool": s.tool, "wordlist": s.wordlist, "report": s.report}
-            for name, s in self.session_mgr.sessions.items()
-        }
-        
-        global_state = {
-            "session_name": self.session.name, "target": self.session.target, "tool": self.session.tool,
-            "wordlist": self.session.wordlist, "report": self.session.report,
-            "proxy_enabled": proxy_config is not None, "sessions": all_sessions_data,
-            "monitoring_status": {
-                "proxy_enabled": proxy_config is not None,
-                "heartbeat_target": active_heartbeat_target
-            }
-        }
-
-        base_state_file = config.get_parameter("GLOBAL", "SESSION_STATE_FILE", "data/.session.json")
-        
-        # Write Global Session State (shared)
-        temp_session_file = f"{base_state_file}.{os.getpid()}.{threading.get_ident()}.tmp"
-        try:
-            with open(temp_session_file, "w") as f:
-                json.dump(global_state, f, indent=2)
-                f.flush()
-                os.fsync(f.fileno())
-            os.replace(temp_session_file, base_state_file)
-        except Exception as e:
-            log.debug(f"[Sync] Failed to write session state: {e}")
-
-        # Write Process-Specific Jobs (unique to this PID)
-        jobs_file_path = f"{base_state_file}.{os.getpid()}.jobs"
-        temp_jobs_file = f"{jobs_file_path}.tmp"
-        try:
-            with open(temp_jobs_file, "w") as f:
-                json.dump(jobs_data, f, indent=2)
-                f.flush()
-                os.fsync(f.fileno())
-            os.replace(temp_jobs_file, jobs_file_path)
-        except Exception as e:
-            log.debug(f"[Sync] Failed to write jobs data: {e}")
+        """Writes state to filesystem. (Implemented by UI Extension)"""
+        pass
 
     def _sync_session_state_for_ui(self, signal_command_completion=False, hint=None):
-        """
-        Serializes the current session state to a file and signals the UI backend.
-        This is the primary mechanism for keeping the CLI and Web UI in sync.
-        """
-        self._write_state_to_file()
-        
-        # --- NEW: Direct Socket.IO Signalling ---
-        # In headless mode, we can't rely on the PTY stdout reader.
-        # If a socketio_emitter is provided, we use it to push updates directly.
-        if hasattr(self, 'socketio_emitter') and self.socketio_emitter:
-            try:
-                from plugins.web_ui.utils import get_current_session_state
-                state = get_current_session_state()
-                self.socketio_emitter('state_update', state)
-                if signal_command_completion:
-                    self.socketio_emitter('command_executed', {"hint": hint})
-            except Exception as e:
-                log.debug(f"[Direct Sync] Error emitting state update: {e}")
-
-        # Signal the UI backend that an update is ready via stdout (for PTY reader).
-        if signal_command_completion:
-            # This signal tells the UI to refresh the whole view
-            if hint:
-                print(f'\x1e{hint}\x1e', end='', flush=True)
-            else:
-                print('\x1e', end='', flush=True)
-        else:
-            # This signal just sends a state update (for live jobs)
-            print('\x1f', end='', flush=True)
+        """Sends updates to Web UI. (Implemented by UI Extension)"""
+        pass
 
     def _load_aliases_from_file(self):
         """Manually loads aliases from the alias file to avoid parsing issues."""
@@ -773,62 +645,8 @@ class MyCLI(cmd2.Cmd):
                 self._original_stty_settings = None
 
     def _ipc_server(self):
-        """A background thread that listens for commands from the Web UI backend."""
-        import socket
-        import json
-        
-        # Use a hidden socket file in the data directory
-        base_state_file = config.get_parameter("GLOBAL", "SESSION_STATE_FILE", "data/.session.json")
-        self._ipc_socket_path = f"{base_state_file}.{os.getpid()}.sock"
-
-        if os.path.exists(self._ipc_socket_path):
-            try: os.remove(self._ipc_socket_path)
-            except: pass
-            
-        try:
-            server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            server.bind(self._ipc_socket_path)
-            server.listen(5)
-            server.settimeout(1.0) # Allow periodical check for stop signal
-            
-            log.debug(f"[IPC] Listening on {self._ipc_socket_path}")
-            
-            while not self.stop_sync_thread.is_set():
-                try:
-                    conn, _ = server.accept()
-                    with conn:
-                        data = conn.recv(4096)
-                        if not data: continue
-                        
-                        cmd = json.loads(data.decode('utf-8'))
-                        cmd_type = cmd.get('type')
-                        
-                        if cmd_type == 'job_input':
-                            job_id = cmd.get('job_id')
-                            text = cmd.get('text')
-                            is_sensitive = cmd.get('is_sensitive', False)
-                            if job_id and text is not None:
-                                # ARCHITECTURE: Resolve placeholders (like b64decode) before sending to process
-                                resolved_input = placeholders.resolve_placeholders(text, self.session)
-                                self.job_mgr.send_input(job_id, resolved_input, is_sensitive=is_sensitive)
-                        
-                        elif cmd_type == 'job_kill':
-                            job_id = cmd.get('job_id')
-                            if job_id:
-                                self.job_mgr.kill_job(job_id)
-                                
-                except (socket.timeout, TimeoutError):
-                    continue
-                except Exception as e:
-                    log.debug(f"[IPC] Request error: {e}")
-                    
-        except Exception as e:
-            if not self.stop_sync_thread.is_set():
-                log.error(f"[IPC] Server failed: {e}")
-        finally:
-            if os.path.exists(self._ipc_socket_path):
-                try: os.remove(self._ipc_socket_path)
-                except: pass
+        """Listens for IPC commands. (Implemented by UI Extension)"""
+        pass
 
 
     def _is_heartbeat_active(self, target_name: str) -> bool:

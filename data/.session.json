@@ -1,7 +1,7 @@
 {
   "session_name": "default",
   "target": null,
-  "tool": "Faketest",
+  "tool": null,
   "wordlist": null,
   "report": null,
   "proxy_enabled": false,
@@ -9,7 +9,7 @@
     "default": {
       "name": "default",
       "target": null,
-      "tool": "Faketest",
+      "tool": null,
       "wordlist": null,
       "report": null
     }

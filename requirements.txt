@@ -21,6 +21,7 @@ nvidia-ml-py
 flask
 flask-socketio
 ptyprocess
+cryptography
 
 # Testing
 pytest

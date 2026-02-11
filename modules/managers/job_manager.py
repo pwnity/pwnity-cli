@@ -340,7 +340,7 @@ class JobManager(BaseManager):
                     
                     # --- FINAL FIX: If this is a workflow job, notify the executor directly ---
                     # This solves the race condition for very fast jobs.
-                    if job.executor_instance:
+                    if job.executor_instance and hasattr(job.executor_instance, 'job_monitor'):
                         # Find which node this job belongs to
                         node_id_for_job = None
                         for nid, jid in job.executor_instance.job_monitor.active_jobs.items():
@@ -418,7 +418,7 @@ class JobManager(BaseManager):
         
         # Priority: explicit argument -> executor attribute
         if sudo_password is None:
-            sudo_password = self.executor.sudo_password if self.executor else None
+            sudo_password = getattr(self.executor, 'sudo_password', None) if self.executor else None
 
         try:
             # Build the command template from the tool definition
