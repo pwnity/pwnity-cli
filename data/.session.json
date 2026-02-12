@@ -1,21 +1,23 @@
 {
   "session_name": "default",
-  "target": null,
-  "tool": null,
+  "target": "test",
+  "tool": "curl",
   "wordlist": null,
   "report": null,
   "proxy_enabled": false,
   "sessions": {
     "default": {
       "name": "default",
-      "target": null,
-      "tool": null,
+      "target": "test",
+      "tool": "curl",
       "wordlist": null,
       "report": null
     }
   },
+  "proxy_settings": {},
+  "ipc_socket": "data/.session.json.32117.sock",
   "monitoring_status": {
     "proxy_enabled": false,
-    "heartbeat_target": null
+    "heartbeat_target": "test"
   }
 }

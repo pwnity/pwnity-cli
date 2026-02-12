@@ -179,13 +179,14 @@ class HeartbeatManager(BaseManager):
             log.info(f"Monitoring will stop automatically after {timelimit} seconds.")
         log.prompt(f"View live data with 'heartbeat show {target_name}' or stop with 'heartbeat stop {target_name}'.")
 
-    def _monitor_loop(self, target_name, url, min_delay, max_delay, timelimit, stop_event, proxy_config):
+    def _monitor_loop(self, target_name, url, min_delay, max_delay, timelimit, stop_event, proxy_config, user_agent=None):
         heartbeat_data = {
             "target_name": target_name,
             "url": url,
             "min_delay_seconds": min_delay,
             "max_delay_seconds": max_delay,
             "timelimit_seconds": timelimit,
+            "user_agent": user_agent,
             "status": "running",
             "data_points": []
         }
@@ -245,7 +246,15 @@ class HeartbeatManager(BaseManager):
                     conn_class = http.client.HTTPSConnection if parsed_url.scheme == 'https' else http.client.HTTPConnection
                     conn = conn_class(host, port, timeout=10)
                 
-                conn.request("GET", path)
+                # Prepare headers with User-Agent
+                # user_agent is already resolved by the caller (sockets.py)
+                headers = {
+                    'User-Agent': user_agent or 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept': '*/*',
+                    'Connection': 'close'
+                }
+                
+                conn.request("GET", path, body=None, headers=headers)
                 response = conn.getresponse()
                 content = response.read()
                 data_point['latency_ms'] = round((time.monotonic() - start_time) * 1000)

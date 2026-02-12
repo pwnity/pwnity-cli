@@ -41,13 +41,48 @@
   "PROXY": {
     "ENABLED": false,
     "TYPE": "socks5",
-    "HOST": "localhost",
+    "HOST": "127.0.0.1",
     "PORT": 9050,
     "USERNAME": "",
     "PASSWORD": "",
     "WRAPPER_COMMAND": "proxychains",
     "WRAPPER_OPTIONS": "-q",
-    "WRAPPER_NEEDS_SUDO": true,
+    "WRAPPER_NEEDS_SUDO": false,
+    "presets": [
+      {
+        "config": {
+          "host": "127.0.0.1",
+          "port": "8080",
+          "type": "http",
+          "wrapper_command": "proxychains",
+          "wrapper_template": "proxychains.tmpl"
+        },
+        "desc": "127.0.0.1:8080",
+        "name": "Burp Suite"
+      },
+      {
+        "config": {
+          "host": "127.0.0.1",
+          "port": "8081",
+          "type": "http",
+          "wrapper_command": "proxychains",
+          "wrapper_template": "proxychains.tmpl"
+        },
+        "desc": "127.0.0.1:8081",
+        "name": "ZAP Proxy"
+      },
+      {
+        "config": {
+          "host": "127.0.0.1",
+          "port": "9050",
+          "type": "socks5",
+          "wrapper_command": "proxychains",
+          "wrapper_template": "proxychains.tmpl"
+        },
+        "desc": "127.0.0.1:9050 (SOCKS5)",
+        "name": "Tor Network"
+      }
+    ],
     "WRAPPER_TEMPLATE": "proxychains.tmpl"
   },
   "COLORS": {

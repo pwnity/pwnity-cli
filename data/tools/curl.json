@@ -16,7 +16,6 @@
     {
       "name": "get",
       "params": [
-        "-s",
         "-A $profile.useragent",
         "$target.url"
       ],

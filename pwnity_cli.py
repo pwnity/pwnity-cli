@@ -513,6 +513,14 @@ class MyCLI(cmd2.Cmd):
                     if state.get('report') != self.session.report:
                         self.session.report = state.get('report')
                         log.debug(f"[Session Sync] Reloaded report: {self.session.report}")
+                    
+                    # --- FIX: Sync Proxy Settings ---
+                    loaded_proxy_settings = state.get('proxy_settings', {})
+                    if loaded_proxy_settings != self.session.proxy_settings:
+                        # Update specific keys to preserve reference if needed, or just replace dict content
+                        self.session.proxy_settings.clear()
+                        self.session.proxy_settings.update(loaded_proxy_settings)
+                        log.debug(f"[Session Sync] Reloaded proxy settings: {self.session.proxy_settings}")
                         
             except Exception as e:
                 log.debug(f"[Session Sync] Error reloading session: {e}")

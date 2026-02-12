@@ -2,7 +2,7 @@
     "notifications": {
         "enableDesktop": false,
         "enableThreading": true,
-        "mutePopups": false,
+        "mutePopups": true,
         "timeout": 5000
     },
     "terminal": {
@@ -12,23 +12,27 @@
         "copyOnSelect": true,
         "cursorBlink": true,
         "scrollback": 5000,
-        "startupBehavior": "docked",
+        "startupBehavior": "closed",
         "shells": [
             {
                 "name": "BASH",
-                "path": "/bin/bash"
+                "path": "/bin/bash",
+                "protected": true
             },
             {
                 "name": "ZSH",
-                "path": "/bin/zsh"
+                "path": "/bin/zsh",
+                "protected": true
             },
             {
                 "name": "SH",
-                "path": "/bin/sh"
+                "path": "/bin/sh",
+                "protected": true
             },
             {
                 "name": "PYTHON",
-                "path": "/usr/bin/python3"
+                "path": "/usr/bin/python3",
+                "protected": true
             },
             {
                 "name": "PHP",
@@ -39,9 +43,9 @@
     "cli": {
         "autoSaveInterval": 30,
         "defaultWordlist": "",
-        "defaultThreads": 10,
         "historyLimit": 1000,
-        "autoConnect": true
+        "autoConnect": true,
+        "defaultThreads": 10
     },
     "ui": {
         "highContrast": false,
