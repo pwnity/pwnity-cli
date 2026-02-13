@@ -273,10 +273,10 @@ def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, t
                 return _traverse_object(obj, attr_path, original_placeholder, f"Workflow Data '{entity_type}'")
             return json.dumps(obj, indent=2) if isinstance(obj, (dict, list)) else str(obj)
 
-        if strict:
-            raise ValueError(f"Required placeholder '{original_placeholder}' not found.")
-        log.warning(f"Workflow placeholder '{original_placeholder}' not found in provided data.")
-        return original_placeholder
+        # IF NOT FOUND in dictionary, we fall through to Case 2/3 (Managers)
+        # This allows global profiles/targets to work even in a workflow context 
+        # unless they are explicitly overridden.
+        pass
 
     # Case 2: Handle WorkflowContext objects from the automation engine.
     # We check the class name as a string to avoid circular imports.
@@ -398,7 +398,16 @@ def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, t
                 obj = report_data.get(data_key, [])
                 obj_name_for_log = f"Report '{session.report}'"
             else:
-                obj_name = getattr(session, entity_type, None)
+                # Retrieve the name of the entity to load (e.g., target name, wordlist name)
+                obj_name = None
+                if isinstance(session, dict):
+                    obj_name = session.get(entity_type)
+                elif hasattr(session, 'cli') and not hasattr(session, entity_type):
+                    # For WorkflowContext, fallback to global CLI session
+                    obj_name = getattr(session.cli, entity_type, None)
+                else:
+                    obj_name = getattr(session, entity_type, None)
+
                 obj_name_for_log = obj_name
                 if not obj_name or not isinstance(obj_name, str):
                     log.warning(f"No object for '{entity_type}' loaded in session. Placeholder '{original_placeholder}' will not be replaced.")

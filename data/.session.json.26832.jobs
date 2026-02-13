@@ -1,0 +1,93 @@
+[
+  {
+    "id": "d8be9f03-1160-450c-9ab1-0e9ee01e60f0",
+    "command_str": "/usr/bin/curl -A Pwnity/1.0 https://pwnity.com",
+    "status": "finished",
+    "duration": "0.10s",
+    "logbook_id": "2b6a04c1-754b-4058-b0e1-8d7de2d6b7eb",
+    "start_time": 1770987585.118564,
+    "output": "[... Output truncated ...]\nre Trajectory</h2><p class=\"section-subtitle\" data-v-e68877dd=\"\">We believe in transparency. Here's a live look at our journey.</p></div><div class=\"roadmap-grid\" data-v-e68877dd=\"\"><div class=\"roadmap-col premium-card fade-in\" data-v-e68877dd=\"\"><h3 data-v-e68877dd=\"\"><span class=\"status stable\" data-v-e68877dd=\"\"></span> Pre-Beta (Stable)</h3><ul class=\"list-green\" data-v-e68877dd=\"\"><li data-v-e68877dd=\"\">Core CLI Framework</li><li data-v-e68877dd=\"\">Session-Based Context Management</li><li data-v-e68877dd=\"\">Tool, Target &amp; Wordlist Library</li><li data-v-e68877dd=\"\">Placeholder &amp; Job System</li><li data-v-e68877dd=\"\">Predefined Tool Presets</li><li data-v-e68877dd=\"\">Initial Documentation &amp; Guides</li></ul></div><div class=\"roadmap-col premium-card fade-in-delay-1\" data-v-e68877dd=\"\"><h3 data-v-e68877dd=\"\"><span class=\"status pulse\" data-v-e68877dd=\"\"></span> In Development</h3><ul class=\"list-blue\" data-v-e68877dd=\"\"><li data-v-e68877dd=\"\">Web UI (Pro)</li><li data-v-e68877dd=\"\">Visual Node Editor</li><li data-v-e68877dd=\"\">Advanced Reporting Formats</li></ul></div><div class=\"roadmap-col premium-card fade-in-delay-2\" data-v-e68877dd=\"\"><h3 data-v-e68877dd=\"\"><span class=\"status planned\" data-v-e68877dd=\"\"></span> Planned</h3><ul class=\"list-plain\" data-v-e68877dd=\"\"><li data-v-e68877dd=\"\">Official Kali Linux Package</li><li data-v-e68877dd=\"\">Community Hub for Sharing</li><li data-v-e68877dd=\"\">AI Command Suggestions</li></ul></div></div></div></section></div></main><footer class=\"app-footer\" data-v-30c4373f=\"\"><div class=\"container footer-grid\" data-v-30c4373f=\"\"><div class=\"footer-brand\" data-v-30c4373f=\"\"><img src=\"/assets/images/text_transparent.png\" alt=\"Pwnity\" class=\"footer-logo\" data-v-30c4373f=\"\"><p data-v-30c4373f=\"\">The Integrated Hacking Environment for the modern security professional.</p><div class=\"social-links\" data-v-30c4373f=\"\"><a href=\"https://github.com/pwnity/pwnity-cli\" target=\"_blank\" data-v-30c4373f=\"\"><i class=\"fa-brands fa-github\" data-v-30c4373f=\"\"></i></a></div></div><div class=\"footer-links\" data-v-30c4373f=\"\"><h4 data-v-30c4373f=\"\">Framework</h4><ul data-v-30c4373f=\"\"><li data-v-30c4373f=\"\"><a href=\"/docs/getting-started\" class=\"\" data-v-30c4373f=\"\">Getting Started</a></li><li data-v-30c4373f=\"\"><a href=\"/docs\" class=\"\" data-v-30c4373f=\"\">Documentation</a></li><li data-v-30c4373f=\"\"><a href=\"/cheatsheet\" class=\"\" data-v-30c4373f=\"\">Cheat Sheet</a></li><li data-v-30c4373f=\"\"><a href=\"https://github.com/pwnity/pwnity-cli/releases\" target=\"_blank\" data-v-30c4373f=\"\">Downloads</a></li></ul></div><div class=\"footer-links\" data-v-30c4373f=\"\"><h4 data-v-30c4373f=\"\">Toolbelt</h4><ul data-v-30c4373f=\"\"><li data-v-30c4373f=\"\"><a href=\"/tools/smart-chain\" class=\"\" data-v-30c4373f=\"\">Smart Chain</a></li><li data-v-30c4373f=\"\"><a href=\"/tools/revshell\" class=\"\" data-v-30c4373f=\"\">RevShell Gen</a></li><li data-v-30c4373f=\"\"><a href=\"/tools/passwd\" class=\"\" data-v-30c4373f=\"\">Passwd Parser</a></li><li data-v-30c4373f=\"\"><a href=\"/tools/hashid\" class=\"\" data-v-30c4373f=\"\">Hash Identifier</a></li></ul></div><div class=\"footer-links\" data-v-30c4373f=\"\"><h4 data-v-30c4373f=\"\">Community</h4><ul data-v-30c4373f=\"\"><li data-v-30c4373f=\"\"><a href=\"/blog\" class=\"\" data-v-30c4373f=\"\">Chronicles (Blog)</a></li><li data-v-30c4373f=\"\"><a href=\"https://github.com/pwnity/pwnity-cli/issues\" target=\"_blank\" data-v-30c4373f=\"\">Issue Tracker</a></li></ul></div><div class=\"footer-links\" data-v-30c4373f=\"\"><h4 data-v-30c4373f=\"\">Legal</h4><ul data-v-30c4373f=\"\"><li data-v-30c4373f=\"\"><a href=\"#\" data-v-30c4373f=\"\">Imprint</a></li><li data-v-30c4373f=\"\"><a href=\"#\" data-v-30c4373f=\"\">Privacy Policy</a></li></ul></div></div><div class=\"footer-bottom\" data-v-30c4373f=\"\"><div class=\"container\" data-v-30c4373f=\"\"><p data-v-30c4373f=\"\">\u00a9 2026 Pwnity Project. Built for hackers, by hackers.</p><p class=\"privacy-note\" data-v-30c4373f=\"\">Local-first architecture. No tracking. Just your data.</p></div></div></footer><!----><!----></div></div><script src=\"/assets/vendor/glightbox/glightbox.min.js\"></script></body></html>",
+    "tool_name": "curl",
+    "pid": 26984,
+    "target": null,
+    "needs_input": false
+  },
+  {
+    "id": "49248321-e1c8-4dd5-b111-a54dec96d782",
+    "command_str": "sudo /home/kali/fake_test.sh 3",
+    "status": "finished",
+    "duration": "12.35s",
+    "logbook_id": "65e53cfa-06bc-47ad-9789-8ce878312995",
+    "start_time": 1770987640.3439908,
+    "output": "\r\nUsername (default: guest): test\r\nPassword: \r\ntest\r\nLogin OK (user: test)\r\n[test] working (1/3)...\r\n[test] working (2/3)...\r\n[test] working (3/3)...\r\nSession ended.\r\n",
+    "tool_name": "Faketest",
+    "pid": 27223,
+    "target": null,
+    "needs_input": false
+  },
+  {
+    "id": "193c9ea0-980e-40b0-93f3-4a87c2f86bea",
+    "command_str": "sudo /home/kali/fake_test.sh 3",
+    "status": "finished",
+    "duration": "63.18s",
+    "logbook_id": "dcf11849-462e-4820-85b0-0f3c9e564af4",
+    "start_time": 1770987816.4017081,
+    "output": "\r\nUsername (default: guest): (no username \u2014 using: guest)\r\nPassword: \r\n\r\n(no password \u2014 using fallback)\r\nLogin FAILED (invalid password)\r\n[guest] working (1/3)...\r\n[guest] working (2/3)...\r\n[guest] working (3/3)...\r\nSession ended.\r\n",
+    "tool_name": "Faketest",
+    "pid": 28379,
+    "target": null,
+    "needs_input": false
+  },
+  {
+    "id": "738ae531-89bf-407f-884f-04c0abf80272",
+    "command_str": "sudo /home/kali/fake_test.sh 3",
+    "status": "finished",
+    "duration": "63.17s",
+    "logbook_id": "f398a180-a8ba-4e30-b6d2-0697bb0eb607",
+    "start_time": 1770987829.5249765,
+    "output": "\r\nUsername (default: guest): (no username \u2014 using: guest)\r\nPassword: \r\n\r\n(no password \u2014 using fallback)\r\nLogin FAILED (invalid password)\r\n[guest] working (1/3)...\r\n[guest] working (2/3)...\r\n[guest] working (3/3)...\r\nSession ended.\r\n",
+    "tool_name": "Faketest",
+    "pid": 28574,
+    "target": null,
+    "needs_input": false
+  },
+  {
+    "id": "4912364c-cbd4-415c-bca8-98bcc8d05476",
+    "command_str": "sudo /home/kali/fake_test.sh 3",
+    "status": "finished",
+    "duration": "55.44s",
+    "logbook_id": "7c481fa5-ec07-421a-95b6-5e37de8869e4",
+    "start_time": 1770987915.3805084,
+    "output": "\r\nUsername (default: guest): (no username \u2014 using: guest)\r\nPassword: \r\ntest\r\nLogin OK (user: guest)\r\n[guest] working (1/3)...\r\n[guest] working (2/3)...\r\n[guest] working (3/3)...\r\nSession ended.\r\n",
+    "tool_name": "Faketest",
+    "pid": 29070,
+    "target": null,
+    "needs_input": false
+  },
+  {
+    "id": "e2dfd7bd-badc-4df4-b43f-ef3c2ffb21e7",
+    "command_str": "sudo /home/kali/fake_test.sh 3",
+    "status": "finished",
+    "duration": "21.45s",
+    "logbook_id": "3163d2f6-b592-4d12-988f-1896900b0082",
+    "start_time": 1770988025.1925373,
+    "output": "\r\nUsername (default: guest): ********\r\nPassword: \r\n********\r\nLogin OK (user: ********)\r\n[********] working (1/3)...\r\n[********] working (2/3)...\r\n[********] working (3/3)...\r\nSession ended.\r\n",
+    "tool_name": "Faketest",
+    "pid": 29519,
+    "target": null,
+    "needs_input": false
+  },
+  {
+    "id": "bdc9f9f1-44f2-4410-a4e4-12f2b80fe342",
+    "command_str": "sudo /home/kali/fake_test.sh 3",
+    "status": "finished",
+    "duration": "63.17s",
+    "logbook_id": "bf4900a9-6438-48bc-b45a-e4df707ae3d7",
+    "start_time": 1770988106.393216,
+    "output": "\r\nUsername (default: guest): (no username \u2014 using: guest)\r\nPassword: \r\n\r\n(no password \u2014 using fallback)\r\nLogin FAILED (invalid password)\r\n[guest] working (1/3)...\r\n[guest] working (2/3)...\r\n[guest] working (3/3)...\r\nSession ended.\r\n",
+    "tool_name": "Faketest",
+    "pid": 29855,
+    "target": null,
+    "needs_input": false
+  }
+]

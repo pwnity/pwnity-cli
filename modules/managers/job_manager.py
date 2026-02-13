@@ -55,7 +55,7 @@ def strip_ansi(text: str) -> str:
 
 class Job:
     """Represents a single background process."""
-    def __init__(self, job_id, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None, sensitive_inputs=None, sudo_password=None):
+    def __init__(self, job_id, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None, sensitive_inputs=None, sudo_password=None, workflow_context=None):
         self.id = job_id
         self.command = command_list
         self.session_obj = session_obj
@@ -116,6 +116,8 @@ class Job:
         self.sudo_password = sudo_password
         # --- NEW: Flag to indicate the job is waiting for user input (e.g. sudo) ---
         self.needs_input = False
+        # --- NEW: Store workflow context for logging transparency ---
+        self.workflow_context = workflow_context
 
     @property
     def duration(self):
@@ -170,6 +172,19 @@ class JobManager(BaseManager):
         self.notifications = deque()
         # --- NEW: Store a reference to the executor for live output callbacks ---
         self.executor = executor_instance
+
+    def _notify_status(self, job):
+        """Notifies the UI about a job status change via Socket.IO if available."""
+        if hasattr(self.cli, 'socketio_emitter') and self.cli.socketio_emitter:
+            try:
+                # We use the to_dict() method to get a clean representation for the UI
+                job_data = job.to_dict()
+                # Ensure we include the PID and current output for the UI
+                job_data['pid'] = job.pid
+                job_data['output'] = job.get_masked_output()
+                self.cli.socketio_emitter('job_status', job_data)
+            except Exception as e:
+                log.debug(f"Failed to emit job_status: {e}")
 
     def _cmd_list(self, args, cli):
         """Handles 'jobs list'."""
@@ -363,6 +378,7 @@ class JobManager(BaseManager):
                             job.executor_instance.on_node_finished(node_id_for_job, job.status, job_output)
                             log.debug(f"[JobManager] Notified executor about completion of job {job.id} for node {node_id_for_job} (Status: {job.status}).")
 
+                    self._notify_status(job)
                     self.notifications.append(job.id)
 
             # --- NEW: Close the PTY master file descriptor when done ---
@@ -379,11 +395,38 @@ class JobManager(BaseManager):
                         session_for_log = job.session_obj
                     # For workflow jobs, use the context object passed via overrides.
                     elif job.session_obj is None and hasattr(job, 'workflow_context') and job.workflow_context:
-                        # The workflow_context object has a to_dict() method for serialization.
-                        if hasattr(job.workflow_context, 'to_dict'):
-                            session_for_log = job.workflow_context.to_dict()
-                        else: # Fallback for other object types that might be passed
-                            session_for_log = vars(job.workflow_context)
+                        ctx = job.workflow_context
+                        # Create a clean version of the context for the logbook
+                        session_for_log = {
+                            "session": "workflow",
+                            "tool": job.tool_name, # Always prefer the explicit tool name string
+                            "target": None,
+                            "wordlist": None
+                        }
+
+                        if isinstance(ctx, dict):
+                            # Extract string values from potentially complex objects (e.g. from TargetNodes)
+                            for key in ['target', 'wordlist']:
+                                val = ctx.get(key)
+                                if isinstance(val, dict):
+                                    # Use 'name', 'url', or 'ip' as fallback for a string representation
+                                    session_for_log[key] = val.get('name') or val.get('url') or val.get('ip') or str(val)
+                                else:
+                                    session_for_log[key] = str(val or "")
+                        elif hasattr(ctx, 'to_dict'):
+                             d = ctx.to_dict()
+                             session_for_log['target'] = d.get('target')
+                             session_for_log['wordlist'] = d.get('wordlist')
+                             if d.get('tool'): session_for_log['tool'] = d.get('tool')
+                    
+                    # --- NEW: Fallback if everything else failed but we have job properties ---
+                    if session_for_log is None and job.session_obj is None:
+                        session_for_log = {
+                            "session": "workflow",
+                            "tool": job.tool_name,
+                            "target": getattr(job, 'target', None),
+                            "wordlist": getattr(job, 'wordlist', None)
+                        }
                     
                     clean_output = strip_ansi(job.output)
                     logbook_id = self.logbook_mgr.create_entry(
@@ -477,17 +520,18 @@ class JobManager(BaseManager):
                 additional_info=additional_info, 
                 display_command=command_for_display,
                 sensitive_inputs=sensitive_inputs,
-                sudo_password=sudo_password # Pass password to job for auto-entry
+                sudo_password=sudo_password, # Pass password to job for auto-entry
+                workflow_context=workflow_placeholder_overrides
             )
 
         except Exception as e:
             log.error(f"Failed to add job for {tool_name}/{command_name}: {e}")
             return None
 
-    def start_job(self, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None, sensitive_inputs=None, sudo_password=None):
+    def start_job(self, command_list, session_obj, tool_name=None, tool_command_name=None, additional_info=None, display_command=None, temp_proxy_conf_path=None, sensitive_inputs=None, sudo_password=None, workflow_context=None):
         """Starts a new command as a background job."""
         job_id = str(uuid.uuid4())
-        job = Job(job_id, command_list, session_obj, tool_name=tool_name, tool_command_name=tool_command_name, additional_info=additional_info, display_command=display_command, temp_proxy_conf_path=temp_proxy_conf_path, sensitive_inputs=sensitive_inputs, sudo_password=sudo_password)
+        job = Job(job_id, command_list, session_obj, tool_name=tool_name, tool_command_name=tool_command_name, additional_info=additional_info, display_command=display_command, temp_proxy_conf_path=temp_proxy_conf_path, sensitive_inputs=sensitive_inputs, sudo_password=sudo_password, workflow_context=workflow_context)
         # --- FIX: Attach the manager's executor instance (if any) to the job object ---
         job.executor_instance = self.executor
         
@@ -537,6 +581,8 @@ class JobManager(BaseManager):
 
             with self._lock:
                 self.jobs[job_id] = job
+            
+            self._notify_status(job)
             
             # The CommandExecutor is now responsible for logging the success message.
             return job_id
@@ -660,6 +706,7 @@ class JobManager(BaseManager):
             
             # The _read_output thread is responsible for the final logbook entry,
             # but we can add the notification here to make the UI responsive.
+            self._notify_status(job)
             self.notifications.append(job.id)
 
     def kill_job(self, job_id):

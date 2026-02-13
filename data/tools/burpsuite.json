@@ -1,4 +1,11 @@
 {
   "name": "burpsuite",
-  "path": "/usr/bin/burpsuite"
+  "path": "/usr/bin/burpsuite",
+  "commands": [
+    {
+      "name": "Start",
+      "description": "Startup Burpsuite",
+      "params": []
+    }
+  ]
 }

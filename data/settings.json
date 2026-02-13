@@ -37,6 +37,14 @@
             {
                 "name": "PHP",
                 "path": "/usr/bin/php -a"
+            },
+            {
+                "name": "METASPLOIT",
+                "path": "msfconsole -q"
+            },
+            {
+                "name": "RECON-NG",
+                "path": "recon-ng"
             }
         ]
     },
