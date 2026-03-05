@@ -1,0 +1,7 @@
+{
+  "name": "my_default_nmap_scan",
+  "target": "pwnity.local",
+  "tool": "nmap",
+  "wordlist": null,
+  "report": "tutorial_report"
+}

@@ -607,7 +607,8 @@ class MyCLI(cmd2.Cmd):
                     duration=job.duration,
                     command_str=job.command_str,
                     logbook_id=job.logbook_id,
-                    session_name=job.session_name
+                    session_name=job.session_name,
+                    timestamp=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job.end_time)) if job.end_time else None
                 )
         return stop
 

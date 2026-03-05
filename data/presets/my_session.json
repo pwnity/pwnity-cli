@@ -1,0 +1,7 @@
+{
+  "name": "my_session",
+  "target": "pwnity.local",
+  "tool": "gobuster",
+  "wordlist": "dirb_common",
+  "report": "best_report"
+}

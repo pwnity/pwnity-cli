@@ -23,6 +23,7 @@ from rich.table import Table, box
 from rich.text import Text
 from modules.placeholders import resolve_placeholders
 from modules.services import log
+import time
 
 class DisplayManager:
     def __init__(self, console: Console):
@@ -482,10 +483,11 @@ class DisplayManager:
             duration=job.duration,
             command_str=job.command_str,
             job_id=job.id,
-            session_name=job.session_name
+            session_name=job.session_name,
+            timestamp=time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(job.end_time)) if job.end_time else None
         )
 
-    def display_execution_summary(self, title, status_text, status_style, return_code, duration, command_str, job_id=None, session_name=None, logbook_id=None):
+    def display_execution_summary(self, title, status_text, status_style, return_code, duration, command_str, job_id=None, session_name=None, logbook_id=None, timestamp=None, border_color=None):
         """Displays a standardized summary panel for command execution."""
         summary_table = Table(show_header=False, box=None, expand=True)
         summary_table.add_column(style="bold blue", width=12)
@@ -498,6 +500,9 @@ class DisplayManager:
         if session_name:
             summary_table.add_row("Session", f"[cyan]{session_name}[/cyan]")
         
+        if timestamp:
+            summary_table.add_row("Timestamp", timestamp)
+            
         summary_table.add_row("Status", f"[{status_style}]{status_text}[/{status_style}]")
         if return_code is not None:
             summary_table.add_row("Exit Code", str(return_code))
@@ -507,7 +512,8 @@ class DisplayManager:
             summary_table.add_row("", f"[dim]Use 'parser apply <parser> {logbook_id}' or 'logbook show {logbook_id}' to analyze.[/dim]")
 
         # Extract color from style string like "bold green" -> "green"
-        border_color = status_style.split(' ')[-1]
+        if not border_color:
+            border_color = status_style.split(' ')[-1]
         
         summary_panel = Panel(summary_table, title=f"[bold]{title}[/bold]", border_style=border_color, expand=True)
         self.console.print(summary_panel)

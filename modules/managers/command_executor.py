@@ -84,7 +84,8 @@ class CommandExecutor:
                         command_str=f"{len(command_lists)} commands executed",
                         logbook_id=None,
                         session_name=session_obj.name,
-                        border_color=border_color
+                        border_color=border_color,
+                        timestamp=time.strftime("%Y-%m-%d %H:%M:%S")
                     )
         finally:
             # --- FINAL FIX: Centralized cleanup logic ---
@@ -179,7 +180,8 @@ class CommandExecutor:
                 duration=duration,
                 command_str=cmd_str,
                 logbook_id=logbook_id,
-                session_name=session_obj.name
+                session_name=session_obj.name,
+                timestamp=time.strftime("%Y-%m-%d %H:%M:%S")
             )
         
         return return_code

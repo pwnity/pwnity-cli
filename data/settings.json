@@ -1,6 +1,6 @@
 {
     "notifications": {
-        "enableDesktop": false,
+        "enableDesktop": true,
         "enableThreading": true,
         "mutePopups": true,
         "timeout": 5000
@@ -45,6 +45,10 @@
             {
                 "name": "RECON-NG",
                 "path": "recon-ng"
+            },
+            {
+                "name": "REV-4444",
+                "path": "nc -lvnp 4444"
             }
         ]
     },

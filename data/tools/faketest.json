@@ -1,0 +1,14 @@
+{
+  "name": "faketest",
+  "path": "/home/kali/fake_test.sh",
+  "commands": [
+    {
+      "name": "test",
+      "description": "test",
+      "params": [
+        "$tool.count"
+      ]
+    }
+  ],
+  "count": "20"
+}

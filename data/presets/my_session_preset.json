@@ -1,0 +1,15 @@
+{
+  "name": "my_session_preset",
+  "target": "pwnity",
+  "tool": "curl",
+  "wordlist": "dirb_common",
+  "report": "my-report",
+  "proxy_settings": {
+    "enabled": false,
+    "host": "127.0.0.1",
+    "port": "9050",
+    "type": "socks5",
+    "wrapper_command": "proxychains",
+    "wrapper_template": "proxychains.tmpl"
+  }
+}

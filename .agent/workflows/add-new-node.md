@@ -11,6 +11,8 @@ Create a new Vue component in `src/components/automation/nodes/[NodeName]Node.vu
 **Important:** 
 - Import `NodeTemplate` locally from `./NodeTemplate.vue`.
 - You do NOT need to import `PwnDropdown`, `PwnInput`, or `PwnToggle` (they are global).
+- **Design Rule:** Keep the node body clean. Do NOT include textual descriptions, placeholder texts, or info/help boxes in the node body. Rely on concise labels and intuitive UI controls.
+- **Port Rule:** All port labels (Input and Output names) MUST be lowercase.
 
 ### Boilerplate Template
 
@@ -144,7 +146,22 @@ Open `src/components/automation/NodeEditor.vue`:
     </template>
     ```
 
-## 4. Architectural Features (Automatic)
+## 4. Register in Backend (Python)
+
+To ensure the backend can execute the new node type:
+
+1.  **Create/Modify Logic**: Add your Python class (inherited from `BaseNode`) in `plugins/web_ui/automation_v2/nodes/`.
+2.  **Register in Factory**: Open `plugins/web_ui/automation_v2/factory.py`:
+    *   **Import** your node class from its module.
+    *   **Add to `NODE_MAP`**:
+        ```python
+        NODE_MAP: Dict[str, Type[BaseNode]] = {
+            # ... existing mappings
+            '[your_type_id]': [YourNodeClass],
+        }
+        ```
+
+## 5. Architectural Features (Automatic)
 
 By following the categories in `nodeRegistry.ts`, the following features are activated automatically:
 
@@ -152,7 +169,7 @@ By following the categories in `nodeRegistry.ts`, the following features are act
 - **Port Configuration**: Nodes in the `data` category (or the `parser` type) automatically show the **PORT CONFIG** tab in the Sidebar.
 - **Execution Sequence**: Nodes in `executables`, `logic`, or `utility` categories appear in the Dock's execution sequence.
 
-## 5. Status Synchronization (Crucial)
+## 6. Status Synchronization (Crucial)
 
 To ensure the node's health is correctly reflected in the Dock/Gallery, your component should synchronize its internal validation state with the `props.data.status` property.
 
@@ -172,7 +189,7 @@ watch(() => isInvalid.value, (invalid) => {
 }, { immediate: true })
 ```
 
-## 6. Verify
+## 7. Verify
 
 1.  Reload the application.
 2.  Open the Automation Editor.

@@ -22,7 +22,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.console import Group
 from rich.text import Text
-import time, uuid
+import time, uuid, sys
 
 class LogbookManager(JSONManager):
     def __init__(self):
@@ -99,6 +99,71 @@ class LogbookManager(JSONManager):
         )
         console.print(panel)
 
+    def _get_single_key(self):
+        """Reads a single key press from the terminal (Linux only)."""
+        import tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+    def _display_chunked_entries(self, entries, title, base_subtitle, cli, chunk_size=20):
+        """Helper to display entries in chunks of 20 with a 'More' prompt."""
+        total = len(entries)
+        if total == 0:
+            log.info("No matching logbook entries found.")
+            return
+
+        # If we are in web UI mode or headless, don't chunk interactively
+        if getattr(cli, 'web_ui_mode', False) or getattr(cli, 'headless_mode', False):
+            self._display_entries_table(entries, title, base_subtitle, cli.console)
+            return
+
+        # If we have 20 or fewer entries, just show them all.
+        if total <= chunk_size:
+            self._display_entries_table(entries, title, base_subtitle, cli.console)
+            return
+
+        # Interactive chunking
+        for i in range(0, total, chunk_size):
+            chunk = entries[i:i + chunk_size]
+            current_count = i + len(chunk)
+            
+            # Refined subtitle logic
+            chunk_info = f"[dim](Showing {i+1}-{current_count} of {total})[/dim]"
+            subtitle = f"{base_subtitle} {chunk_info}"
+
+            self._display_entries_table(chunk, title, subtitle, cli.console)
+
+            if current_count < total:
+                prompt_line = Text.assemble(
+                    ("-- Press ", "bold cyan"),
+                    ("[Space]", "bold white"),
+                    (" for next page, ", "bold cyan"),
+                    ("[q]", "bold white"),
+                    (" to quit -- ", "bold cyan"),
+                    (f"({total - current_count} entries remaining)", "dim")
+                )
+                cli.console.print(prompt_line, end="\r")
+                
+                try:
+                    while True:
+                        key = self._get_single_key()
+                        if key.lower() == 'q' or key == '\x03': # q or Ctrl+C
+                            cli.console.print(" " * len(prompt_line.plain), end="\r") # Clear prompt
+                            return
+                        if key == ' ' or key == '\r' or key == '\n': # Space or Enter
+                            cli.console.print(" " * len(prompt_line.plain), end="\r") # Clear prompt
+                            break
+                except Exception:
+                    # Fallback for non-TTY or errors
+                    if input().lower().startswith('q'):
+                        break
+
     def _cmd_list(self, args, cli):
         """Handles 'logbook list'."""
         limit = args.limit
@@ -107,13 +172,19 @@ class LogbookManager(JSONManager):
         
         # Sort by timestamp and take the most recent ones
         sorted_entries = sorted(all_entries_data, key=lambda x: x.get('timestamp', ''), reverse=True)
-        entries_to_show = sorted_entries[:limit]
+        entries_to_show = sorted_entries[:limit] if limit > 0 else sorted_entries
 
-        self._display_entries_table(
+        # Clearer base subtitle
+        if limit > 0:
+            subtitle = f"Showing the last {len(entries_to_show)} of {len(all_entries_data)} entries."
+        else:
+            subtitle = f"Showing all {len(all_entries_data)} entries."
+
+        self._display_chunked_entries(
             entries=entries_to_show,
             title=":scroll: [bold]Execution Logbook[/bold]",
-            subtitle=f"[dim]Showing the last {len(entries_to_show)} of {len(all_entries_data)} entries. Use 'logbook show <id>' for full output.[/dim]",
-            console=cli.console
+            base_subtitle=subtitle,
+            cli=cli
         )
 
     def _cmd_filter(self, args, cli):
@@ -138,13 +209,19 @@ class LogbookManager(JSONManager):
         
         # Sort by timestamp and apply the limit
         sorted_filtered = sorted(filtered_entries, key=lambda x: x.get('timestamp', ''), reverse=True)
-        entries_to_show = sorted_filtered[:args.limit]
+        entries_to_show = sorted_filtered[:args.limit] if args.limit > 0 else sorted_filtered
 
-        self._display_entries_table(
+        # Clearer base subtitle
+        if args.limit > 0:
+            subtitle = f"Showing {len(entries_to_show)} of {len(filtered_entries)} matching entries."
+        else:
+            subtitle = f"Showing all {len(filtered_entries)} matching entries."
+
+        self._display_chunked_entries(
             entries=entries_to_show,
             title=f":mag: [bold]Filtered Logbook: {args.type} = '{args.value}'[/bold]",
-            subtitle=f"[dim]Showing {len(entries_to_show)} of {len(filtered_entries)} matching entries.[/dim]",
-            console=cli.console
+            base_subtitle=subtitle,
+            cli=cli
         )
 
     def _cmd_show(self, args, cli):
@@ -191,5 +268,6 @@ class LogbookManager(JSONManager):
             duration=execution_data.get('duration_seconds', 0),
             command_str=entry_data.get('command', ''),
             logbook_id=entry_data.get('id'),
-            session_name=context_data.get('session')
+            session_name=context_data.get('session'),
+            timestamp=entry_data.get('timestamp')
         )

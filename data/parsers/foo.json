@@ -20,6 +20,11 @@
       "name": "GoBusterFiles",
       "regex": "/\\w+\\s+\\(\\w+:\\s+\\w+\\)",
       "exclude_patterns": []
+    },
+    {
+      "name": "this_is_a_test",
+      "regex": "[A-Z][a-z]+:\\s\\d+\\s/\\s\\d+\\s\\(\\d+\\.\\d+%\\)",
+      "exclude_patterns": []
     }
   ]
 }

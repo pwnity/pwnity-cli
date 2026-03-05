@@ -1,0 +1,10 @@
+{
+  "name": "my_new_parser",
+  "rules": [
+    {
+      "name": "my_new_rule",
+      "regex": "(\\/[a-zA-Z0-9_.-]+)+\\/?",
+      "exclude_patterns": []
+    }
+  ]
+}

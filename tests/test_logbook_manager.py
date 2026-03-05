@@ -147,7 +147,7 @@ def test_list_log_entries(logbook_manager, mock_session, mocker):
     mock_cli.console = mocker.MagicMock()
 
     # Simulate the args object that argparse would create, including the default limit.
-    logbook_manager._cmd_list(args=argparse.Namespace(limit=20), cli=mock_cli)
+    logbook_manager._cmd_list(args=argparse.Namespace(limit=0), cli=mock_cli)
 
     # Überprüfe, ob eine Tabelle gedruckt wurde
     mock_cli.console.print.assert_called_once()
@@ -163,8 +163,8 @@ def test_list_log_entries_empty(logbook_manager, mocker):
     mock_cli = mocker.MagicMock()
 
     # Simulate the args object that argparse would create.
-    logbook_manager._cmd_list(args=argparse.Namespace(limit=20), cli=mock_cli)
-    mock_log_info.assert_called_with("No logbook entries have been recorded yet.")
+    logbook_manager._cmd_list(args=argparse.Namespace(limit=0), cli=mock_cli)
+    mock_log_info.assert_called_with("No matching logbook entries found.")
 
 def test_load_corrupt_entry(logbook_manager, tmp_path, mocker):
     """Testet, ob das Laden einer beschädigten Log-Datei fehlschlägt und einen Fehler loggt."""

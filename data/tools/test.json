@@ -1,0 +1,14 @@
+{
+  "name": "test",
+  "path": "/home/kali/fake_test.sh",
+  "commands": [
+    {
+      "name": "Test",
+      "description": "This was just the description ^^",
+      "params": [
+        "$tool.rounds"
+      ]
+    }
+  ],
+  "rounds": "20"
+}

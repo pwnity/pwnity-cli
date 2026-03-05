@@ -15,7 +15,7 @@
     }
   },
   "proxy_settings": {},
-  "ipc_socket": "data/.session.json.26832.sock",
+  "ipc_socket": null,
   "monitoring_status": {
     "proxy_enabled": false,
     "heartbeat_target": null
