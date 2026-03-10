@@ -23,7 +23,10 @@ import argparse # Import argparse for type checking
 
 # Global registry for managers
 _manager_registry = {}
-import xml.etree.ElementTree as ET
+try:
+    import defusedxml.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 import json
 
 # Pattern for the innermost function call, e.g., func(arg) where arg has no parentheses
@@ -217,12 +220,20 @@ def _resolve_from_parts(entity_type, attr_path, original_placeholder, session, t
             return original_placeholder
 
         file_name_sanitized = path_parts[0]
+        
+        # --- PATH TRAVERSAL PROTECTION ---
+        # Ensure the filename has no path components (.., /, etc)
+        file_name_sanitized = os.path.basename(file_name_sanitized)
+        
         # Correctly desanitize the filename.
         if '_' in file_name_sanitized:
             parts = file_name_sanitized.rsplit('_', 1)
             file_name = '.'.join(parts)
         else:
             file_name = file_name_sanitized
+        
+        # Final safety check on the reconstructed file_name
+        file_name = os.path.basename(file_name)
         remaining_path = ".".join(path_parts[1:])
 
         report_mgr = _manager_registry.get('REPORT')

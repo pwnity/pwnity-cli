@@ -22,6 +22,7 @@ flask
 flask-socketio
 ptyprocess
 cryptography
+flask_wtf
 
 # Testing
 pytest

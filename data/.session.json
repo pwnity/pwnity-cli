@@ -1,17 +1,17 @@
 {
   "session_name": "default",
-  "target": null,
-  "tool": null,
-  "wordlist": null,
-  "report": null,
+  "target": "pwnity.local",
+  "tool": "gobuster",
+  "wordlist": "dirb_big",
+  "report": "test_report",
   "proxy_enabled": false,
   "sessions": {
     "default": {
       "name": "default",
-      "target": null,
-      "tool": null,
-      "wordlist": null,
-      "report": null
+      "target": "pwnity.local",
+      "tool": "gobuster",
+      "wordlist": "dirb_big",
+      "report": "test_report"
     }
   },
   "proxy_settings": {},

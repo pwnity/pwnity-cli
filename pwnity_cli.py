@@ -497,6 +497,15 @@ class MyCLI(cmd2.Cmd):
                         state = json.load(f)
                     
                     # Update our session object with the file's state
+                    
+                    # 1. Sync session name if changed externally
+                    session_name = state.get('session_name')
+                    if session_name and hasattr(self, 'session_mgr') and session_name != self.session.name:
+                        if session_name in self.session_mgr.sessions:
+                            self.session = self.session_mgr.switch(session_name)
+                            log.debug(f"[Session Sync] Switched to session: {self.session.name}")
+
+                    # 2. Sync session attributes
                     # Only update if values are different to avoid unnecessary changes
                     if state.get('target') != self.session.target:
                         self.session.target = state.get('target')

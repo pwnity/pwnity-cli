@@ -17,13 +17,17 @@ MANIFEST
 wheels/
 wheelhouse/ # Specific to pwnity's wheelhouse directory
 plugins/
-data/wheelhouse/**
+data/wheelhouse/*.*
 data/logbook/**
-data/heartbeats/**
-data/targets/**
-data/reports/**
-data/workflows/**
+data/heartbeats/*.json
+data/targets/*.json
+data/reports/*.json
+data/workflows/*.json
+data/presets/*.json
+data/wordlists/*.json
 pro-web-ui/
+data/.session.json*
+data/.session.json
 
 # --- Virtual Environment ---
 venv/

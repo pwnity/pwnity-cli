@@ -118,8 +118,8 @@ class LogbookManager(JSONManager):
             log.info("No matching logbook entries found.")
             return
 
-        # If we are in web UI mode or headless, don't chunk interactively
-        if getattr(cli, 'web_ui_mode', False) or getattr(cli, 'headless_mode', False):
+        # If we are headless, don't chunk interactively
+        if getattr(cli, 'headless_mode', False):
             self._display_entries_table(entries, title, base_subtitle, cli.console)
             return
 
