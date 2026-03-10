@@ -9,7 +9,7 @@
         "dir",
         "-w $wordlist.path",
         "-u $target.base_url",
-        "-t 50"
+        "-t 20"
       ],
       "description": "Performs directory and file brute-forcing against a web target"
     },
@@ -30,7 +30,7 @@
         "vhost",
         "-u $target.base_url",
         "-w $wordlist.path",
-        "-t 50"
+        "-t 20"
       ],
       "description": "Performs virtual host brute-forcing via HTTP Host header"
     }

@@ -30,6 +30,14 @@ except ImportError:
     log.error("Dependencies 'python-whois' and/or 'dnspython' not found. 'gather' command is disabled.")
     log.error("Please install with 'pip install python-whois dnspython'.")
 
+try:
+    from cryptography import x509
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.x509.oid import NameOID
+    cryptography_available = True
+except ImportError:
+    cryptography_available = False
+
 class ReconService:
     """Gathers information about a given target."""
 
@@ -236,10 +244,56 @@ class ReconService:
 
         if protocol == 'https':
             try:
+                # Try standard verification first
                 context = ssl.create_default_context()
-                with socket.create_connection((self.hostname, port), timeout=5) as sock:
-                    with context.wrap_socket(sock, server_hostname=self.hostname) as ssock:
-                        cert = ssock.getpeercert()
+                cert = None
+                try:
+                    with socket.create_connection((self.hostname, port), timeout=5) as sock:
+                        with context.wrap_socket(sock, server_hostname=self.hostname) as ssock:
+                            cert = ssock.getpeercert()
+                except (ssl.SSLCertVerificationError, ssl.SSLError) as e:
+                    # Fallback to unverified context if verification fails (e.g., self-signed)
+                    log.info(f"  -> SSL verification failed ({e}). Retrying unverified...")
+                    unverified_context = ssl._create_unverified_context()
+                    with socket.create_connection((self.hostname, port), timeout=5) as sock:
+                        with unverified_context.wrap_socket(sock, server_hostname=self.hostname) as ssock:
+                            cert = ssock.getpeercert()
+
+                if cert is not None:
+                    if cert == {} and cryptography_available:
+                        try:
+                            # Fallback to cryptography for unverified/self-signed cert details
+                            with socket.create_connection((self.hostname, port), timeout=5) as sock:
+                                with unverified_context.wrap_socket(sock, server_hostname=self.hostname) as ssock:
+                                    der_cert = ssock.getpeercert(True)
+                                    x509_cert = x509.load_der_x509_certificate(der_cert, default_backend())
+                                    
+                                    # Extract info manually
+                                    subject = {attr.oid._name: attr.value for attr in x509_cert.subject}
+                                    issuer = {attr.oid._name: attr.value for attr in x509_cert.issuer}
+                                    
+                                    sans = []
+                                    try:
+                                        ext = x509_cert.extensions.get_extension_for_class(x509.SubjectAlternativeName)
+                                        sans = ext.value.get_values_for_type(x509.DNSName)
+                                    except Exception: pass
+
+                                    cert_info = {
+                                        'subject': subject,
+                                        'issuer': issuer,
+                                        'valid_from': x509_cert.not_valid_before_utc.isoformat(),
+                                        'valid_to': x509_cert.not_valid_after_utc.isoformat(),
+                                        'sans': sans,
+                                        'note': "Self-signed or unverified certificate (details extracted via cryptography)"
+                                    }
+                                    log.success("  -> SSL certificate analyzed (self-signed/unverified).")
+                        except Exception as crypto_err:
+                            log.debug(f"Cryptography extraction failed: {crypto_err}")
+                            cert_info = {"note": "Self-signed or unverified certificate (details extraction failed)"}
+                    elif cert == {}:
+                        cert_info = {"note": "Self-signed or unverified certificate (no details available via standard API)"}
+                        log.info("  -> SSL certificate retrieved (self-signed/unverified).")
+                    else:
                         cert_info = {
                             'subject': dict(x[0] for x in cert.get('subject', [])),
                             'issuer': dict(x[0] for x in cert.get('issuer', [])),
@@ -247,14 +301,19 @@ class ReconService:
                             'valid_to': cert.get('notAfter'),
                             'sans': [x[1] for x in cert.get('subjectAltName', [])]
                         }
-                        updates['ssl_info'] = cert_info
-                        log.success("  -> SSL certificate successfully analyzed.")
+                        log.success("  -> SSL certificate analyzed.")
+                    updates['ssl_info'] = cert_info
             except Exception as e:
                 log.warning(f"  -> Error retrieving SSL certificate: {e}")
 
         try:
-            conn_class = http.client.HTTPSConnection if protocol == 'https' else http.client.HTTPConnection
-            conn = conn_class(self.hostname, port, timeout=5)
+            if protocol == 'https':
+                # Use unverified context for request to ensure headers are retrieved
+                context = ssl._create_unverified_context()
+                conn = http.client.HTTPSConnection(self.hostname, port, timeout=5, context=context)
+            else:
+                conn = http.client.HTTPConnection(self.hostname, port, timeout=5)
+                
             conn.request("GET", self.target.get('uri', '/'))
             response = conn.getresponse()
             headers = dict(response.getheaders())

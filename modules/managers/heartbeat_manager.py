@@ -243,8 +243,12 @@ class HeartbeatManager(BaseManager):
                         # For HTTP over HTTP proxy, this is straightforward.
                         conn = http.client.HTTPConnection(proxy_host, proxy_port, timeout=10)
                 else: # No Proxy or SOCKS Proxy (uses patched socket)
-                    conn_class = http.client.HTTPSConnection if parsed_url.scheme == 'https' else http.client.HTTPConnection
-                    conn = conn_class(host, port, timeout=10)
+                    if parsed_url.scheme == 'https':
+                        # Use an unverified context for monitoring to support self-signed certs
+                        context = ssl._create_unverified_context()
+                        conn = http.client.HTTPSConnection(host, port, timeout=10, context=context)
+                    else:
+                        conn = http.client.HTTPConnection(host, port, timeout=10)
                 
                 # Prepare headers with User-Agent
                 # user_agent is already resolved by the caller (sockets.py)
