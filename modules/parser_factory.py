@@ -28,8 +28,6 @@ except ImportError:
 class ChoicesProvider:
     """
     Helper class to provide choices for Argparse completers.
-    This avoids deepcopy errors by only holding a reference to the manager.
-    An instance of this class is a 'callable' that cmd2 can use as a `completer`.
     """
     def __init__(self, manager, method_name='list_all'):
         self.manager = manager
@@ -38,6 +36,40 @@ class ChoicesProvider:
     def __call__(self, *args, **kwargs):
         list_method = getattr(self.manager, self.method_name)
         return list_method()
+
+class UpdateFieldChoicesProvider:
+    """Provides existing keys of an entity as choices for the 'update' field."""
+    def __init__(self, manager):
+        self.manager = manager
+
+    def __call__(self, *args, **kwargs):
+        parsed_args = kwargs.get('parsed_args')
+        # Core fields that should always be available
+        core_keys = ['tags', 'description', 'name']
+        
+        if not parsed_args or not hasattr(parsed_args, 'name') or not parsed_args.name:
+            return sorted(core_keys)
+        
+        data = self.manager.load(parsed_args.name, silent=True)
+        if not data:
+            return sorted(core_keys)
+        
+        # Suggest all root keys plus core ones (use set for uniqueness)
+        all_keys = set(data.keys()) | set(core_keys)
+        return sorted(list(all_keys))
+
+class TagChoicesProvider:
+    """Provides unique tags from all entities as choices, but only if field is 'tags'."""
+    def __init__(self, manager):
+        self.manager = manager
+
+    def __call__(self, *args, **kwargs):
+        parsed_args = kwargs.get('parsed_args')
+        # Only suggest tags if the field we are updating is actually 'tags'
+        if not parsed_args or getattr(parsed_args, 'field', '').lower() != 'tags':
+            return []
+        
+        return self.manager.list_all_tags()
 
 class ParserFactory:
     def __init__(self, target_mgr, tool_mgr, wordlist_mgr, preset_mgr, session_mgr, job_mgr, profile_mgr, help_mgr, manual_mgr, parser_mgr=None, logbook_mgr=None, report_mgr=None, revshell_mgr=None, heartbeat_mgr=None, library_mgr=None, workflow_mgr=None, config_mgr=None):
@@ -178,7 +210,18 @@ class ParserFactory:
                                                   formatter_class=self.formatter, add_help=False)
             self._add_custom_help(update_parser, "update")
             update_parser.add_argument("name", help=f"The name of the {entity_name_singular} to update.", choices_provider=choices_provider)
-            update_parser.add_argument("update_args", nargs=argparse.REMAINDER, help="The field and value to update (e.g., 'url https://example.com').")
+            # --- NEU: Field und Value mit intelligentem Autocomplete ---
+            field_completer = UpdateFieldChoicesProvider(self.target_mgr if entity_name_singular == "Target" else 
+                                                        self.tool_mgr if entity_name_singular == "Tool" else
+                                                        self.wordlist_mgr if entity_name_singular == "Wordlist" else
+                                                        self.preset_mgr)
+            tag_completer = TagChoicesProvider(self.target_mgr if entity_name_singular == "Target" else 
+                                              self.tool_mgr if entity_name_singular == "Tool" else
+                                              self.wordlist_mgr if entity_name_singular == "Wordlist" else
+                                              self.preset_mgr)
+            
+            update_parser.add_argument("field", help="The field to update (e.g. 'tags', 'description', 'path').", choices_provider=field_completer)
+            update_parser.add_argument("value", nargs='+', help="The new value(s).", choices_provider=tag_completer)
         if "delete" not in exclude:
             delete_parser = subparsers.add_parser("delete",
                                                   help=f"Delete a {entity_name_singular} or a field from it.",
@@ -245,7 +288,11 @@ class ParserFactory:
                                               formatter_class=self.formatter, add_help=False)
         self._add_custom_help(update_parser, "update")
         update_parser.add_argument("name", help="The name of the Target to update.", choices_provider=completer)
-        update_parser.add_argument("update_args", nargs=argparse.REMAINDER, help="The field and value to update (e.g., 'url https://example.com').")
+        # --- NEU: Field und Value mit Autocomplete ---
+        update_parser.add_argument("field", help="The field to update (e.g. 'tags', 'url', 'notes').", 
+                                   choices_provider=UpdateFieldChoicesProvider(self.target_mgr))
+        update_parser.add_argument("value", nargs='+', help="The new value(s).",
+                                   choices_provider=TagChoicesProvider(self.target_mgr))
         update_parser.examples = [
             ("target update my-server url https://example.com:8443/path", "Sets the URL and extracts all related info."),
             ("target update my-server notes 'Initial reconnaissance target.'", "Adds or overwrites a custom field."),
@@ -320,7 +367,11 @@ class ParserFactory:
                                               formatter_class=self.formatter, add_help=False)
         self._add_custom_help(update_parser, "update")
         update_parser.add_argument("name", help="The name of the tool to update.", choices_provider=completer)
-        update_parser.add_argument("update_args", nargs=argparse.REMAINDER, help="The update instruction (e.g., 'sudo true', 'command <cmd_name>', or '<cmd_name> param <param_value>').")
+        # --- NEU: Field und Value mit Autocomplete ---
+        update_parser.add_argument("field", help="The field or area to update (e.g. 'tags', 'path', 'command', or a specific command name).",
+                                   choices_provider=UpdateFieldChoicesProvider(self.tool_mgr))
+        update_parser.add_argument("value", nargs='+', help="The new value or instruction.",
+                                   choices_provider=TagChoicesProvider(self.tool_mgr))
         update_parser.examples = [
             ("tool update nmap sudo true", "Marks the tool to always run with sudo."),
             ("tool update nmap command stealth-scan", "Adds a new command named 'stealth-scan'."),
@@ -690,7 +741,11 @@ class ParserFactory:
                                               formatter_class=self.formatter, add_help=False)
         self._add_custom_help(update_parser, "update")
         update_parser.add_argument("name", help="The name of the parser to update.", choices_provider=parser_completer)
-        update_parser.add_argument("update_args", nargs=argparse.REMAINDER, help="The update instruction (e.g., 'description ...', 'add-rule <rule_name>', or '<rule_name> regex ...').")
+        # --- NEU: Field und Value mit Autocomplete ---
+        update_parser.add_argument("field", help="The field or rule to update (e.g. 'tags', 'description', 'add-rule').",
+                                   choices_provider=UpdateFieldChoicesProvider(self.parser_mgr))
+        update_parser.add_argument("value", nargs='+', help="The new value or instruction.",
+                                   choices_provider=TagChoicesProvider(self.parser_mgr))
         update_parser.examples = [
             ("parser update common description \"New description.\"", "Updates the parser's description."),
             ("parser update common add-rule new_rule", "Adds a new, empty rule named 'new_rule'."),

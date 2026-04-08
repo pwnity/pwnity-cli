@@ -126,5 +126,6 @@
       "name": "closed_ports",
       "regex": "Not shown: (\\d+) closed tcp ports"
     }
-  ]
+  ],
+  "instr": "host_down regex Host seems down"
 }

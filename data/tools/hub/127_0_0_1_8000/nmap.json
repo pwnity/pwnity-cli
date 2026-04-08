@@ -1,0 +1,67 @@
+{
+  "path": "/usr/bin/nmap",
+  "sudo": false,
+  "name": "nmap",
+  "commands": [
+    {
+      "name": "quick",
+      "params": [
+        "-T4",
+        "-F",
+        "$target.ip"
+      ],
+      "description": "Performs a fast top-ports scan to quickly identify common open services"
+    },
+    {
+      "name": "full",
+      "params": [
+        "-p-",
+        "-T4",
+        "--min-rate=1000",
+        "-v",
+        "$target.ip"
+      ],
+      "description": "Performs a full TCP port scan on all ports (noisy and potentially detectable)"
+    },
+    {
+      "name": "service",
+      "params": [
+        "-sV",
+        "-sC",
+        "-T4",
+        "$target.ip"
+      ],
+      "description": "Enumerates services and versions on open ports using default scripts"
+    },
+    {
+      "name": "udp",
+      "params": [
+        "-sU",
+        "--top-ports=100",
+        "-v",
+        "$target.ip"
+      ],
+      "description": "Scans common UDP ports to identify exposed UDP services (slow and unreliable by nature)"
+    },
+    {
+      "name": "aggressive",
+      "params": [
+        "-A",
+        "-T4",
+        "$target.ip"
+      ],
+      "description": "Runs an aggressive scan enabling OS detection, version detection, scripts, and traceroute"
+    }
+  ],
+  "description": "Scans hosts or networks with the nmap scanner tool.",
+  "usage": "Update the target IP and run a scan against it.",
+  "tags": [
+    "nmap",
+    "scan",
+    "network"
+  ],
+  "hub_id": "e2077edc-d5fd-4f91-a198-85db96a8ad56",
+  "hub_origin": "http://127.0.0.1:8000",
+  "hub_author": "V3rm1ll1on",
+  "hub_hash": "95c9e6877b092193ea46023a39eeefe6a866adc1ee7faf5d669805b252ab35ae"
+}

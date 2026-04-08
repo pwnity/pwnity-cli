@@ -93,6 +93,7 @@ data/wordlists/         # User-defined wordlists
 data/presets/           # User-defined presets
 data/heartbeats/        # Heartbeat monitoring data
 etc/profile.json        # User's personal profile settings
+etc/hub_config.json     # Pwnity Hub authentication and config
 
 # --- Other Python-related ignores ---
 # Installer logs

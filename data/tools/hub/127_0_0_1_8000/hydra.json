@@ -1,0 +1,35 @@
+{
+  "path": "/usr/bin/hydra",
+  "sudo": false,
+  "name": "hydra",
+  "commands": [
+    {
+      "name": "http_post_form",
+      "params": [
+        "-L $tool.userlist",
+        "-P $wordlist.path",
+        "$target.host",
+        "http-post-form \\\"$target.uri:$auth.post_data:F=$auth.fail_string\\\""
+      ],
+      "description": "Brute-forces HTTP POST authentication forms using user and password lists"
+    },
+    {
+      "name": "http_get",
+      "params": [
+        "-L $tool.userlist",
+        "-P $wordlist.path",
+        "$target.host",
+        "http-get"
+      ],
+      "description": "Brute-forces HTTP Basic Authentication"
+    }
+  ],
+  "description": "Brute-forces login credentials for various network services using wordlists",
+  "userlist": "/path/to/your/userlist",
+  "usage": "Use 'pwn start bg' to run the process in",
+  "tags": "hydra,bruteforce,password,hash",
+  "hub_id": "718161b7-a7c4-4848-b7bd-708fa746f871",
+  "hub_origin": "http://127.0.0.1:8000",
+  "hub_author": "V3rm1ll1on",
+  "hub_hash": "c144e8506a658e66411ca232599e7e51192d9ae9380126384a21e4e3b0179a52"
+}

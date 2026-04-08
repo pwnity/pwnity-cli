@@ -189,7 +189,8 @@ class ToolManager(JSONManager):
     def _cmd_update(self, args, cli):
         """Dispatches tool update operations based on arguments."""
         tool_name = args.name
-        update_args = args.update_args
+        # Reconstruct update_args from field and value for internal handlers
+        update_args = [args.field] + args.value
         tool = self.load(tool_name)
         if not tool:
             return
@@ -281,7 +282,13 @@ class ToolManager(JSONManager):
         if len(update_args) < 2:
             return False
 
-        field, value_str = update_args[0], " ".join(update_args[1:])
+        field, value_parts = update_args[0], update_args[1:]
+        
+        # --- FIX: Join with comma if field is 'tags', otherwise with space ---
+        if field.lower() == 'tags':
+            value_str = ",".join(value_parts)
+        else:
+            value_str = " ".join(value_parts)
 
         if field.lower() == 'name':
             self.rename(tool_name, value_str)
@@ -615,11 +622,11 @@ class ToolManager(JSONManager):
         
         # --- Teil 1: Allgemeine Tool-Informationen ---
         if data_to_show:
+            from .base_manager import _add_data_to_table_recursively
             top_level_table = Table(show_header=False, box=None, padding=(0, 2))
             top_level_table.add_column(style="bold blue", no_wrap=True)
             top_level_table.add_column(style="green")
-            for key, value in data_to_show.items():
-                top_level_table.add_row(key, str(value))
+            _add_data_to_table_recursively(top_level_table, data_to_show)
             
             general_info_panel = Panel(
                 top_level_table, title="[bold]General Information[/bold]", border_style="blue", expand=True
@@ -678,41 +685,61 @@ class ToolManager(JSONManager):
         console.print(main_panel)
 
     def _cmd_list(self, args, cli):
-        """Overrides the default list to show a detailed table inside a panel."""
+        """Overrides the default list to show a compact, clean 2-line layout."""
         items = self.list_all()
         if not items:
             log.info("No Tools found.")
             return
 
-        # Use a minimal box style for a cleaner look inside the panel
-        table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
-        table.add_column("Name", style="yellow", no_wrap=True, min_width=15)
-        table.add_column("Description", style="dim", no_wrap=False, max_width=100)
-        table.add_column("Path", style="cyan", no_wrap=False, max_width=40)
-        table.add_column("Sudo", style="red", width=5)
-        table.add_column("Commands", style="magenta", no_wrap=False, max_width=100)
+        from rich.text import Text
+        items = sorted(items, key=lambda x: (1 if x.startswith("hub/") else 0, x))
 
-        for name in items:
-            data = self.load(name)
-            if data:
-                sudo_status = "Yes" if data.get('sudo') else "No"
-                # --- NEW: Get command names instead of count ---
-                command_names = [cmd.get('name', '') for cmd in data.get('commands', [])]
-                commands_str = ", ".join(command_names)
+        output = []
+        for item_name in items:
+            data = self.load(item_name)
+            if not data: continue
 
-                table.add_row(
-                    data.get('name', name),
-                    data.get('description', ''),
-                    data.get('path', ''),
-                    sudo_status,
-                    commands_str
-                )
+            # 1. Identify origin
+            is_hub = item_name.startswith("hub/")
+            origin_tag = "[blue][L][/blue]"
+            display_name = item_name
+            
+            if is_hub:
+                parts = item_name.split("/")
+                origin = parts[1].replace("_", ":")
+                origin_tag = f"[cyan][H][/cyan]"
+                base_name = parts[-1]
+                prefix = "/".join(parts[:-1])
+                display_name = f"[dim]{prefix}/[/dim][bold yellow]{base_name}[/bold yellow] [dim](@{origin})[/dim]"
+            else:
+                display_name = f"[bold green]{item_name}[/bold green]"
 
-        panel = Panel(
-            table,
+            # 2. Data
+            desc = data.get('description', '')
+            path = data.get('path', '')
+            sudo_prefix = "[bold red]sudo[/bold red] " if data.get('sudo') else ""
+            command_names = [cmd.get('name', '') for cmd in data.get('commands', [])]
+            commands_str = ", ".join(command_names)
+
+            # --- Row 1: [L] curl - description ---
+            desc_part = f" - [italic grey50]{desc}[/italic grey50]" if desc else ""
+            output.append(Text.from_markup(f" {origin_tag} {display_name}{desc_part}"))
+
+            # --- Row 2: • sudo /path | cmds ---
+            output.append(Text.from_markup(f"     [dim]•[/dim] {sudo_prefix}[cyan]{path}[/cyan] [dim]|[/dim] [magenta]{commands_str}[/magenta]"))
+
+            # --- Row 3: Tags ---
+            tags = self.normalize_tags(data.get('tags', ''))
+            if tags:
+                tag_str = " ".join([f"[cyan]#{t}[/cyan]" for t in tags])
+                output.append(Text.from_markup(f"     [dim]• Tags: {tag_str}[/dim]"))
+            
+            # Spacer
+            output.append(Text(""))
+
+        cli.console.print(Panel(
+            Group(*output),
             title="[bold]Available Tools[/bold]",
-            border_style="yellow",
-            expand=False,
+            border_style="dim",
             subtitle=f"{len(items)} Tools total"
-        )
-        cli.console.print(panel)
+        ))

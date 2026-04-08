@@ -66,64 +66,38 @@ class ParserManager(JSONManager):
         log.prompt(f"Add rules with: parser update {name} rule <rule_name>")
 
     def _cmd_update(self, args, cli):
-        """Handles 'parser update'."""
+        """Handles the 'update' subcommand for parsers."""
         parser_name = args.name
-        update_args = args.update_args
-        parser_data = self.load(parser_name)
-        if not parser_data:
-            return
-
-        if not update_args:
-            log.error("No update arguments provided.")
-            log.prompt("Use 'parser update -h' for help.")
-            return
-
-        # Syntax: `... description "new description"`
-        if update_args[0] == 'description':
-            new_desc = " ".join(update_args[1:])
-            self.update(parser_name, 'description', new_desc)
+        field = args.field
+        # value is REMAINDER (list)
+        value_parts = args.value if args.value else []
+        
+        if field.lower() == 'description':
+            new_val = " ".join(value_parts) if value_parts else ""
+            self.update(parser_name, 'description', new_val)
             log.success(f"Description for parser '{parser_name}' updated.")
-            return
-
-        # Syntax: `... add-rule <rule_name>`
-        if len(update_args) == 2 and update_args[0] == 'add-rule':
-            rule_name = update_args[1]
-            rules = parser_data.setdefault('rules', [])
-            if any(r.get('name') == rule_name for r in rules):
-                log.warning(f"Rule '{rule_name}' already exists in parser '{parser_name}'.")
+        elif field.lower() == 'tags':
+            new_val = ",".join(value_parts) if value_parts else ""
+            self.update(parser_name, 'tags', new_val)
+            # Success logged by self.update if using BaseManager logic
+        elif field.lower() == 'add-rule':
+            if not value_parts:
+                log.error("Rule name missing. Use: parser update <name> add-rule <rule_name>")
                 return
-            rules.append({'name': rule_name, 'regex': '', 'exclude_patterns': []})
-            self.update(parser_name, 'rules', rules)
+            rule_name = value_parts[0]
+            self.update(parser_name, f"add-rule {rule_name}", "")
             log.success(f"Added new rule '{rule_name}' to parser '{parser_name}'.")
-            log.prompt(f"Set its pattern with: parser update {parser_name} {rule_name} regex \"...\"")
-            return
-
-        # Syntax: `... <rule_name> regex "..."` or `... <rule_name> exclude "..."`
-        if len(update_args) >= 3:
-            rule_name, field, value = update_args[0], update_args[1], " ".join(update_args[2:])
-            
-            rules = parser_data.get('rules', [])
-            rule_to_update = next((r for r in rules if r.get('name') == rule_name), None)
-
-            # If the rule doesn't exist, we can't proceed with setting a field.
-            if not rule_to_update:
-                log.error(f"Rule '{rule_name}' not found in parser '{parser_name}'.")
-                return
-
-            if field == 'regex':
-                rule_to_update['regex'] = value
-                self.update(parser_name, 'rules', rules)
-                log.success(f"Regex for rule '{rule_name}' updated.")
-            elif field == 'exclude':
-                excludes = rule_to_update.setdefault('exclude_patterns', [])
-                excludes.append(value)
-                self.update(parser_name, 'rules', rules)
-                log.success(f"Exclusion pattern added to rule '{rule_name}'.")
+        else:
+            # Assume field is a rule name
+            if len(value_parts) >= 2:
+                # Syntax: parser update <name> <rule_name> <rule_field> <value>
+                # e.g. parser update common email regex "..."
+                rule_field = value_parts[0]
+                rule_value = " ".join(value_parts[1:])
+                instr = f"{field} {rule_field} {rule_value}"
+                self.update(parser_name, "instr", instr)
             else:
-                log.error(f"Invalid field '{field}'. Use 'regex' or 'exclude'.")
-            return
-
-        log.error("Invalid syntax for 'parser update'. Use 'parser update -h' for help.")
+                log.error(f"Invalid update syntax for rule '{field}'. Expected: <rule_name> <regex|exclude> <value>")
 
     def _cmd_delete(self, args, cli):
         """Handles 'parser delete'."""
@@ -392,10 +366,14 @@ class ParserManager(JSONManager):
             # Arrange rule panels in columns for better readability
             content = Columns(rule_panels, equal=True, expand=True)
 
+        # --- Tags im Untertitel ---
+        tags = self.normalize_tags(parser_data.get('tags', ''))
+        tag_str = "  •  " + " ".join([f"[cyan]#{t}[/cyan]" for t in tags]) if tags else ""
+        
         main_panel = Panel(
             content,
             title=f"Parser: [bold]{parser_data.get('name', name)}[/bold]",
-            subtitle=f"[dim]{parser_data.get('description', '')}[/dim]",
+            subtitle=f"[dim]{parser_data.get('description', '')}[/dim]{tag_str}",
             border_style="magenta",
             expand=True
         )

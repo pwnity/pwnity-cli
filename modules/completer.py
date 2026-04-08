@@ -145,7 +145,7 @@ class Completer:
 
             # --- FIX: Dynamically add all top-level keys from the tool's data to the suggestions ---
             # The previous implementation had a hardcoded list.
-            base_suggestions = ['path', 'sudo', 'name', 'command']
+            base_suggestions = ['path', 'sudo', 'name', 'command', 'tags', 'description']
             # --- NEW: Use recursive helper to get all nested paths ---
             dynamic_suggestions = self._generate_paths_recursively(tool_data)
             command_names = [cmd.get('name') for cmd in tool_data.get("commands", []) if cmd.get('name')]
@@ -335,7 +335,7 @@ class Completer:
                 return []
             # --- FIX: Dynamically add all top-level keys from the target's data ---
             # The previous implementation had a hardcoded list.
-            base_suggestions = ['url'] # Keep 'url' as a default suggestion
+            base_suggestions = ['url', 'tags', 'description'] # Keep core fields as default suggestions
             # --- NEW: Use recursive helper to get all nested paths ---
             dynamic_suggestions = self._generate_paths_recursively(target_data)
             all_suggestions = list(self._create_completion_items_from_paths(target_data, dynamic_suggestions)) + base_suggestions
@@ -411,7 +411,7 @@ class Completer:
         # 3. Context-sensitive completion for 'wordlist update <name> ...' or 'wordlist delete <name> ...'
         if num_tokens == 3 and tokens[1] in ['update', 'delete']:
             # A wordlist object primarily has a 'path' field that can be modified.
-            return [s for s in ['path'] if s.startswith(text)]
+            return [s for s in ['path', 'tags', 'description'] if s.startswith(text)]
 
         return []
 

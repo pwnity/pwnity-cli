@@ -237,6 +237,12 @@ class MyCLI(cmd2.Cmd):
                 # Plugin not found, continue in standard CLI mode
                 pass
 
+        try:
+            from plugins.hub_integration.extension import setup_hub_extension
+            setup_hub_extension(self)
+        except ImportError:
+            pass
+
         # Handle command line arguments for initial state
         import argparse
         parser = argparse.ArgumentParser(add_help=False)
@@ -420,10 +426,27 @@ class MyCLI(cmd2.Cmd):
 
         # Part 2: Context (Target, Tool, Wordlist)
         path_parts = []
-        if self.session and self.session.target: path_parts.append(ansi.style(self.session.target, fg=ansi.Fg.GREEN))
-        if self.session and self.session.tool: path_parts.append(ansi.style(self.session.tool, fg=ansi.Fg.YELLOW))
-        if self.session and self.session.wordlist: path_parts.append(ansi.style(self.session.wordlist, fg=ansi.Fg.MAGENTA))
-        if self.session and self.session.report: path_parts.append(ansi.style(self.session.report, fg=ansi.Fg.WHITE))
+        if self.session and self.session.target: 
+            path_parts.append(ansi.style(self.session.target, fg=ansi.Fg.GREEN))
+        
+        if self.session and self.session.tool: 
+            tool_full_name = self.session.tool
+            tool_display = tool_full_name
+            # Try to fetch hub info for the prompt
+            tool_data = self.tool_mgr.load(tool_full_name)
+            if tool_data and "hub_origin" in tool_data:
+                # 1. Extract netloc for cleaner display (e.g., localhost:8000)
+                from urllib.parse import urlparse
+                origin = urlparse(tool_data["hub_origin"]).netloc
+                # 2. Extract base name (e.g., nmap instead of hub/host/nmap)
+                base_name = tool_full_name.split('/')[-1]
+                tool_display = f"{base_name} ({origin})"
+            path_parts.append(ansi.style(tool_display, fg=ansi.Fg.YELLOW))
+            
+        if self.session and self.session.wordlist: 
+            path_parts.append(ansi.style(self.session.wordlist, fg=ansi.Fg.MAGENTA))
+        if self.session and self.session.report: 
+            path_parts.append(ansi.style(self.session.report, fg=ansi.Fg.WHITE))
 
         if path_parts:
             part2 = " | ".join(path_parts)

@@ -9,9 +9,10 @@
         "dir",
         "-w $wordlist.path",
         "-u $target.base_url",
-        "-t 20"
+        "-t 10"
       ],
-      "description": "Performs directory and file brute-forcing against a web target"
+      "description": "Performs directory and file brute-forcing against a web target",
+      "execute_per_param": false
     },
     {
       "name": "dns",

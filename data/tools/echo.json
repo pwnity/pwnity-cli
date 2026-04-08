@@ -1,0 +1,15 @@
+{
+  "name": "echo",
+  "path": "/usr/bin/echo",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "show",
+      "params": [
+        "$target.ip",
+        "This is a test"
+      ],
+      "description": "This is a Test"
+    }
+  ]
+}

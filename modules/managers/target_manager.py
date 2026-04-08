@@ -99,11 +99,19 @@ class TargetManager(JSONManager):
 
     def _cmd_update(self, args, cli):
         """Overrides the update logic to handle URLs intelligently."""
-        if len(args.update_args) < 2:
+        # Reconstruct update_args for internal handlers
+        update_args = [args.field] + args.value
+        if len(update_args) < 2:
             log.error("Invalid update command. Expected: update <name> <field> <value>")
             return
 
-        field, value_str = args.update_args[0], " ".join(args.update_args[1:])
+        field, value_parts = update_args[0], update_args[1:]
+        
+        # --- FIX: Join with comma if field is 'tags', otherwise with space ---
+        if field.lower() == 'tags':
+            value_str = ",".join(value_parts)
+        else:
+            value_str = " ".join(value_parts)
         
         # Priority 1: Handle special 'url' field
         if field.lower() == 'url':
@@ -428,6 +436,7 @@ class TargetManager(JSONManager):
             table = Table(show_header=False, box=None, padding=(0, 2))
             table.add_column(style="white", no_wrap=True)
             table.add_column(style="green", ratio=1)
+            
             _add_data_to_table_recursively(table, group_data)
             panels[title] = Panel(table, title=f"[bold]{title}[/bold]", border_style="dim", expand=True)
             handled_keys.update(group_data.keys())
@@ -474,6 +483,7 @@ class TargetManager(JSONManager):
         table = Table(box=None, expand=False, show_header=True, header_style="bold blue", padding=(0, 2))
         table.add_column("Name", style="green", no_wrap=True, min_width=15)
         table.add_column("IP Address", style="white", no_wrap=True, width=16, justify="left")
+        table.add_column("Tags", style="cyan", no_wrap=False)
         table.add_column("URL", style="cyan", no_wrap=False, ratio=1)
         table.add_column("DNS", style="yellow", width=5, justify="center")
         table.add_column("WHOIS", style="magenta", width=7, justify="center")
@@ -482,6 +492,10 @@ class TargetManager(JSONManager):
         for name in items:
             data = self.load(name)
             if data:
+                # Tags auslesen
+                tags = self.normalize_tags(data.get('tags', ''))
+                tag_str = ", ".join([f"#{t}" for t in tags]) if tags else ""
+                
                 # Check for reconnaissance data
                 dns_info_keys = {'cname_records', 'ipv6_addresses', 'ptr_record', 'name_servers', 'mx_records', 'txt_records'}
                 has_dns = any(key in data for key in dns_info_keys)
@@ -495,6 +509,7 @@ class TargetManager(JSONManager):
                 table.add_row(
                     data.get('name', name),
                     data.get('ip', ''),
+                    tag_str,
                     data.get('url', ''),
                     dns_check,
                     whois_check,

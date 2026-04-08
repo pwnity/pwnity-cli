@@ -1,0 +1,34 @@
+{
+  "name": "firefox",
+  "path": "/usr/bin/firefox",
+  "sudo": false,
+  "commands": [
+    {
+      "name": "open",
+      "params": [
+        "--url $target.url"
+      ],
+      "description": "Opens the target URL in Firefox"
+    },
+    {
+      "name": "private_session",
+      "params": [
+        "--private-window",
+        "$target.url"
+      ],
+      "description": "Opens the target URL in a private browsing window"
+    }
+  ],
+  "description": "Starts firefox directly with the loaded target.url. ",
+  "tags": [
+    "firefox",
+    "ffuf",
+    "curl",
+    "burpsuite"
+  ],
+  "usage": "Use 'pwn start bg' to run the process in",
+  "hub_id": "a1402c9e-89fd-427f-817d-92496ed3248b",
+  "hub_origin": "http://127.0.0.1:8000",
+  "hub_author": "V3rm1ll1on",
+  "hub_hash": "65d9ca61634eb7ecb5c58364fd2eb9f2f4a97a22d1e0e80d32fbd9348c38041b"
+}

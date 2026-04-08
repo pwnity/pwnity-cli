@@ -38,5 +38,6 @@
   ],
   "description": "Scans WordPress installations for vulnerabilities, plugins, themes, and users",
   "usage": "To activate an API Token, use 'tool update wpscan api_token --api-token YOURAPITOKEN'",
-  "api_token": ""
+  "api_token": "",
+  "tags": "tag1,tag2,tag3"
 }

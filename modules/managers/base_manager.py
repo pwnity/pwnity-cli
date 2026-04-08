@@ -20,6 +20,8 @@ from modules.services import log, config
 import json, os, re
 from rich.table import Table
 from rich.panel import Panel
+from rich.console import Group
+from rich.text import Text
 
 class BaseManager:
     """Base class for all managers to provide common functionality."""
@@ -60,6 +62,14 @@ class BaseManager:
         """Helper method to get the entity type as a string (e.g., 'Target', 'Tool')."""
         return self.__class__.__name__.replace("Manager", "")
 
+    def normalize_tags(self, tags_data):
+        """Standardizes tags from both string (comma-separated) and list formats into a sorted list."""
+        if isinstance(tags_data, str) and tags_data:
+            return sorted([t.strip() for t in tags_data.split(',') if t.strip()])
+        elif isinstance(tags_data, list):
+            return sorted([str(t).strip() for t in tags_data if str(t).strip()])
+        return []
+
 def _add_data_to_table_recursively(table: Table, data, indent_level=0):
     """
     Traverses a nested dictionary or list and adds its content as rows to a rich Table,
@@ -68,6 +78,23 @@ def _add_data_to_table_recursively(table: Table, data, indent_level=0):
     indent = "  " * indent_level
     if isinstance(data, dict):
         for key, value in data.items():
+            # Support both String and List for tags for smooth transition
+            if key == 'tags':
+                # Use a dummy instance of BaseManager to access normalize_tags if needed, 
+                # but better to just use the logic directly here or make it a helper.
+                # Since we are in a helper function outside classes:
+                if isinstance(value, str) and value:
+                    tags_list = [t.strip() for t in value.split(',') if t.strip()]
+                elif isinstance(value, list):
+                    tags_list = value
+                else:
+                    tags_list = []
+                
+                if tags_list:
+                    tag_str = " ".join([f"[cyan]#{t}[/cyan]" for t in tags_list])
+                    table.add_row(f"{indent}[bold blue]{key}[/bold blue]", tag_str)
+                    continue
+
             styled_key = f"{indent}[bold blue]{key}[/bold blue]"
             
             if isinstance(value, dict) and value:
@@ -97,17 +124,68 @@ class JSONManager(BaseManager):
         # --- NEU: Flag, um verschachtelte Speicherung pro Manager zu aktivieren ---
         # Der LogbookManager wird dieses Flag setzen.
         self.use_nested_structure = False
+        self.cache = {}
+
+    def _format_and_show_entity(self, data, console):
+        """Standard Rich formatting for any JSON entity."""
+        name = data.get('name', 'N/A')
+        entity_type = self._get_entity_type()
+        
+        from rich.text import Text
+        from rich.console import Group
+        
+        details_table = Table(show_header=False, box=None, padding=(0, 2))
+        details_table.add_column(style="bold blue", no_wrap=True)
+        details_table.add_column(style="green")
+        
+        # Skip only name as it's in the header. Tags is handled by the recursive renderer.
+        display_data = {k: v for k, v in data.items() if k != 'name'}
+        _add_data_to_table_recursively(details_table, display_data)
+        
+        console.print(Panel(
+            details_table,
+            title=f"[bold]{entity_type}: {name}[/bold]",
+            border_style="blue",
+            expand=True
+        ))
+
+    def list_all_tags(self):
+        """Returns a unique, sorted list of all tags used across all entities of this type."""
+        all_tags = set()
+        for name in self.list_all():
+            data = self.load(name) # load() handles exists and error logging
+            if data and 'tags' in data:
+                all_tags.update(self.normalize_tags(data['tags']))
+        return sorted(list(all_tags))
 
     def _get_entity_path(self, name: str) -> str:
         """Gibt den vollständigen Pfad zu einer Entitätsdatei zurück, unter Berücksichtigung der Speicherstruktur."""
         sanitized_name = self._sanitize_filename(name)
-        if self.use_nested_structure and len(sanitized_name) > 2:
-            # Erstellt einen Pfad wie /data/logbook/a/b/ab12...
-            nested_dir = os.path.join(self.folder, sanitized_name[0], sanitized_name[1])
-            return os.path.join(nested_dir, f"{sanitized_name}.json")
-        else:
-            # Standard-Verhalten: flache Struktur
+        
+        # 1. Namespaced handling: If the name contains a slash, it's a direct path
+        if '/' in sanitized_name:
             return os.path.join(self.folder, f"{sanitized_name}.json")
+
+        # 2. Check for specific nested structure (logbook style)
+        if self.use_nested_structure and len(sanitized_name) > 2:
+            nested_dir = os.path.join(self.folder, sanitized_name[0], sanitized_name[1])
+            path = os.path.join(nested_dir, f"{sanitized_name}.json")
+            if os.path.exists(path):
+                return path
+
+        # 3. Check flat structure (standard root)
+        flat_path = os.path.join(self.folder, f"{sanitized_name}.json")
+        if os.path.exists(flat_path):
+            return flat_path
+
+        # 4. Deep search for organized subdirectories (legacy lookup for local names)
+        # This allows 'load nmap' to find 'remote/nmap.json' if root doesn't have it.
+        for root, _, files in os.walk(self.folder):
+            if f"{sanitized_name}.json" in files:
+                return os.path.join(root, f"{sanitized_name}.json")
+
+        # Fallback to standard flat path for creation
+        return flat_path
 
     def _save_data(self, name, data):
         """
@@ -135,9 +213,9 @@ class JSONManager(BaseManager):
     def _sanitize_filename(self, name):
         """
         Sanitizes a string to make it safe for use as a filename.
-        Replaces invalid characters with underscores.
+        Replaces invalid characters with underscores. Allows / for subdirectories.
         """
-        return re.sub(r'[^a-zA-Z0-9_.-]', '_', name)
+        return re.sub(r'[^a-zA-Z0-9_/.-]', '_', name)
 
     def rename(self, old_name, new_name):
         """Renames an entity, including its JSON file and the 'name' field in the content."""
@@ -272,55 +350,56 @@ class JSONManager(BaseManager):
 
 
     def list_all(self) -> list[str]:
-        """Listet alle Entitäten auf, entweder flach oder durch rekursives Durchsuchen."""
+        """Listet alle Entitäten auf, indem der gesamte Ordner rekursiv durchsucht wird."""
         names = []
-        if self.use_nested_structure:
-            # Rekursives Durchsuchen der Verzeichnisstruktur
-            for root, _, files in os.walk(self.folder):
-                for file in files:
-                    if file.endswith(".json"):
-                        names.append(file.replace(".json", ""))
-        else:
-            names = [f.replace(".json", "") for f in os.listdir(self.folder) if f.endswith(".json")]
+        for root, _, files in os.walk(self.folder):
+            for file in files:
+                if file.endswith(".json") and not file.endswith(".tmp"):
+                    rel_dir = os.path.relpath(root, self.folder)
+                    if rel_dir == ".":
+                        name = file.replace(".json", "")
+                    else:
+                        name = os.path.join(rel_dir, file.replace(".json", ""))
+                    names.append(name)
         return sorted(names)
 
-    def update(self, name, key, value):
-        """
-        Adds or changes a key/value pair in an existing JSON object.
-        Supports nested keys and list indices using dot notation (e.g., 'params.0').
-        """
+
+    def update(self, name, field, value):
+        """Adds or changes a key/value pair in an existing JSON object using dot notation."""
         data = self.load(name)
-        if not data:
-            log.error(f"Cannot update '{name}', as it could not be loaded.")
+        if not data or field is None:
             return None
 
-        keys = key.split('.')
-        curr = data
-        for i, k in enumerate(keys[:-1]):
-            # Check if next key is an integer (list index)
-            next_is_idx = False
-            try:
-                int(keys[i+1])
-                next_is_idx = True
-            except: pass
+        # Support escaped newlines (e.g. \n) in strings if passed via CLI
+        if isinstance(value, str):
+            value = value.replace("\\n", "\n")
 
+        # --- Handle simple/direct updates ---
+        if "." not in field:
+            data[field] = value
+            if self._save_data(name, data):
+                return data
+            return None
+
+        # --- Handle nested updates (dot notation: command.params.0) ---
+        keys = field.split('.')
+        curr = data
+        for k in keys[:-1]:
             if isinstance(curr, dict):
-                if k not in curr:
-                    curr[k] = [] if next_is_idx else {}
-                curr = curr[k]
+                curr = curr.setdefault(k, {})
             elif isinstance(curr, list):
                 try:
                     idx = int(k)
                     # If index is exactly len(curr), we want to append or create placeholder?
-                    # Usually better to ensure it exists.
                     while len(curr) <= idx:
-                        curr.append([] if next_is_idx else {})
+                        curr.append({}) # Default to object if not specified
                     curr = curr[idx]
                 except (ValueError, IndexError):
                     return None
             else: return None
 
         last_key = keys[-1]
+        
         if isinstance(curr, dict):
             curr[last_key] = value
         elif isinstance(curr, list):
@@ -515,20 +594,19 @@ class JSONManager(BaseManager):
 
     def _cmd_update(self, args, cli):
         entity_type = self._get_entity_type()
-        if len(args.update_args) < 2:
-            log.error(f"Invalid update command. Expected: update <name> <field> <value>")
-            return
         
-        field = args.update_args[0]
-        value = " ".join(args.update_args[1:])  # Value can contain spaces
+        field = args.field
+        # --- FIX: Join with comma if field is 'tags', otherwise with space ---
+        if field.lower() == 'tags':
+            value = ",".join(args.value) if args.value else ""
+        else:
+            value = " ".join(args.value) if args.value else ""  # Join REMAINDER back together
         
         # --- FIX: Prevent accidental renames with complex values ---
-        # The 'rename' action should only be triggered if the value is a single, simple word.
-        # A value with spaces (like 'foo.bar foo') should not trigger a rename.
         if field.lower() == 'name':
             if ' ' in value.strip():
                 log.error(f"Cannot rename {entity_type} to a name with spaces: '{value}'")
-                log.prompt(f"Use 'target rename <old_name> <new_name>' with a single-word new name.")
+                log.prompt(f"Use '{entity_type.lower()} rename <old_name> <new_name>' with a single-word new name.")
             else:
                 self.rename(args.name, value)
         else:
@@ -563,7 +641,62 @@ class JSONManager(BaseManager):
             log.info(f"No {entity_type_plural} found.")
             return
 
-        cli.display_mgr.display_simple_list(items, f"Available {entity_type_plural}")
+        from rich.text import Text
+        items = sorted(items, key=lambda x: (1 if x.startswith("hub/") else 0, x))
+        
+        output = []
+        for item in items:
+            data = self.load(item)
+            is_hub = item.startswith("hub/")
+            origin_tag = "[blue][L][/blue]"
+            display_name = item
+            
+            if is_hub:
+                parts = item.split("/")
+                origin = parts[1].replace("_", ":")
+                origin_tag = f"[cyan][H][/cyan]"
+                base_name = parts[-1]
+                prefix = "/".join(parts[:-1])
+                display_name = f"[dim]{prefix}/[/dim][bold yellow]{base_name}[/bold yellow] [dim](@{origin})[/dim]"
+            else:
+                display_name = f"[bold green]{item}[/bold green]"
+
+            # Row 1: [Tag] Name - Description
+            desc = data.get('description', '') if data else ""
+            author = data.get('author', '') if data else ""
+            author_part = f" [dim](by {author})[/dim]" if author else ""
+            desc_part = f" - [italic grey50]{desc}[/italic grey50]" if desc else ""
+            output.append(Text.from_markup(f" {origin_tag} {display_name}{author_part}{desc_part}"))
+            
+            # --- NEU: Tags Reihe ---
+            tags_raw = data.get('tags', '') if data else ''
+            if isinstance(tags_raw, str) and tags_raw:
+                tags_list = [t.strip() for t in tags_raw.split(',') if t.strip()]
+            elif isinstance(tags_raw, list):
+                tags_list = tags_raw
+            else:
+                tags_list = []
+            if tags_list:
+                tag_str = " ".join([f"[cyan]#{t}[/cyan]" for t in tags_list])
+                output.append(Text.from_markup(f"     [dim]• Tags: {tag_str}[/dim]"))
+
+            # Row 2: Secondary info (e.g. Rules for parsers)
+            if entity_type == "Parser" and data:
+                rules = data.get('rules', [])
+                if isinstance(rules, dict):
+                    rule_names = ", ".join(rules.keys())
+                elif isinstance(rules, list):
+                    rule_names = ", ".join([r.get('name', 'unnamed') for r in rules if isinstance(r, dict)])
+                else:
+                    rule_names = ""
+                
+                if rule_names:
+                    output.append(Text.from_markup(f"     [dim]• Rules: {rule_names}[/dim]"))
+
+            # Empty spacer
+            output.append(Text(""))
+
+        cli.console.print(Panel(Group(*output), title=f"Available {entity_type_plural}", border_style="dim", expand=True))
 
     def _cmd_load(self, args, cli):
         entity_type = self._get_entity_type()

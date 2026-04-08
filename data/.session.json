@@ -1,21 +1,21 @@
 {
   "session_name": "default",
-  "target": "pwnity.local",
-  "tool": "curl",
+  "target": null,
+  "tool": null,
   "wordlist": null,
   "report": null,
   "proxy_enabled": false,
   "sessions": {
     "default": {
       "name": "default",
-      "target": "pwnity.local",
-      "tool": "curl",
+      "target": null,
+      "tool": null,
       "wordlist": null,
       "report": null
     }
   },
   "proxy_settings": {},
-  "ipc_socket": "data/.session.json.45705.sock",
+  "ipc_socket": null,
   "monitoring_status": {
     "proxy_enabled": false,
     "heartbeat_target": null

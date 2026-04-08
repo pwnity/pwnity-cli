@@ -1,0 +1,81 @@
+{
+  "path": "/usr/bin/curl",
+  "sudo": false,
+  "name": "curl",
+  "commands": [
+    {
+      "name": "head",
+      "params": [
+        "-I",
+        "-s",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Performs an HTTP HEAD request to retrieve response headers"
+    },
+    {
+      "name": "get",
+      "params": [
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Performs a basic HTTP GET request and returns the response body"
+    },
+    {
+      "name": "headers",
+      "params": [
+        "-s",
+        "-D -",
+        "-o /dev/null",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Retrieves full HTTP response headers"
+    },
+    {
+      "name": "cors_check",
+      "params": [
+        "-s",
+        "-H",
+        "\"Origin: https://evil.com\"",
+        "-D -",
+        "-o /dev/null",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Checks CORS configuration using a custom Origin header"
+    },
+    {
+      "name": "follow_redirects",
+      "params": [
+        "-s",
+        "-L",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Performs an HTTP GET request and follows redirects"
+    },
+    {
+      "name": "options",
+      "params": [
+        "-s",
+        "-X OPTIONS",
+        "-D -",
+        "-o /dev/null",
+        "-A $profile.useragent",
+        "$target.url"
+      ],
+      "description": "Queries allowed HTTP methods via an OPTIONS request"
+    }
+  ],
+  "description": "A simple curl command wrapper",
+  "usage": "Use 'pwn start bg' to run the process in",
+  "tags": [
+    "curl",
+    "burpsuite"
+  ],
+  "hub_id": "b0cc4c4f-ee18-4bb7-aa2a-1975e8daa16f",
+  "hub_origin": "http://127.0.0.1:8000",
+  "hub_author": "V3rm1ll1on",
+  "hub_hash": "3512e48cfacda802e4d6dc35b8bb81be9ea6e5333fb753f7d30378b71f347220"
+}

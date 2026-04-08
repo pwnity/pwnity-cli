@@ -78,6 +78,7 @@ class HelpManager:
             "Configuration & Shell": ["config", "print", "proxy", "alias", "history", "edit", "run_script", "shell", "quit"],
             "Help & Information": ["manual", "help"]
         }
+        self._command_descriptions = {}
 
     def show_command_overview(self):
         """Displays a categorized overview of all available commands."""
@@ -111,7 +112,11 @@ class HelpManager:
             for cmd_name in existing_commands:
                 func = getattr(cli, 'do_' + cmd_name, None)
                 if func:
-                    help_text = (func.__doc__ or '').strip().split('\n')[0]
+                    # Priority: 1. Custom description, 2. Docstring
+                    help_text = self._command_descriptions.get(cmd_name)
+                    if not help_text:
+                        help_text = (func.__doc__ or '').strip().split('\n')[0]
+                    
                     table.add_row(f"  {cmd_name}", help_text)
 
         main_panel = Panel(table, title="[bold]Available Commands[/bold]",
@@ -119,12 +124,15 @@ class HelpManager:
         self.console.print(main_panel)
         self.console.print()
 
-    def add_command_to_category(self, command, category, description):
+    def add_command_to_category(self, command, category, description=None):
         """Dynamically adds a command to a help category."""
         if category not in self._command_categories:
             self._command_categories[category] = []
         if command not in self._command_categories[category]:
             self._command_categories[category].append(command)
+        
+        if description:
+            self._command_descriptions[command] = description
 
     def show_subcommand_help(self, command_name, subcommand_name):
         """Displays a rich help panel for a specific subcommand."""
