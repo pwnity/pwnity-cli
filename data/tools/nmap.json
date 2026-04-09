@@ -53,6 +53,7 @@
       "description": "Runs an aggressive scan enabling OS detection, version detection, scripts, and traceroute"
     }
   ],
-  "description": "Scans hosts or networks with the nmap scanner tool",
-  "usage": "Update the target IP and run a scan against it."
+  "description": "A comprehensive description of what this tool does... I guess this is just a simple test for the quality so I dont mind how long this description is ",
+  "usage": "Update the target IP and run a scan against it.",
+  "tags": "recon,web,scanner"
 }

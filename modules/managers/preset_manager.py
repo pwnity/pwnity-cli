@@ -119,7 +119,7 @@ class PresetManager(JSONManager):
             if isinstance(proxy_settings, dict):
                 cli.session.proxy_settings = proxy_settings
                 render_items.append(Text("")) # Spacer
-                render_items.append(Text("ℹ️ Proxy settings from preset have been applied.", style="dim"))
+                render_items.append(Text("Info: Proxy settings from preset have been applied.", style="dim"))
  
         panel = Panel(
             Group(*render_items),
@@ -198,7 +198,7 @@ class PresetManager(JSONManager):
         
         main_panel = Panel(
             Group(*render_items),
-            title=f":floppy_disk: [bold]Preset: {name}[/bold]",
+            title=f"[bold]Preset: {name}[/bold]",
             border_style="magenta",
             expand=True
         )

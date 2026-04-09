@@ -436,7 +436,7 @@ class HeartbeatManager(BaseManager):
         bottom_cols = Columns([status_panel, ip_panel, hash_panel, config_panel], expand=True)
         
         status_color = "green" if data.get('status') == 'running' else "yellow"
-        title_text = f":pulse: [bold]Heartbeat: {target_name}[/bold] ([{status_color}]{data.get('status')}[/{status_color}])"
+        title_text = f"[bold]Heartbeat: {target_name}[/bold] ([{status_color}]{data.get('status')}[/{status_color}])"
         return Panel(Group(latency_panel, bottom_cols), title=Text.from_markup(title_text), border_style="blue", expand=True)
 
     def _cmd_show(self, args, cli):

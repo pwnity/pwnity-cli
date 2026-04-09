@@ -111,7 +111,7 @@ class DisplayManager:
 
                 main_report_panel = Panel(
                         report_group,
-                        title=f":notebook_with_decorative_cover: [bold]Report Data: {report_data.get('name')}[/bold]",
+                        title=f"[bold]Report Data: {report_data.get('name')}[/bold]",
                         border_style="white"
                     )
                 self.console.print(main_report_panel)
@@ -126,7 +126,7 @@ class DisplayManager:
                     markup_list.append(f"{indent_str}[bold blue]commands[/bold blue]:")
                     for cmd in value:
                         cmd_name = cmd.get('name', 'N/A')
-                        markup_list.append(f"{indent_str}  :arrow_forward: [cyan]{cmd_name}[/cyan]")
+                        markup_list.append(f"{indent_str}  - [cyan]{cmd_name}[/cyan]")
                         params = cmd.get('params', [])
                         for j, param in enumerate(params, 1):
                             # Display the raw placeholder, not the resolved value
@@ -534,7 +534,7 @@ class DisplayManager:
 
         panel = Panel(
             table,
-            title=f":briefcase: [bold]Session: {session.name}[/bold]",
+            title=f"[bold]Session: {session.name}[/bold]",
             border_style="cyan",
             expand=False
         )
@@ -662,7 +662,7 @@ class DisplayManager:
 
         main_panel = Panel(
             Group(*render_items),
-            title=f":mag: [bold]{title}[/bold] ({total_matches} total matches)",
+            title=f"[bold]{title}[/bold] ({total_matches} total matches)",
             subtitle=f"[dim]{subtitle}[/dim]" if subtitle else None,
             border_style="magenta"
         )

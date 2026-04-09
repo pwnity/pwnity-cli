@@ -662,7 +662,7 @@ class ToolManager(JSONManager):
                         params_table.add_row(f"{i}:", str(param))
                     cmd_details_group.append(params_table)
                 
-                panel = Panel(Group(*cmd_details_group), title=f":arrow_forward: [cyan]{cmd_name}[/cyan]", border_style="dim", expand=True)
+                panel = Panel(Group(*cmd_details_group), title=f"[cyan]{cmd_name}[/cyan]", border_style="dim", expand=True)
                 command_panels.append(panel)
 
         # --- Part 3: Combine everything ---
@@ -678,7 +678,7 @@ class ToolManager(JSONManager):
         # Wrap the group with a main panel
         main_panel = Panel(
             content_group,
-            title=f":wrench: [bold]Tool: {name}[/bold]",
+            title=f"[bold]Tool: {name}[/bold]",
             border_style="yellow",
             expand=True
         )
